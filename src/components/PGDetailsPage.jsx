@@ -1,135 +1,64 @@
+
+
+
+
+
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Phone, Loader2, Navigation, Share2, Star, BadgeCheck, MapPin } from "lucide-react";
+import { Phone, Loader2, Navigation, Share2, Star, BadgeCheck } from "lucide-react";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import SkeletonLoader from "./loader/skeletondetails.jsx";
 
-
 import AuthModal from "../components/AuthModal";
 import { useGetPgByIdQuery } from "../Bothfeatures/features/api/allpg.js";
-import { useRazorpayPaymentVerifyMutation, useRazorpayPaymentMutation } from "../Bothfeatures/features2/api/paymentapi";
+import {
+  useRazorpayPaymentVerifyMutation,
+  useRazorpayPaymentMutation,
+} from "../Bothfeatures/features2/api/paymentapi";
 import { useOnlinepaidtenantMutation } from "../Bothfeatures/features2/api/tenant";
 
+/* ============================
+   RAZORPAY SCRIPT LOADER
+============================ */
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) return resolve(true);
 
-// ------------------ RAZORPAY PAYMENT FUNCTION ------------------
-// async function startPayment(amount, razorpayPayment, razorpayPaymentVerify, id, onlinepaidtenant) {
-//   console.log("💰 Starting payment flow for amount:", amount);
-
-//   try {
-//     // Step 1: Create order on backend
-//     console.log("🔹 Creating order via backend...");
-//     const { data: orderData, error: orderError } = await razorpayPayment({ amount: amount * 100 });
-
-//     if (orderError) {
-//       console.error("❌ Error creating order:", orderError);
-//       toast.error("Failed to create order");
-//       return;
-//     }
-
-//     if (!orderData?.order) {
-//       console.error("❌ No order data received:", orderData);
-//       toast.error("Failed to create order");
-//       return;
-//     }
-
-//     const order = orderData.order;
-//     console.log("✅ Order created successfully:", order);
-
-//     // Step 2: Razorpay options
-//     const options = {
-//       key: "rzp_live_Rn8nwfw3Hdmb8E",
-//       amount: order.amount,
-//       currency: order.currency,
-//       name: "Roomgi.com",
-//       description: "PG/hotel/rental room Booking Payment",
-//       order_id: order.id,
-//       handler: async function (response) {
-//         console.log("📥 Payment handler triggered. Response:", response);
-
-//         try {
-//           // Step 3: Verify payment on backend
-//           console.log("🔹 Verifying payment...");
-//           const { data: verifyData, error: verifyError } = await razorpayPaymentVerify({
-//             razorpay_order_id: response.razorpay_order_id,
-//             razorpay_payment_id: response.razorpay_payment_id,
-//             razorpay_signature: response.razorpay_signature,
-//             roomId: id,
-//             amount: amount,
-//           });
-
-//           if (verifyError) {
-//             console.error("❌ Error verifying payment:", verifyError);
-//             toast.error("Payment Verification Failed ❌");
-//             return;
-//           }
-
-//           if (!verifyData?.success) {
-//             console.error("❌ Verification failed:", verifyData);
-//             toast.error("Payment Verification Failed ❌");
-//             return;
-//           }
-
-//           console.log("✅ Payment verified successfully:", verifyData);
-//           toast.success("Payment Successful ✔");
-
-//           // Step 4: Mark tenant as paid
-//           console.log("🔹 Marking tenant as paid...");
-//           await onlinepaidtenant(id);
-//           console.log("✅ Tenant payment recorded");
-
-//         } catch (err) {
-//           console.error("❌ Exception during verification:", err);
-//           toast.error("Verification Error!");
-//         }
-//       },
-//       prefill: { name: "Guest User", email: "guest@example.com" },
-//       theme: { color: "#3399cc" },
-//       modal: {
-//         ondismiss: function () {
-//           console.warn("⚠️ User closed Razorpay modal without paying");
-//           toast.info("Payment not completed.");
-//         }
-//       }
-//     };
-
-//     // Step 5: Open Razorpay payment modal
-//     console.log("🔹 Opening Razorpay modal...");
-//     const rzp = new window.Razorpay(options);
-//     rzp.on('payment.failed', function (response) {
-//       console.error("❌ Payment failed:", response.error);
-//       toast.error(`Payment Failed: ${response.error.description}`);
-//     });
-//     rzp.open();
-//     console.log("✅ Razorpay modal opened");
-
-//   } catch (err) {
-//     console.error("❌ Exception in startPayment:", err);
-//     toast.error("Payment Error!");
-//   }
-// }
-
-
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+/* ============================
+   START PAYMENT
+============================ */
 async function startPayment(
   amount,
   razorpayPayment,
   razorpayPaymentVerify,
-  id,
-  onlinepaidtenant,
+  roomId,
   navigate
 ) {
   try {
-    const { data } = await razorpayPayment({ amount: amount * 100 });
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      toast.error("Razorpay SDK failed to load");
+      return;
+    }
 
+    const { data } = await razorpayPayment({ amount: amount * 100 });
     if (!data?.order) {
-      toast.error("Failed to create order");
+      toast.error("Order creation failed");
       return;
     }
 
     const order = data.order;
 
     const options = {
-      key: "rzp_live_Rn8nwfw3Hdmb8E",
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID, // ✅ FIXED
       amount: order.amount,
       currency: order.currency,
       name: "Roomgi.com",
@@ -142,7 +71,7 @@ async function startPayment(
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
-            roomId: id,
+            roomId,
             amount,
           });
 
@@ -153,107 +82,103 @@ async function startPayment(
 
           toast.success("Payment successful ✔");
           navigate(0);
-
-        } catch (err) {
-          console.log(err)
+        } catch {
           toast.error("Verification error ❌");
         }
       },
 
       modal: {
-        ondismiss: () => {
-          toast.info("Payment cancelled");
-        },
+        ondismiss: () => toast.info("Payment cancelled"),
       },
 
       prefill: {
         name: "Guest User",
         email: "guest@example.com",
       },
+
       theme: { color: "#3399cc" },
     };
 
     const rzp = new window.Razorpay(options);
-
-    rzp.on("payment.failed", (response) => {
-      toast.error(response.error.description || "Payment failed");
-    });
-
     rzp.open();
-
-  } catch (error) {
+  } catch {
     toast.error("Payment error ❌");
   }
 }
 
-
+/* =========================
+   MAIN COMPONENT
+========================= */
 export default function PGDetailsPage() {
   const navigate = useNavigate();
-  const [onlinepaidtenant, { data: addtenantdata, isLoading: tenantloading, error }] = useOnlinepaidtenantMutation()
-
-  const [razorpayPayment, { isLoading: razorpaypaymentloading }] = useRazorpayPaymentMutation();
-  const [razorpayPaymentVerify] = useRazorpayPaymentVerifyMutation();
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
   const { id } = useParams();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
   const { data, isLoading, isError } = useGetPgByIdQuery(id);
+  const [razorpayPayment, { isLoading: razorpaypaymentloading }] =
+    useRazorpayPaymentMutation();
+  const [razorpayPaymentVerify] =
+    useRazorpayPaymentVerifyMutation();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [imageIndex, setImageIndex] = useState(0);
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const pg = data?.room;
 
   const allImages = useMemo(() => {
     if (!pg) return [];
-    const roomImages = pg.roomImages || [];
-    return [...roomImages];
+    return pg.roomImages || [];
   }, [pg]);
 
-  // Get user location
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (pos) =>
+          setUserLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          }),
         () => toast.warning("Enable location to get directions")
       );
     }
   }, []);
 
   const handleBook = (amount) => {
-    
     if (!isAuthenticated) {
-      toast.error("Logged In  first")
-
+      toast.error("Login first");
+      return;
     }
-    else {
-      startPayment(amount, razorpayPayment, razorpayPaymentVerify, id, onlinepaidtenant, navigate)
 
-    }
+    startPayment(
+      amount,
+      razorpayPayment,
+      razorpayPaymentVerify,
+      id,
+      navigate
+    );
   };
 
   const handleGetDirections = () => {
     if (!isAuthenticated) return setIsAuthModalOpen(true);
+
     const [lng, lat] = pg?.branch?.location?.coordinates || [];
     if (!lat || !lng) return toast.error("PG location missing");
     if (!userLocation.lat) return toast.error("User location not available");
 
     window.open(
-      `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${lat},${lng}&travelmode=driving`,
+      `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${lat},${lng}`,
       "_blank"
     );
   };
 
   const sharePG = () => {
     if (!isAuthenticated) return setIsAuthModalOpen(true);
-    if (navigator.share) {
-      navigator.share({
-        title: `Check out ${pg.branch.name}`,
-        text: "I found an amazing PG!",
-        url: window.location.href,
-      });
-    } else {
-      toast.info("Browser does not support sharing");
-    }
+    navigator.share
+      ? navigator.share({
+          title: `Check out ${pg.branch.name}`,
+          url: window.location.href,
+        })
+      : toast.info("Sharing not supported");
   };
 
   if (isLoading) {
@@ -264,12 +189,20 @@ export default function PGDetailsPage() {
     );
   }
 
-  if (isError || !pg)
+  if (isError || !pg) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh]">
-        <p className="text-red-500 text-lg font-semibold">Error loading PG!</p>
+      <div className="flex items-center justify-center h-[60vh]">
+        <p className="text-red-500 font-semibold">Error loading PG</p>
       </div>
     );
+  }
+
+
+
+
+
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
