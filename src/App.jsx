@@ -32,6 +32,8 @@ import Bookings from "./components/booking";
 import CreateComplaint from "./components/complain";
 import ComplaintsPage from "./components/mycomplain"
 import  Profile from "./components/myprofile"
+import ScrollToTop from "./components/ScrollToTop";
+
 function App() {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
@@ -62,6 +64,7 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen">
+       <ScrollToTop />
 
       {isAdminRoute ? (
         <DashboardHeader
@@ -76,6 +79,7 @@ function App() {
 
       {/* Main content */}
       <main className="flex-1">
+         <ScrollToTop />
         <Routes>
 
           {/* Protected Routes */}
