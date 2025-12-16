@@ -67,29 +67,7 @@ console.log("Logged-in User ID:", user?._id?.toString());
 
 const hasReviewed =
   booking?.room?.personalreview?.some((r, index) => {
-    console.log(`\n---- Review ${index + 1} ----`);
-    console.log("Full review object:", r);
-
-    console.log(
-      "Review user object:",
-      r.user
-    );
-
-    console.log(
-      "Review user _id:",
-      r.user?._id
-    );
-
-    console.log(
-      "Review user _id (string):",
-      r.user?._id?.toString()
-    );
-
-    console.log(
-      "Logged user _id (string):",
-      user?._id?.toString()
-    );
-
+  
     const isMatch =
       r.user?._id?.toString() === user?._id?.toString();
 
