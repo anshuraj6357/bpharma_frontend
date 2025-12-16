@@ -51,7 +51,7 @@ export default function Header() {
     dispatch(userLoggedout());
     localStorage.removeItem("user");
     toast.success("Logged out");
-    navigate("/login");
+    navigate("/");
     setMobileMenu(false);
   };
 

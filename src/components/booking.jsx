@@ -67,10 +67,11 @@ function BookingCard({ booking }) {
 
   const isCheckedOut = booking.status === "In-Active";
 
-  const hasReviewed =
-    booking?.room?.personalreview?.some(
-      (r) => r?.user?.toString() === user?._id?.toString()
-    ) || false;
+  const userReview = booking?.room?.personalreview?.find(
+    (r) => r?.user?._id?.toString() === user?._id?.toString()
+  );
+
+  const hasReviewed = !!userReview;
 
   const handleSubmitReview = async (rating, review) => {
     try {
@@ -112,11 +113,7 @@ function BookingCard({ booking }) {
           <Detail label="Room" value={booking.roomNumber} icon={<BedDouble size={14} />} />
           <Detail label="Rent" value={`₹${booking.Rent}`} icon={<Wallet size={14} />} />
           <Detail label="Check-in" value={formatDate(booking.checkInDate)} icon={<Calendar size={14} />} />
-          <Detail
-            label="Check-out"
-            value={booking.checkedoutdate ? formatDate(booking.checkedoutdate) : "—"}
-            icon={<Calendar size={14} />}
-          />
+          <Detail label="Check-out" value={booking.checkedoutdate ? formatDate(booking.checkedoutdate) : "—"} icon={<Calendar size={14} />} />
         </div>
 
         {/* ACTIONS */}
@@ -124,26 +121,36 @@ function BookingCard({ booking }) {
           {!isCheckedOut && (
             <button
               onClick={() => navigate(`/complain/${booking.branch?._id}`)}
-              className="bg-red-50 text-red-600 py-2.5 rounded-xl hover:bg-red-600 hover:text-white transition"
+              className="bg-red-50 text-red-600 py-2.5 rounded-xl hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-1"
             >
-              <AlertCircle size={16} className="inline mr-1" />
-              Raise Complaint
+              <AlertCircle size={16} /> Raise Complaint
             </button>
           )}
 
           {isCheckedOut && !hasReviewed && (
             <button
               onClick={() => setShowReview(true)}
-              className="bg-yellow-500 text-white py-2.5 rounded-xl hover:bg-yellow-600"
+              className="bg-yellow-500 text-white py-2.5 rounded-xl hover:bg-yellow-600 transition flex items-center justify-center gap-1"
             >
-              ⭐ Rate & Review
+              <Star size={16} /> Rate & Review
             </button>
           )}
 
-          {hasReviewed && (
-            <p className="text-center text-green-600 text-sm">
-              ✅ Already Reviewed
-            </p>
+          {hasReviewed &&isCheckedOut&& (
+            <div className="bg-green-50 border border-green-300 text-green-800 rounded-xl p-3 text-center shadow-sm flex flex-col items-center gap-2 hover:shadow-md transition">
+              <p className="font-semibold flex items-center gap-2">
+                <Star size={16} className="text-yellow-400" /> Already Reviewed
+              </p>
+              
+              <div className="flex gap-1">
+                {Array.from({ length: userReview.rating }).map((_, i) => (
+                  <Star key={i} size={16} className="text-yellow-400" />
+                ))}
+                {Array.from({ length: 5 - userReview.rating }).map((_, i) => (
+                  <Star key={i} size={16} className="text-gray-300" />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -158,6 +165,7 @@ function BookingCard({ booking }) {
     </>
   );
 }
+
 
 /* ===================== REVIEW MODAL ===================== */
 
@@ -183,11 +191,10 @@ function ReviewModal({ onClose, onSubmit, loading }) {
               key={n}
               size={30}
               onClick={() => setRating(n)}
-              className={`cursor-pointer ${
-                n <= rating
+              className={`cursor-pointer ${n <= rating
                   ? "text-yellow-400 fill-yellow-400"
                   : "text-gray-300"
-              }`}
+                }`}
             />
           ))}
         </div>
