@@ -2,92 +2,111 @@ import { Mail, Phone, MapPin, Globe } from "lucide-react";
 import { useSelector } from "react-redux";
 import Footer from "./Footer";
 
-
 export default function ContactUs() {
-  const { user,isAuthenticated } = useSelector((state) => state.auth); // get user from redux
-  const role = user?.role; // default role if no user
-  return (<>
-    <div className="max-w-3xl mx-auto px-6 py-12">
-      {/* Heading */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
-        Contact Us – ROOMGI
-      </h1>
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const role = user?.role;
 
-      <p className="text-gray-600 mb-8 leading-relaxed">
-        We're here to help you with bookings, refunds, support, or any service-related queries.
-        Feel free to reach out through any of the contact options below.
-      </p>
+  return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-green-50 via-white to-white">
+      {/* Main Content */}
+      <main className="flex-1 pt-12 pb-20 px-6">
+        <div className="max-w-7xl mx-auto bg-white border rounded-3xl shadow-xl px-12 py-14">
 
-      <div className="space-y-6">
+          {/* Header */}
+          <header className="text-center mb-16">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+              Contact Us
+            </h1>
+            <p className="text-green-600 text-xl font-semibold mt-2">
+              ROOMGI
+            </p>
+            <p className="text-gray-600 mt-4 max-w-3xl mx-auto">
+              We’re here to help you with bookings, refunds, cancellations,
+              partnerships, or any service-related queries.
+            </p>
+          </header>
 
-        {/* Email */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-full">
-              <Mail className="w-6 h-6" />
+          {/* Contact Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* Email */}
+            <div className="bg-gray-50 p-8 rounded-2xl border hover:shadow-md transition">
+              <div className="flex items-center gap-5">
+                <div className="p-4 bg-blue-100 text-blue-600 rounded-full">
+                  <Mail className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Email Support
+                  </h2>
+                  <p className="text-gray-600">support@roomgi.com</p>
+                </div>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold">Email</h2>
-              <p className="text-gray-600">support@roomgi.com</p>
+
+            {/* Phone */}
+            <div className="bg-gray-50 p-8 rounded-2xl border hover:shadow-md transition">
+              <div className="flex items-center gap-5">
+                <div className="p-4 bg-green-100 text-green-600 rounded-full">
+                  <Phone className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Phone Support
+                  </h2>
+                  <p className="text-gray-600">+91 8104 559889</p>
+                </div>
+              </div>
             </div>
+
+            {/* Address */}
+            <div className="bg-gray-50 p-8 rounded-2xl border hover:shadow-md transition">
+              <div className="flex items-center gap-5">
+                <div className="p-4 bg-purple-100 text-purple-600 rounded-full">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Office Address
+                  </h2>
+                  <p className="text-gray-600">
+                    Patna, Bihar, India
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Website */}
+            <a
+              href="https://www.roomgi.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gray-50 p-8 rounded-2xl border hover:shadow-md transition"
+            >
+              <div className="flex items-center gap-5">
+                <div className="p-4 bg-orange-100 text-orange-600 rounded-full">
+                  <Globe className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Website
+                  </h2>
+                  <p className="text-gray-600">www.roomgi.com</p>
+                </div>
+              </div>
+            </a>
           </div>
+
+          {/* Footer Note */}
+          <p className="text-gray-600 text-sm text-center mt-14 max-w-3xl mx-auto">
+            For refunds, cancellations, or booking-related issues, please reach
+            out to us via email or phone. Our support team is happy to assist you.
+          </p>
+
         </div>
+      </main>
 
-        {/* Phone */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-50 text-green-600 rounded-full">
-              <Phone className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">Phone</h2>
-              <p className="text-gray-600">+91-8104559889</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Address */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-50 text-purple-600 rounded-full">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">Address</h2>
-              <p className="text-gray-600">Patna, Bihar</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Website */}
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition cursor-pointer">
-          <a
-            href="https://www.roomgi.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-4"
-          >
-            <div className="p-3 bg-orange-50 text-orange-600 rounded-full">
-              <Globe className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold">Website</h2>
-              <p className="text-gray-600">www.roomgi.com</p>
-            </div>
-          </a>
-        </div>
-
-        {/* Footer Message */}
-        <p className="text-gray-600 mt-6 text-sm">
-          For any support regarding refunds, cancellations, or bookings, contact us via email or WhatsApp.
-        </p>
-
-      </div>
-
+      {/* Footer */}
+      {isAuthenticated && role !== "user" && <Footer />}
     </div>
-
-         {(isAuthenticated && role !== "user") ? <Footer /> : <></>}
-    </>
-
   );
 }

@@ -2,39 +2,60 @@ import { useSelector } from "react-redux";
 import Footer from "./Footer";
 
 export default function ShippingPolicy() {
-  const { user, isAuthenticated } = useSelector((state) => state.auth); // get user from redux
-  const role = user?.role; // default role if no user
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const role = user?.role;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Main content (takes up remaining height) */}
-      <main className="flex-1 flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8">
-        {/* Card Container */}
-        <div className="bg-white rounded-3xl shadow-xl max-w-3xl w-full p-10 text-center">
-          {/* Title */}
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-8">
-            Shipping Policy – ROOMGI
-          </h1>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-green-50 via-white to-white">
+      {/* Main Content */}
+      <main className="flex-1 pt-28 pb-20 px-6">
+        <div className="max-w-7xl mx-auto bg-white border rounded-3xl shadow-xl px-12 py-14">
+          
+          {/* Header */}
+          <header className="text-center mb-14">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+              Shipping Policy
+            </h1>
+            <p className="text-green-600 text-xl font-semibold mt-2">
+              ROOMGI
+            </p>
+            <p className="text-gray-600 mt-4 max-w-3xl mx-auto">
+              This Shipping Policy explains the delivery mechanism applicable to
+              services provided by ROOMGI.
+            </p>
+          </header>
 
-          {/* Content */}
-          <p className="text-gray-700 text-lg sm:text-xl mb-4 leading-relaxed">
-            ROOMGI is a service-based platform that provides online PG Hotel, Hostel and Rooml booking services.
-          </p>
-          <p className="text-gray-700 text-lg sm:text-xl mb-4 leading-relaxed">
-            We do not ship any physical products.
-          </p>
-          <p className="text-gray-700 text-lg sm:text-xl mb-4 leading-relaxed">
-            All bookings, confirmations, and receipts are delivered digitally via email, SMS, or WhatsApp.
-          </p>
-          <p className="text-gray-700 text-lg sm:text-xl font-semibold">
-            Therefore, shipping charges and delivery timelines are{" "}
-            <span className="text-blue-600">not applicable</span> to our services.
-          </p>
+          {/* Policy Content */}
+          <div className="space-y-8 text-gray-700 text-lg leading-relaxed max-w-4xl mx-auto">
+            <section>
+              <p>
+                ROOMGI is a service-based digital platform offering online PG,
+                Hostel, Hotel, and Room booking services. As such, no physical
+                goods are shipped or delivered.
+              </p>
+            </section>
+
+            <section>
+              <p>
+                All bookings, confirmations, invoices, and payment receipts are
+                delivered electronically through email, SMS, or WhatsApp to the
+                registered contact details provided by the user.
+              </p>
+            </section>
+
+            <section>
+              <p className="font-semibold">
+                Therefore, shipping charges, logistics, and delivery timelines
+                are <span className="text-green-600">not applicable</span> to any
+                service offered on the ROOMGI platform.
+              </p>
+            </section>
+          </div>
         </div>
       </main>
 
-      {/* Footer fixed at bottom of layout (same logic as TermsConditions) */}
-      {isAuthenticated && role !== "user" ? <Footer /> : null}
+      {/* Footer */}
+      {isAuthenticated && role !== "user" && <Footer />}
     </div>
   );
 }
