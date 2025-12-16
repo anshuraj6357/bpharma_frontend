@@ -6,6 +6,7 @@ import Properties from "./pages/Properties";
 import Tenants from "./pages/Tenants";
 import Payments from "./pages/Payments";
 import Complaints from "./pages/Complaints";
+import Subscription from "./pages/Subscription";
 import AddStaff from "./pages/c-xyz/addstaff";
 import EditStaff from "./pages/c-xyz/editstaff";
 import AddPayment from "./pages/c-xyz/addpayment";
@@ -43,6 +44,7 @@ export default function AdminApp() {
           <Route path="payments" element={<Payments />} />
           <Route path="addstaff" element={<AddStaff />} />
           <Route path="complaints" element={<Complaints />} />
+          <Route path="subscription" element={<Subscription />} />
           <Route path="staff" element={<StaffUtilities />} />
           <Route path="showrooms" element={<ShowRooms />} />
           <Route path="addhotelroom" element={<AddHotelRoom />} />

@@ -17,6 +17,7 @@ export default function DashboardLayout() {
     { id: "payments", label: "Payments", path: "/admin/payments" },
     { id: "rooms", label: "Rooms", path: "/admin/ShowRooms" },
     { id: "complaints", label: "complaints", path: "/admin/complaints" },
+    { id: "subscription", label: "subscription", path: "/admin/subscription" },
     // { id: "staff", label: "Staff & Utilities", path: "/admin/staff" },
   ];
 
