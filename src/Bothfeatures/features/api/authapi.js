@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { userLoggedin, userLoggedout } from "../../features/authSlice";
 
 // Backend URL
-const USER_API = "https://admin-backend-pgmega.onrender.com/api/v1/user/";
+const USER_API = "https://roomgi-backend-project-2.onrender.com/api/v1/user/";
 
 /* -------------------- BASE QUERY -------------------- */
 const baseQuery = fetchBaseQuery({
