@@ -5,6 +5,8 @@ import {
   CheckCircle,
   CreditCard,
   IndianRupee,
+  ShieldCheck,
+  TrendingUp,
 } from "lucide-react";
 
 /* ---------------- MAIN COMPONENT ---------------- */
@@ -17,80 +19,91 @@ export default function Subscription() {
       title: "Starter",
       duration: "1 Month",
       price: 499,
-      highlight: false,
+      badge: null,
+      savings: null,
     },
     {
       id: "3_month",
       title: "Growth",
       duration: "3 Months",
       price: 1399,
-      highlight: true,
+      badge: "POPULAR",
+      savings: "Save ₹98",
     },
     {
       id: "6_month",
       title: "Professional",
       duration: "6 Months",
       price: 2599,
-      highlight: true,
+      badge: "BEST VALUE",
+      savings: "Save ₹395",
     },
     {
       id: "9_month",
       title: "Business",
       duration: "9 Months",
       price: 3699,
-      highlight: false,
+      badge: null,
+      savings: "Save ₹792",
     },
     {
       id: "11_month",
       title: "Enterprise",
       duration: "11 Months",
       price: 4399,
-      highlight: false,
+      badge: "MAX SAVINGS",
+      savings: "Save ₹1090",
     },
   ];
 
   const handleSubscribe = (plan) => {
-    console.log("Selected plan:", plan);
-    // 🔗 Razorpay integration here
+    console.log("Subscribe:", plan);
+    // Razorpay order create → checkout → verify
   };
 
   return (
-    <div className="space-y-6 px-4 md:px-8 lg:px-16">
+    <div className="space-y-8 px-4 md:px-8 lg:px-16">
 
-      {/* ---------------- HEADER ---------------- */}
-      <div className="bg-gradient-to-r from-[#1e3a5f] to-blue-600 p-6 rounded-3xl text-white shadow-lg">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Crown /> Subscription & Billing
+      {/* ---------------- HERO ---------------- */}
+      <div className="bg-gradient-to-r from-[#1e3a5f] to-blue-600 p-8 rounded-3xl text-white shadow-lg">
+        <h1 className="text-3xl font-bold flex items-center gap-3">
+          <Crown className="text-yellow-300" />
+          Subscription & Billing
         </h1>
-        <p className="text-blue-100">
-          Manage your plan, payments & subscription validity
+        <p className="text-blue-100 mt-2 max-w-2xl">
+          Upgrade your Roomgi admin to manage unlimited properties, rooms,
+          tenants, payments and complaints with full control.
         </p>
       </div>
 
       {/* ---------------- CURRENT PLAN ---------------- */}
       <div className="bg-white p-6 rounded-2xl shadow border flex flex-col md:flex-row justify-between gap-6">
         <div>
-          <p className="text-gray-500">Current Plan</p>
+          <p className="text-gray-500 text-sm">Current Plan</p>
           <h2 className="text-2xl font-bold text-[#1e3a5f]">
-            Professional Plan
+            Professional (6 Months)
           </h2>
-          <p className="text-sm text-gray-600 mt-1 flex items-center gap-2">
-            <Calendar size={16} /> Valid till: 12 Jan 2026
+
+          <p className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+            <Calendar size={16} />
+            Valid till <span className="font-medium">12 Jan 2026</span>
+          </p>
+
+          <p className="mt-2 flex items-center gap-2 text-sm text-green-600">
+            <ShieldCheck size={16} />
+            Subscription Active
           </p>
         </div>
 
         <div className="flex gap-3 items-center">
-          <span className="px-4 py-2 bg-green-100 text-green-700 rounded-xl font-medium">
-            Active
-          </span>
-          <button className="px-5 py-2.5 bg-[#1e3a5f] text-white rounded-xl font-semibold hover:opacity-90 transition">
+          <button className="px-6 py-2.5 bg-[#1e3a5f] text-white rounded-xl font-semibold hover:opacity-90 transition">
             Renew / Upgrade
           </button>
         </div>
       </div>
 
       {/* ---------------- FILTER ---------------- */}
-      <div className="sticky top-2 bg-white p-3 rounded-2xl shadow flex gap-2">
+      <div className="bg-white p-3 rounded-2xl shadow flex gap-2 w-fit">
         {["all", "monthly", "long-term"].map((type) => (
           <button
             key={type}
@@ -107,7 +120,7 @@ export default function Subscription() {
       </div>
 
       {/* ---------------- PLANS ---------------- */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {plans.map((plan) => (
           <PlanCard
             key={plan.id}
@@ -119,7 +132,10 @@ export default function Subscription() {
 
       {/* ---------------- PAYMENT HISTORY ---------------- */}
       <div className="bg-white p-6 rounded-2xl shadow border">
-        <h3 className="text-lg font-semibold mb-4">Payment History</h3>
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <TrendingUp size={18} />
+          Payment History
+        </h3>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -155,14 +171,11 @@ export default function Subscription() {
 /* ---------------- PLAN CARD ---------------- */
 function PlanCard({ plan, onSubscribe }) {
   return (
-    <div
-      className={`rounded-2xl p-6 shadow border relative ${
-        plan.highlight ? "border-blue-500" : "bg-white"
-      }`}
-    >
-      {plan.highlight && (
-        <span className="absolute top-4 right-4 text-xs bg-blue-600 text-white px-3 py-1 rounded-full">
-          Popular
+    <div className="relative bg-white rounded-2xl p-6 shadow border hover:shadow-lg transition">
+
+      {plan.badge && (
+        <span className="absolute -top-3 left-4 text-xs font-semibold bg-blue-600 text-white px-3 py-1 rounded-full">
+          {plan.badge}
         </span>
       )}
 
@@ -173,29 +186,26 @@ function PlanCard({ plan, onSubscribe }) {
         <IndianRupee size={22} /> {plan.price}
       </p>
 
-      <ul className="mt-4 space-y-2 text-sm text-gray-600">
-        <Feature text="Unlimited Properties" />
-        <Feature text="Unlimited Rooms" />
-        <Feature text="Tenant Management" />
-        <Feature text="Payments & Analytics" />
-        <Feature text="Complaint System" />
-      </ul>
+      {plan.savings && (
+        <p className="text-sm text-green-600 mt-1">{plan.savings}</p>
+      )}
+
+      <div className="mt-4 space-y-2 text-sm text-gray-600">
+        <Feature text="Unlimited Properties & Rooms" />
+        <Feature text="Tenant & Payment Management" />
+        <Feature text="Complaint & Analytics Dashboard" />
+        <Feature text="Priority Support" />
+      </div>
 
       <button
         onClick={() => onSubscribe(plan)}
-        className={`
-          mt-6 w-full flex items-center justify-center gap-2
+        className="mt-6 w-full flex items-center justify-center gap-2
           px-5 py-2.5 rounded-xl font-semibold
-          ${
-            plan.highlight
-              ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
-              : "bg-gray-900 text-white"
-          }
-          hover:opacity-90 transition
-        `}
+          bg-gradient-to-r from-blue-500 to-blue-600
+          text-white hover:opacity-90 transition"
       >
         <CreditCard size={16} />
-        Subscribe Now
+        Subscribe Securely
       </button>
     </div>
   );
@@ -204,9 +214,9 @@ function PlanCard({ plan, onSubscribe }) {
 /* ---------------- FEATURE ---------------- */
 function Feature({ text }) {
   return (
-    <li className="flex items-center gap-2">
+    <div className="flex items-center gap-2">
       <CheckCircle size={14} className="text-green-500" />
       {text}
-    </li>
+    </div>
   );
 }
