@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/tenant/";
+const USER_API = "https://admin-backend-pgmega.onrender.com/api/tenant/";
 
 
 const TenantApi = createApi({
@@ -46,10 +46,10 @@ const TenantApi = createApi({
             providesTags: ["Tenant"],
         }),
 
-        getAllTenantByBranchId: builder.query({
-            query: (id) => `GetTenantsByBranchid/${id}`,
-            providesTags: ["Tenant"],
-        }),
+        // getAllTenantByBranchId: builder.query({
+        //     query: (id) => `GetTenantsByBranchid/${id}`,
+        //     providesTags: ["Tenant"],
+        // }),
 
         getTenantById: builder.query({
             query: (id) => `GetTenantByid/${id}`,
@@ -91,7 +91,7 @@ export const {
     useChangeStatusMutation, // 👈 NOTE
     useGetTenantByIdQuery,
     useUpdateTenantMutation,
-    useGetAllTenantByBranchIdQuery
+    // useGetAllTenantByBranchIdQuery
 } = TenantApi;
 
 export default TenantApi;

@@ -40,7 +40,9 @@ export default function AddPayment({ onClose }) {
 
   useEffect(() => {
     if (branchData?.allbranch) setBranches(branchData.allbranch);
-    if (tenantData?.findAllTenant) setTenants(tenantData.findAllTenant);
+    if (tenantData) {
+      console.log(tenantData)
+      setTenants(tenantData.findAllTenant)};
 
     if (isSuccess) {
       toast.success("Payment added successfully!");
