@@ -9,20 +9,23 @@ import {
   Calendar,
   BedDouble,
   Wallet,
-  MessageCircle,
   AlertCircle,
   Star,
   X,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
+/* ===================== MAIN ===================== */
+
 export default function Booking() {
   const { data, isLoading } = useGetbookingQuery();
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin h-14 w-14 border-4 border-gray-300 border-t-blue-600 rounded-full"></div>
+      <div className="max-w-6xl mx-auto px-4 py-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <BookingSkeleton key={i} />
+        ))}
       </div>
     );
   }
@@ -39,7 +42,9 @@ export default function Booking() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold text-center mb-10">My Bookings</h1>
+      <h1 className="text-3xl font-bold text-center mb-10">
+        My Bookings
+      </h1>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {bookings.map((booking) => (
@@ -50,38 +55,22 @@ export default function Booking() {
   );
 }
 
-/* ---------------- BOOKING CARD ---------------- */
+/* ===================== CARD ===================== */
 
 function BookingCard({ booking }) {
-  console.log(booking.room)
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  console.log(user)
 
   const [showReview, setShowReview] = useState(false);
-  const [createReview] = useCreateReviewMutation();
+  const [createReview, { isLoading: reviewLoading }] =
+    useCreateReviewMutation();
 
   const isCheckedOut = booking.status === "In-Active";
 
-console.log("Logged-in User ID:", user?._id?.toString());
-
-const hasReviewed =
-  booking?.room?.personalreview?.some((r, index) => {
-  
-    const isMatch =
-      r.user?._id?.toString() === user?._id?.toString();
-
-    console.log("Is same user? 👉", isMatch);
-
-    return isMatch;
-  }) || false;
-
-console.log("\nFINAL hasReviewed VALUE 👉", hasReviewed);
-
-
-  const handleComplain = () => {
-    navigate(`/complain/${booking.branch?._id}`);
-  };
+  const hasReviewed =
+    booking?.room?.personalreview?.some(
+      (r) => r?.user?.toString() === user?._id?.toString()
+    ) || false;
 
   const handleSubmitReview = async (rating, review) => {
     try {
@@ -94,32 +83,32 @@ console.log("\nFINAL hasReviewed VALUE 👉", hasReviewed);
       toast.success("Review submitted successfully");
       setShowReview(false);
     } catch (err) {
-      console.log(err)
       toast.error(err?.data?.message || "Failed to submit review");
     }
   };
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition p-5 flex flex-col">
+      <div className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition p-5 border">
         {/* IMAGE */}
         <img
           src={booking?.room?.roomImages?.[0] || "/room-placeholder.jpg"}
           alt="Room"
-          className="h-40 w-full object-cover rounded-xl mb-4"
+          className="h-44 w-full object-cover rounded-2xl"
         />
 
         {/* INFO */}
-        <h2 className="text-lg font-bold flex items-center gap-2">
-          <Home size={18} /> {booking.branch?.name}
-        </h2>
-
-        <p className="text-sm text-gray-500 flex items-center gap-1">
-          <MapPin size={14} /> {booking.branch?.city}
-        </p>
+        <div className="mt-4 space-y-1">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <Home size={18} /> {booking.branch?.name}
+          </h2>
+          <p className="text-sm text-gray-500 flex items-center gap-1">
+            <MapPin size={14} /> {booking.branch?.city}
+          </p>
+        </div>
 
         {/* DETAILS */}
-        <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
+        <div className="grid grid-cols-2 gap-4 mt-5 text-sm">
           <Detail label="Room" value={booking.roomNumber} icon={<BedDouble size={14} />} />
           <Detail label="Rent" value={`₹${booking.Rent}`} icon={<Wallet size={14} />} />
           <Detail label="Check-in" value={formatDate(booking.checkInDate)} icon={<Calendar size={14} />} />
@@ -131,31 +120,37 @@ console.log("\nFINAL hasReviewed VALUE 👉", hasReviewed);
         </div>
 
         {/* ACTIONS */}
-        <div className="flex gap-3 mt-5 flex-wrap">
-          <button
-            onClick={handleComplain}
-            className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
-          >
-            <AlertCircle size={16} className="inline" /> Complaint
-          </button>
-          {isCheckedOut && !hasReviewed && booking?.room?._id && (
+        <div className="mt-6 flex flex-col gap-3">
+          {!isCheckedOut && (
             <button
-              onClick={() => {
-                console.log("Room ID:", booking.room._id);
-                setShowReview(true);
-              }}
-              className="w-full bg-yellow-500 text-white py-2 rounded-lg hover:bg-yellow-600"
+              onClick={() => navigate(`/complain/${booking.branch?._id}`)}
+              className="bg-red-50 text-red-600 py-2.5 rounded-xl hover:bg-red-600 hover:text-white transition"
             >
-              Rate & Review
+              <AlertCircle size={16} className="inline mr-1" />
+              Raise Complaint
             </button>
           )}
 
+          {isCheckedOut && !hasReviewed && (
+            <button
+              onClick={() => setShowReview(true)}
+              className="bg-yellow-500 text-white py-2.5 rounded-xl hover:bg-yellow-600"
+            >
+              ⭐ Rate & Review
+            </button>
+          )}
+
+          {hasReviewed && (
+            <p className="text-center text-green-600 text-sm">
+              ✅ Already Reviewed
+            </p>
+          )}
         </div>
       </div>
 
-      {/* REVIEW MODAL */}
       {showReview && (
         <ReviewModal
+          loading={reviewLoading}
           onClose={() => setShowReview(false)}
           onSubmit={handleSubmitReview}
         />
@@ -164,59 +159,79 @@ console.log("\nFINAL hasReviewed VALUE 👉", hasReviewed);
   );
 }
 
-/* ---------------- REVIEW MODAL ---------------- */
+/* ===================== REVIEW MODAL ===================== */
 
-function ReviewModal({ onClose, onSubmit }) {
+function ReviewModal({ onClose, onSubmit, loading }) {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
-        <button onClick={onClose} className="absolute right-4 top-4 text-gray-500">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+      <div className="bg-white rounded-2xl w-full max-w-md p-6 relative animate-scaleIn">
+        <button onClick={onClose} className="absolute top-4 right-4">
           <X />
         </button>
 
-        <h2 className="text-xl font-bold mb-4 text-center">
+        <h2 className="text-xl font-bold text-center mb-4">
           Rate your stay
         </h2>
 
         {/* STARS */}
         <div className="flex justify-center gap-2 mb-4">
-          {[1, 2, 3, 4, 5].map((num) => (
+          {[1, 2, 3, 4, 5].map((n) => (
             <Star
-              key={num}
-              size={28}
-              onClick={() => setRating(num)}
-              className={`cursor-pointer ${num <= rating
+              key={n}
+              size={30}
+              onClick={() => setRating(n)}
+              className={`cursor-pointer ${
+                n <= rating
                   ? "text-yellow-400 fill-yellow-400"
                   : "text-gray-300"
-                }`}
+              }`}
             />
           ))}
         </div>
 
-        {/* TEXT */}
         <textarea
-          placeholder="Write your experience..."
-          className="w-full border rounded-lg p-3 mb-4"
           rows={4}
+          className="w-full border rounded-xl p-3 mb-4"
+          placeholder="Write your experience..."
           value={review}
           onChange={(e) => setReview(e.target.value)}
         />
 
         <button
+          disabled={!rating || loading}
           onClick={() => onSubmit(rating, review)}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+          className="w-full bg-blue-600 disabled:bg-gray-300 text-white py-3 rounded-xl"
         >
-          Submit Review
+          {loading ? "Submitting..." : "Submit Review"}
         </button>
       </div>
     </div>
   );
 }
 
-/* ---------------- HELPERS ---------------- */
+/* ===================== SKELETON ===================== */
+
+function BookingSkeleton() {
+  return (
+    <div className="bg-white rounded-3xl p-5 shadow animate-pulse">
+      <div className="h-44 bg-gray-200 rounded-2xl mb-4" />
+      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+      <div className="h-3 bg-gray-200 rounded w-1/2 mb-4" />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="h-4 bg-gray-200 rounded" />
+        <div className="h-4 bg-gray-200 rounded" />
+        <div className="h-4 bg-gray-200 rounded" />
+        <div className="h-4 bg-gray-200 rounded" />
+      </div>
+      <div className="h-10 bg-gray-200 rounded-xl mt-6" />
+    </div>
+  );
+}
+
+/* ===================== HELPERS ===================== */
 
 function Detail({ label, value, icon }) {
   return (
