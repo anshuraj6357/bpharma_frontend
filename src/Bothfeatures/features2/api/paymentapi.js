@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "http://localhost:5000/api/payment";
+const USER_API = "https://roomgi-backend-project-2.onrender.com/api/payment";
 
 export const paymentApi = createApi({
   reducerPath: "paymentApi",
@@ -28,10 +28,10 @@ export const paymentApi = createApi({
 
     // 🔹 3. Create Razorpay order
     razorpayPayment: builder.mutation({
-      query: (amount) => ({
+      query: ({amount,receipt}) => ({
         url: "create-order",
         method: "POST",
-        body: amount,
+        body: {amount,receipt},
       }),
     }),
 
