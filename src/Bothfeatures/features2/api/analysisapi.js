@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 // const USER_API = "https://admin-backend-pgmega.onrender.com/api/";
 
-const USER_API = "http://localhost:5000/api/";
+const USER_API = "https://roomgi-backend-project-2.onrender.com/api/";
 
 
 
