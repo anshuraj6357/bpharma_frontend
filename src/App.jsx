@@ -32,6 +32,7 @@ import Bookings from "./components/booking";
 import CreateComplaint from "./components/complain";
 import ComplaintsPage from "./components/mycomplain"
 import  Profile from "./components/myprofile"
+import  SignupSuccess from "./components/signupsuccess";
 import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
@@ -94,6 +95,8 @@ function App() {
             <Route path="/complain/:branchId" element={<CreateComplaint />} />
             <Route path="/mycomplain" element={<ComplaintsPage />} />
              <Route path="/myprofile" element={<Profile />} />
+             <Route path="/signup-success" element={<SignupSuccess />} />
+
           </Route>
 
           {/* Public Routes */}

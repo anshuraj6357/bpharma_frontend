@@ -77,10 +77,89 @@
 }
 
 
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.4s ease-out;
+}
 
 
 
 
+/* 🌸 PREMIUM FLOWER PETALS */
+.petal {
+  position: absolute;
+  top: -15%;
+  width: 18px;
+  height: 28px;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ffd6e8,
+    #f472b6,
+    #db2777
+  );
+  border-radius: 70% 30% 70% 30%;
+  opacity: 0.8;
+  filter: blur(0.4px);
+  animation: petalFall linear infinite;
+  z-index: 1;
+}
+
+.petal1 { left: 8%;  animation-duration: 18s; }
+.petal2 { left: 25%; animation-duration: 22s; }
+.petal3 { left: 45%; animation-duration: 20s; }
+.petal4 { left: 65%; animation-duration: 24s; }
+.petal5 { left: 85%; animation-duration: 19s; }
+
+@keyframes petalFall {
+  0% {
+    transform: translateY(-10%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(120vh) rotate(360deg);
+    opacity: 0.9;
+  }
+}
+
+/* 🌷 LUXURY BLOOM */
+@keyframes bloomSlow {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.15) translateY(-20px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.animate-bloomSlow {
+  animation: bloomSlow 14s ease-in-out infinite;
+}
+
+/* ✨ ENTRY */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out;
+}
 
 
 @layer components {
