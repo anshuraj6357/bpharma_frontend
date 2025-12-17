@@ -232,96 +232,99 @@ export default function Properties() {
           const totalOccupancyRate = getOccupancyRate(totalOccupied, totalRooms);
 
           return (
-           <div key={property._id} className="bg-white rounded-3xl shadow-lg border hover:shadow-2xl transition-all duration-300 overflow-hidden group flex flex-col">
-  
-  {/* IMAGE SECTION */}
-  <div className="relative h-60 overflow-hidden rounded-t-3xl">
-    <img
-      src={property?.Propertyphoto?.[0] || '/fallback-image.png'}
-      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-    />
-    
-    {/* Manager Badge / Appoint */}
-    <div className="absolute top-4 left-4">
-      {!property.branchmanager ? (
-        <button
-          onClick={() => handleAppointManager(property._id)}
-          className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl shadow-md flex items-center gap-2 text-sm hover:scale-105 transition"
-        >
-          <UserPlus size={16} /> Appoint Manager
-        </button>
-      ) : (
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl shadow-md flex items-center gap-2 text-sm">
-          <UserPlus size={16} /> {property.branchmanager?.name}
-        </div>
-      )}
-    </div>
+            <div key={property._id} className="bg-white rounded-3xl shadow-lg border hover:shadow-2xl transition-all duration-300 overflow-hidden group flex flex-col">
 
-    {/* Vacant Badge */}
-    <div className={`absolute top-4 right-4 px-4 py-1 rounded-full text-sm font-medium shadow-md ${getStatusColor(totalVacant)}`}>
-      {totalVacant} Vacant
-    </div>
-  </div>
+              {/* IMAGE SECTION */}
+              <div className="relative h-60 overflow-hidden rounded-t-3xl">
+                <img
+                  src={property?.Propertyphoto?.[0] || '/fallback-image.png'}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
 
-  {/* DETAILS SECTION */}
-  <div className="p-6 flex flex-col flex-1 justify-between">
-    
-    {/* PROPERTY INFO */}
-    <div className="space-y-2">
-      <h3 className="text-2xl font-semibold text-[#1e3a5f] truncate">{property.name}</h3>
-      <div className="flex items-center gap-2 text-gray-600 text-sm truncate">
-        <MapPin size={18} className="text-gray-500" />
-        <span className="truncate">{property.address}, {property.city}, {property.state} - {property.pincode}</span>
-      </div>
-      <p className="text-sm text-gray-400">Landmark: {property.landmark}</p>
-    </div>
+                {/* Manager Badge / Appoint */}
+                <div className="absolute top-4 left-4">
+                  {!property.branchmanager ? (
+                    <button
+                      onClick={() => handleAppointManager(property._id)}
+                      className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl shadow-md flex items-center gap-2 text-sm hover:scale-105 transition"
+                    >
+                      <UserPlus size={16} />
+                      Appoint Manager
+                    </button>
+                  ) : (
+                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl shadow-md flex items-center gap-2 text-sm">
+                      <UserPlus size={16} />
+                      {property.branchmanager.name}
+                    </div>
+                  )}
+                </div>
 
-    {/* OCCUPANCY METRICS */}
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-      {[
-        { name: 'Beds', icon: <BedDouble size={20} />, occupied: occupiedBeds, total: property.totalBeds, rate: bedsOccupancyRate },
-        { name: 'Rental Rooms', icon: <Users size={20} />, occupied: occupiedRental, total: property.totalrentalRoom, rate: rentalOccupancyRate },
-        { name: 'Hotel Rooms', icon: <Users size={20} />, occupied: occupiedHotel, total: property.totelhotelroom, rate: hotelOccupancyRate },
-        { name: 'Total Occupancy', icon: <Users size={20} />, occupied: totalOccupied, total: totalRooms, rate: totalOccupancyRate },
-      ].map((room, idx) => (
-        <div key={idx} className="text-center p-4 bg-gray-50 rounded-2xl shadow-inner flex flex-col items-center justify-center">
-          <div className="text-gray-600 mb-1">{room.icon}</div>
-          <p className="text-sm text-gray-600">{room.name}</p>
-          <p className="text-lg font-semibold text-[#1e3a5f]">{room.occupied} / {room.total}</p>
-          <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-            <div className="h-2 rounded-full bg-orange-500 transition-all duration-500" style={{ width: `${room.rate}%` }}></div>
-          </div>
-          <p className="text-xs text-gray-500 mt-1">{room.rate}% Occupied</p>
-        </div>
-      ))}
-    </div>
 
-    {/* ACTION BUTTONS */}
-    <div className="flex gap-3 mt-6">
-      <button className="flex-1 bg-[#1e3a5f] text-white py-3 rounded-2xl flex items-center justify-center gap-2 font-medium hover:bg-[#162f4b] transition-all">
-        <Eye size={18} /> View Layout
-      </button>
+                {/* Vacant Badge */}
+                <div className={`absolute top-4 right-4 px-4 py-1 rounded-full text-sm font-medium shadow-md ${getStatusColor(totalVacant)}`}>
+                  {totalVacant} Vacant
+                </div>
+              </div>
 
-      {user?.role !== "branch-manager" && (
-        <>
-          <button className="p-3 border rounded-2xl hover:bg-gray-100 transition flex items-center justify-center">
-            <Edit size={18} />
-          </button>
-          <button
-            onClick={() => handleDeleteProperty(occupiedBeds, property._id)}
-            className="p-3 border border-red-400 rounded-2xl hover:bg-red-50 transition flex items-center justify-center"
-          >
-            {deletingPropertyId === property._id ? (
-              <Loader2 className="w-5 h-5 animate-spin text-red-500" />
-            ) : (
-              <Trash2 className="text-red-500" size={18} />
-            )}
-          </button>
-        </>
-      )}
-    </div>
-  </div>
-</div>
+              {/* DETAILS SECTION */}
+              <div className="p-6 flex flex-col flex-1 justify-between">
+
+                {/* PROPERTY INFO */}
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-semibold text-[#1e3a5f] truncate">{property.name}</h3>
+                  <div className="flex items-center gap-2 text-gray-600 text-sm truncate">
+                    <MapPin size={18} className="text-gray-500" />
+                    <span className="truncate">{property.address}, {property.city}, {property.state} - {property.pincode}</span>
+                  </div>
+                  <p className="text-sm text-gray-400">Landmark: {property.landmark}</p>
+                </div>
+
+                {/* OCCUPANCY METRICS */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                  {[
+                    { name: 'Beds', icon: <BedDouble size={20} />, occupied: occupiedBeds, total: property.totalBeds, rate: bedsOccupancyRate },
+                    { name: 'Rental Rooms', icon: <Users size={20} />, occupied: occupiedRental, total: property.totalrentalRoom, rate: rentalOccupancyRate },
+                    { name: 'Hotel Rooms', icon: <Users size={20} />, occupied: occupiedHotel, total: property.totelhotelroom, rate: hotelOccupancyRate },
+                    { name: 'Total Occupancy', icon: <Users size={20} />, occupied: totalOccupied, total: totalRooms, rate: totalOccupancyRate },
+                  ].map((room, idx) => (
+                    <div key={idx} className="text-center p-4 bg-gray-50 rounded-2xl shadow-inner flex flex-col items-center justify-center">
+                      <div className="text-gray-600 mb-1">{room.icon}</div>
+                      <p className="text-sm text-gray-600">{room.name}</p>
+                      <p className="text-lg font-semibold text-[#1e3a5f]">{room.occupied} / {room.total}</p>
+                      <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
+                        <div className="h-2 rounded-full bg-orange-500 transition-all duration-500" style={{ width: `${room.rate}%` }}></div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{room.rate}% Occupied</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* ACTION BUTTONS */}
+                <div className="flex gap-3 mt-6">
+                  <button className="flex-1 bg-[#1e3a5f] text-white py-3 rounded-2xl flex items-center justify-center gap-2 font-medium hover:bg-[#162f4b] transition-all">
+                    <Eye size={18} /> View Layout
+                  </button>
+
+                  {user?.role !== "branch-manager" && (
+                    <>
+                      <button className="p-3 border rounded-2xl hover:bg-gray-100 transition flex items-center justify-center">
+                        <Edit size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProperty(occupiedBeds, property._id)}
+                        className="p-3 border border-red-400 rounded-2xl hover:bg-red-50 transition flex items-center justify-center"
+                      >
+                        {deletingPropertyId === property._id ? (
+                          <Loader2 className="w-5 h-5 animate-spin text-red-500" />
+                        ) : (
+                          <Trash2 className="text-red-500" size={18} />
+                        )}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
 
           );
         }) : (

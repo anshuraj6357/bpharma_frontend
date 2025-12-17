@@ -41,7 +41,7 @@ async function startPayment(
   razorpayPayment,
   razorpayPaymentVerify,
   roomId,
-  navigate
+  navigate, setIsConfirmingBooking
 ) {
   try {
     const loaded = await loadRazorpayScript();
@@ -73,6 +73,8 @@ async function startPayment(
 
       handler: async (rzpResponse) => {
         try {
+          setIsConfirmingBooking(true); // 🔥 START LOADING
+
           const verifyData = await razorpayPaymentVerify({
             razorpay_order_id: rzpResponse.razorpay_order_id,
             razorpay_payment_id: rzpResponse.razorpay_payment_id,
@@ -95,8 +97,12 @@ async function startPayment(
       },
 
       modal: {
-        ondismiss: () => toast.info("Payment cancelled"),
+        ondismiss: () => {
+          setIsConfirmingBooking(false);
+          toast.info("Payment cancelled");
+        },
       },
+
 
       prefill: {
         name: "Guest User",
@@ -115,6 +121,8 @@ async function startPayment(
 }
 
 
+
+
 /* =========================
    MAIN COMPONENT
 ========================= */
@@ -122,8 +130,13 @@ export default function PGDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
+
 
   const { data, isLoading, isError } = useGetPgByIdQuery(id);
+
+
+
   const [razorpayPayment, { isLoading: razorpaypaymentloading }] =
     useRazorpayPaymentMutation();
   const [razorpayPaymentVerify] =
@@ -165,7 +178,8 @@ export default function PGDetailsPage() {
       razorpayPayment,
       razorpayPaymentVerify,
       id,
-      navigate
+      navigate,
+      setIsConfirmingBooking
     );
   };
 
@@ -191,6 +205,15 @@ export default function PGDetailsPage() {
       })
       : toast.info("Sharing not supported");
   };
+  const { data: userdata } = useProfileQuery();
+
+
+
+
+  const user = userdata?.profile;
+  console.log(user)
+
+
 
   if (isLoading) {
     return (
@@ -207,20 +230,28 @@ export default function PGDetailsPage() {
       </div>
     );
   }
-    const { data:userdata } = useProfileQuery();
-
-
-    const user=userdata?.profile;
-    console.log(user)
-
-
-
-
-
 
   return (
     <div className="min-h-screen bg-gray-50">
 
+
+      {isConfirmingBooking && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl w-[90%] max-w-sm">
+
+            <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+
+            <h2 className="text-xl font-bold text-gray-800">
+              Confirming your booking
+            </h2>
+
+            <p className="text-sm text-gray-500 text-center">
+              Please wait while we securely confirm your payment and reserve your room.
+            </p>
+
+          </div>
+        </div>
+      )}
 
       {/* IMAGE SLIDER */}
       <div className="max-w-6xl mx-auto mt-6 relative h-auto">
@@ -527,9 +558,9 @@ export default function PGDetailsPage() {
               <div className="flex items-center justify-between
         bg-green-50 border border-green-200
         rounded-xl px-4 py-3 mb-4">
-          
+
                 <label className="flex items-center gap-3 cursor-pointer">
-                 
+
                   <input
                     type="checkbox"
                     checked={useWallet}
@@ -556,7 +587,8 @@ export default function PGDetailsPage() {
             <div className="w-full flex flex-col gap-2">
               {razorpaypaymentloading ? (
                 <button
-                  disabled
+                  disabled={razorpaypaymentloading || isConfirmingBooking}
+
                   className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white py-4 rounded-xl font-semibold shadow-lg cursor-not-allowed hover:bg-blue-600 transition transform"
                 >
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -680,6 +712,7 @@ export default function PGDetailsPage() {
     </div>
   );
 }
+
 
 // REUSABLE INFO BLOCK COMPONENT
 function InfoBlock({ title, children }) {
