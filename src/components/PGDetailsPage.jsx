@@ -36,44 +36,132 @@ function loadRazorpayScript() {
 /* ============================
    START PAYMENT
 ============================ */
+// async function startPayment(
+//   amount,
+//   razorpayPayment,
+//   razorpayPaymentVerify,
+//   roomId,
+//   navigate, setIsConfirmingBooking
+// ) {
+//   try {
+//     const loaded = await loadRazorpayScript();
+//     if (!loaded) {
+//       toast.error("Razorpay SDK failed to load");
+//       return;
+//     }
+//     console.log(amount)
+
+//     const response = await razorpayPayment({
+//       amount: amount.payableAmount * 100,
+//       receipt: `receipt_${Date.now()}_${roomId}`,
+//     }).unwrap();
+
+//     const order = response?.order;
+//     if (!order) {
+//       console.log("Order response:", response);
+//       toast.error("Order creation failed");
+//       return;
+//     }
+
+//     const options = {
+//       key: "rzp_live_Rn8nwfw3Hdmb8E",
+//       amount: order.amount,
+//       currency: order.currency,
+//       name: "Roomgi.com",
+//       description: "Room Booking Payment",
+//       order_id: order.id,
+
+//       handler: async (rzpResponse) => {
+//         try {
+//           setIsConfirmingBooking(true); // 🔥 START LOADING
+
+//           const verifyData = await razorpayPaymentVerify({
+//             razorpay_order_id: rzpResponse.razorpay_order_id,
+//             razorpay_payment_id: rzpResponse.razorpay_payment_id,
+//             razorpay_signature: rzpResponse.razorpay_signature,
+//             roomId,
+//             amount,
+//           }).unwrap();
+
+//           if (!verifyData?.success) {
+//             toast.error("Payment verification failed ❌");
+//             return;
+//           }
+
+//           toast.success("Payment successful ✔");
+//           navigate(0);
+//         } catch (err) {
+//           console.error(err);
+//           toast.error("Verification error ❌");
+//         }
+//       },
+
+//       modal: {
+//         ondismiss: () => {
+//           setIsConfirmingBooking(false);
+//           toast.info("Payment cancelled");
+//         },
+//       },
+
+
+//       prefill: {
+//         name: "Guest User",
+//         email: "guest@example.com",
+//       },
+
+//       theme: { color: "#3399cc" },
+//     };
+
+//     const rzp = new window.Razorpay(options);
+//     rzp.open();
+//   } catch (err) {
+//     console.error(err);
+//     toast.error("Payment error ❌");
+//   }
+// }
+
+
 async function startPayment(
   amount,
   razorpayPayment,
   razorpayPaymentVerify,
   roomId,
-  navigate, setIsConfirmingBooking
+  navigate,
+  setIsConfirmingBooking
 ) {
   try {
+    // 1️⃣ Load Razorpay SDK
     const loaded = await loadRazorpayScript();
     if (!loaded) {
       toast.error("Razorpay SDK failed to load");
       return;
     }
-    console.log(amount)
 
+    // 2️⃣ Create Order (Backend)
     const response = await razorpayPayment({
-      amount: amount.payableAmount * 100,
+      amount: amount.payableAmount * 100, // paisa
       receipt: `receipt_${Date.now()}_${roomId}`,
     }).unwrap();
 
     const order = response?.order;
     if (!order) {
-      console.log("Order response:", response);
       toast.error("Order creation failed");
       return;
     }
 
+    // 3️⃣ Razorpay Options
     const options = {
-      key: "rzp_live_Rn8nwfw3Hdmb8E",
+      key: "rzp_live_Rn8nwfw3Hdmb8E", // 🔐 env me rakho ideally
       amount: order.amount,
       currency: order.currency,
       name: "Roomgi.com",
       description: "Room Booking Payment",
       order_id: order.id,
 
+      // ✅ PAYMENT SUCCESS (GPay / UPI / Card sab ke liye)
       handler: async (rzpResponse) => {
         try {
-          setIsConfirmingBooking(true); // 🔥 START LOADING
+          setIsConfirmingBooking(true); // 🔥 loader ON
 
           const verifyData = await razorpayPaymentVerify({
             razorpay_order_id: rzpResponse.razorpay_order_id,
@@ -85,17 +173,29 @@ async function startPayment(
 
           if (!verifyData?.success) {
             toast.error("Payment verification failed ❌");
+            setIsConfirmingBooking(false);
             return;
           }
 
-          toast.success("Payment successful ✔");
-          navigate(0);
+          toast.success("Payment successful 🎉");
+
+          const bookingInfo = {
+            bookingId: verifyData?.bookingId || order.id,
+            branchName: verifyData?.branchName || "PG Name",
+            roomNumber: verifyData?.roomNumber || roomId,
+            amount: amount.payableAmount,
+          };
+
+          navigate("/bookingssuccess", { state: bookingInfo, replace: true });
+
         } catch (err) {
           console.error(err);
           toast.error("Verification error ❌");
+          setIsConfirmingBooking(false);
         }
       },
 
+      // ❌ Payment cancelled
       modal: {
         ondismiss: () => {
           setIsConfirmingBooking(false);
@@ -103,23 +203,24 @@ async function startPayment(
         },
       },
 
-
       prefill: {
         name: "Guest User",
         email: "guest@example.com",
       },
 
-      theme: { color: "#3399cc" },
+      theme: { color: "#2563eb" },
     };
 
+    // 4️⃣ Open Razorpay
     const rzp = new window.Razorpay(options);
     rzp.open();
+
   } catch (err) {
     console.error(err);
     toast.error("Payment error ❌");
+    setIsConfirmingBooking(false);
   }
 }
-
 
 
 

@@ -31,10 +31,10 @@ import ProtectedRoute from "./userprotectedroutes";
 import Bookings from "./components/booking";
 import CreateComplaint from "./components/complain";
 import ComplaintsPage from "./components/mycomplain"
-import  Profile from "./components/myprofile"
-import  SignupSuccess from "./components/signupsuccess";
+import Profile from "./components/myprofile"
+import SignupSuccess from "./components/signupsuccess";
 import ScrollToTop from "./components/ScrollToTop";
-
+import BookingSuccess from "./components/bookingssuccess"
 function App() {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
@@ -65,7 +65,7 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen">
-       <ScrollToTop />
+      <ScrollToTop />
 
       {isAdminRoute ? (
         <DashboardHeader
@@ -80,7 +80,7 @@ function App() {
 
       {/* Main content */}
       <main className="flex-1">
-         <ScrollToTop />
+        <ScrollToTop />
         <Routes>
 
           {/* Protected Routes */}
@@ -94,8 +94,10 @@ function App() {
             <Route path="/search/:city" element={<Searched />} />
             <Route path="/complain/:branchId" element={<CreateComplaint />} />
             <Route path="/mycomplain" element={<ComplaintsPage />} />
-             <Route path="/myprofile" element={<Profile />} />
-             <Route path="/signup-success" element={<SignupSuccess />} />
+            <Route path="/myprofile" element={<Profile />} />
+            <Route path="/signup-success" element={<SignupSuccess />} />
+            <Route path="/bookingssuccess" element={<BookingSuccess />} />
+            <Route path="/mybooking" element={<Bookings />} />
 
           </Route>
 
@@ -104,7 +106,6 @@ function App() {
           <Route path="/contactus" element={<ContactUs />} />
           <Route path="/privacypolicy" element={<PrivacyPolicy />} />
           <Route path="/termsandcondition" element={<TermsConditions />} />
-          <Route path="/mybooking" element={<Bookings />} />
           <Route path="/shippingpolicy" element={<ShippingPolicy />} />
           <Route path="/helpcenter" element={<HelpCenter />} />
           <Route path="/faqs" element={<FAQs />} />
