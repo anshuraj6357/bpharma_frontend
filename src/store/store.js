@@ -1,40 +1,54 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
+
 import authReducer, { hydrateUser } from "../Bothfeatures/features/authSlice";
-import wishlistReducer, { hydrateWishlist } from "../Bothfeatures/features/wishlist";
+import wishlistReducer from "../Bothfeatures/features/wishlist";
+import tenantReducer from "../Bothfeatures/notpaidtenantslice";
+
+// RTK QUERY APIs
 import { PgApi } from "../Bothfeatures/features/api/allpg";
 import authApi from "../Bothfeatures/features/api/authapi";
-
-import tenantReducer from "../Bothfeatures/notpaidtenantslice";
-import paymentApi from "../Bothfeatures/features2/api/paymentapi.js";
+import paymentApi from "../Bothfeatures/features2/api/paymentapi";
 import reviewApi from "../Bothfeatures/features2/api/reviewapi";
-import propertyApi from "../Bothfeatures/features2/api/propertyapi.js";
-import TenantApi from "../Bothfeatures/features2/api/tenant.js";
-import AnalysisApi from "../Bothfeatures/features2/api/analysisapi.js";
-import staffApi from "../Bothfeatures/features2/api/staffapi.js";
-import ComplainApi from "../Bothfeatures/features2/api/complainapi.js";
-
+import propertyApi from "../Bothfeatures/features2/api/propertyapi";
+import TenantApi from "../Bothfeatures/features2/api/tenant";
+import AnalysisApi from "../Bothfeatures/features2/api/analysisapi";
+import staffApi from "../Bothfeatures/features2/api/staffapi";
+import ComplainApi from "../Bothfeatures/features2/api/complainapi";
 
 // -------------------------------
-// CONFIGURE STORE
+// COMBINED REDUCER
+// -------------------------------
+const appReducer = combineReducers({
+  auth: authReducer,
+  tenants: tenantReducer,
+  wishlist: wishlistReducer,
+
+  [PgApi.reducerPath]: PgApi.reducer,
+  [authApi.reducerPath]: authApi.reducer,
+  [paymentApi.reducerPath]: paymentApi.reducer,
+  [reviewApi.reducerPath]: reviewApi.reducer,
+  [propertyApi.reducerPath]: propertyApi.reducer,
+  [TenantApi.reducerPath]: TenantApi.reducer,
+  [AnalysisApi.reducerPath]: AnalysisApi.reducer,
+  [ComplainApi.reducerPath]: ComplainApi.reducer,
+  [staffApi.reducerPath]: staffApi.reducer,
+});
+
+// -------------------------------
+// ROOT REDUCER (LOGOUT = FULL RESET)
+// -------------------------------
+const rootReducer = (state, action) => {
+  if (action.type === "auth/userLoggedout") {
+    state = undefined; // 🔥 clears redux completely
+  }
+  return appReducer(state, action);
+};
+
+// -------------------------------
+// STORE
 // -------------------------------
 export const appStore = configureStore({
-  reducer: {
-    auth: authReducer,
-    tenants: tenantReducer,
-    wishlist: wishlistReducer,
-
-    [PgApi.reducerPath]: PgApi.reducer,
-    [authApi.reducerPath]: authApi.reducer,
-    [reviewApi.reducerPath]: reviewApi.reducer,
-
-    [propertyApi.reducerPath]: propertyApi.reducer,
-    [TenantApi.reducerPath]: TenantApi.reducer,
-    [AnalysisApi.reducerPath]: AnalysisApi.reducer,
-    [ComplainApi.reducerPath]: ComplainApi.reducer,
-    [staffApi.reducerPath]: staffApi.reducer,
-    [paymentApi.reducerPath]: paymentApi.reducer,
-  },
-
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       PgApi.middleware,
@@ -49,35 +63,22 @@ export const appStore = configureStore({
     ),
 });
 
-
-
 // -------------------------------
 // HYDRATE USER FROM LOCAL STORAGE
 // -------------------------------
 const initializeUser = () => {
   try {
     const storedUser = localStorage.getItem("user");
-
-    if (!storedUser) {
-      return { user: null, isAuthenticated: false };
-    }
+    if (!storedUser) return { user: null, isAuthenticated: false };
 
     const parsedUser = JSON.parse(storedUser);
+    if (!parsedUser) return { user: null, isAuthenticated: false };
 
-    if (!parsedUser || typeof parsedUser !== "object") {
-      return { user: null, isAuthenticated: false };
-    }
-
-    return {
-      user: parsedUser,
-      isAuthenticated: true,
-    };
-
+    return { user: parsedUser, isAuthenticated: true };
   } catch (err) {
-    console.error("Failed to parse stored user:", err);
+    console.error("User hydrate error:", err);
     return { user: null, isAuthenticated: false };
   }
 };
 
-const initialState = initializeUser();
-appStore.dispatch(hydrateUser(initialState));
+appStore.dispatch(hydrateUser(initializeUser()));
