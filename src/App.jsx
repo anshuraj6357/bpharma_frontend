@@ -97,6 +97,7 @@ function App() {
             <Route path="/myprofile" element={<Profile />} />
             <Route path="/signup-success" element={<SignupSuccess />} />
             <Route path="/bookingssuccess" element={<BookingSuccess />} />
+
             <Route path="/mybooking" element={<Bookings />} />
 
           </Route>
