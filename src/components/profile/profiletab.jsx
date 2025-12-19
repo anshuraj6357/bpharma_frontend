@@ -7,8 +7,7 @@ export default function ProfileTabs({ activeTab, setActiveTab, data }) {
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "reviews", label: "Reviews" },
-    { id: "complaints", label: "Complaints" },
-    { id: "payments", label: "Payments" },
+  
   ];
 
   return (
@@ -34,12 +33,6 @@ export default function ProfileTabs({ activeTab, setActiveTab, data }) {
       <div className="mt-6">
         {activeTab === "overview" && <Overview data={data} />}
         {activeTab === "reviews" && <Reviews reviews={data?.reviews} />}
-        {activeTab === "complaints" && (
-          <Complaints complaints={data?.complain} />
-        )}
-        {activeTab === "payments" && (
-          <Payments payments={data?.payment} />
-        )}
       </div>
     </div>
   );

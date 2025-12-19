@@ -138,7 +138,7 @@ async function startPayment(
     // 2️⃣ Create Razorpay order on backend
     console.log("📦 Creating Razorpay order...");
     const response = await razorpayPayment({
-      amount: amount.payableAmount*100, // amount in INR
+      amount: amount.payableAmount * 100, // amount in INR
       receipt: `receipt_${Date.now()}_${roomId}`,
     }).unwrap();
 
@@ -344,6 +344,19 @@ export default function PGDetailsPage() {
       </div>
     );
   }
+  const totalRent =
+    pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0);
+
+  const maxWalletAllowed = totalRent * 0.1;
+  const walletDiscount = Math.min(user?.walletBalance || 0, maxWalletAllowed);
+
+  // 👇 FINAL CHECK
+  const finalAfterWallet = totalRent - walletDiscount;
+
+  // 👇 WALLET APPLICABLE ONLY IF > ₹1 LEFT
+  const isWalletApplicable = finalAfterWallet > 1;
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -510,7 +523,7 @@ export default function PGDetailsPage() {
 
                   <div className="flex flex-col">
                     <span className="text-sm text-gray-500 font-medium">Address</span>
-                    <p className="text-lg font-semibold text-gray-800 tracking-wide">{pg.branch.address}</p>
+                    <p className="text-lg font-semibold text-gray-800 tracking-wide">{data?.roomz}</p>
                   </div>
 
                   <div className="flex flex-col">
@@ -653,141 +666,180 @@ export default function PGDetailsPage() {
         <div className="space-y-8">
 
           {/* ================== RENT CARD ================== */}
-          <InfoBlock title="Rent Details">
-            <div className="text-center py-4">
-              <p className="text-gray-500 text-sm">
-                {pg.category === "Pg" || pg.category === "Rented-Room"
-                  ? "Rent per Month"
-                  : "Rent Options"}
-              </p>
-              <h3 className="text-4xl font-bold text-gray-900 mt-1">
-                {pg.category === "Pg" || pg.category === "Rented-Room"
-                  ? `₹${pg.price}`
-                  : <></>}
-              </h3>
-            </div>
+          <InfoBlock title="Rent & Services Breakdown">
+            <div className="w-full max-w-md mx-auto bg-white shadow-lg rounded-2xl p-6 space-y-6">
 
-            {/* ================== WALLET USAGE ================== */}
-            {isAuthenticated && user?.walletBalance > 0 && (
-              <div className="flex items-center justify-between
-        bg-green-50 border border-green-200
-        rounded-xl px-4 py-3 mb-4">
+              {/* ================= BASE RENT / SERVICES ================= */}
+              <div>
+                <h4 className="text-gray-700 font-semibold text-lg mb-2">
+                  Base Rent Breakdown
+                </h4>
 
-                <label className="flex items-center gap-3 cursor-pointer">
-
-                  <input
-                    type="checkbox"
-                    checked={useWallet}
-                    onChange={() => setUseWallet(!useWallet)}
-                    className="h-5 w-5 accent-green-600"
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-gray-800">
-                      Use Wallet Balance
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      Available: ₹{user.walletBalance}
-                    </span>
-                  </div>
-                </label>
-
-                {useWallet && (
-                  <span className="text-sm font-semibold text-green-700">
-                    −₹{Math.min(user.walletBalance, pg.price * (1 / 10))}
-                  </span>
-                )}
-              </div>
-            )}
-            <div className="w-full flex flex-col gap-2">
-              {razorpaypaymentloading ? (
-                <button
-                  disabled={razorpaypaymentloading || isConfirmingBooking}
-
-                  className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white py-4 rounded-xl font-semibold shadow-lg cursor-not-allowed hover:bg-blue-600 transition transform"
-                >
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Processing Payment...</span>
-                </button>
-              ) : pg.category === "Pg" || pg.category === "Rented-Room" ? (
-                <button
-                  onClick={() => {
-                    if (!isAuthenticated) return toast.error("Login first");
-                    if (pg.availabilityStatus !== "Available") return;
-                    const walletUsed = useWallet ? Math.min(user.walletBalance, pg.price * 0.1) : 0;
-                    const payableAmount = pg.price - walletUsed;
-                    handleBook({ totalAmount: pg.price, walletUsed, payableAmount });
-                  }}
-                  disabled={pg.availabilityStatus !== "Available" || !isAuthenticated}
-                  className={`flex flex-col items-center justify-center gap-2 w-full py-4 rounded-xl font-semibold shadow-lg
-        ${pg.availabilityStatus === "Available" && isAuthenticated
-                      ? "bg-blue-600 text-white hover:bg-blue-700 transition transform hover:-translate-y-1 hover:scale-105"
-                      : "bg-gray-300 text-gray-600 cursor-not-allowed relative group overflow-hidden"
-                    }`}
-                >
-                  <span className="text-lg">
-                    {pg.availabilityStatus === "Available"
-                      ? "Monthly Booking"
-                      : <>
-                        <span className="line-through">Monthly Booking</span>
-                        <span className="text-red-500"> ✖ </span>
-                      </>}
-                  </span>
-                  <span className="text-sm">
-                    ₹{pg.price - (useWallet ? Math.min(user.walletBalance, pg.price * 0.1) : 0)} / month
-                  </span>
-                  {/* Tooltips */}
-                  {pg.availabilityStatus !== "Available" && (
-                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full bg-gray-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
-                      Booking not available
-                    </span>
-                  )}
-                  {!isAuthenticated && pg.availabilityStatus === "Available" && (
-                    <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full bg-blue-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition">
-                      Login required
-                    </span>
-                  )}
-                </button>
-              ) : (
-                <div className="w-full flex flex-col gap-4">
-                  {["rentperNight", "rentperday", "rentperhour"].map((key) => {
-                    if (!pg[key]) return null;
-                    const label = key === "rentperNight" ? "Booking per Night" : key === "rentperday" ? "Booking per Day" : "Booking per Hour";
-                    const price = pg[key];
-                    const isAvailable = pg.occupied === 0;
-                    const colorClasses =
-                      key === "rentperNight"
-                        ? "from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-                        : key === "rentperday"
-                          ? "from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-                          : "from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700";
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => isAvailable && handleBook({ totalAmount: price, walletUsed: 0, payableAmount: price })}
-                        disabled={!isAvailable}
-                        className={`flex justify-between items-center w-full py-4 px-6 rounded-xl font-semibold shadow-lg transition transform
-              ${isAvailable
-                            ? `bg-gradient-to-r ${colorClasses} text-white hover:-translate-y-1 hover:scale-105`
-                            : "bg-gray-200 text-gray-500 cursor-not-allowed relative group"
-                          }`}
+                <div className="pl-4 space-y-2">
+                  {pg.services?.length > 0 ? (
+                    pg.services.map((s) => (
+                      <div
+                        key={s._id}
+                        className="flex justify-between text-gray-800 text-sm"
                       >
-                        <div className="flex flex-col text-left">
-                          <span className="text-lg font-bold">
-                            {isAvailable ? label : <>
-                              <span className="line-through">{label}</span>
-                              <span className="text-red-500 ml-1">✖</span>
-                            </>}
-                          </span>
-                          <span className="text-sm mt-1">₹{price} {key === "rentperNight" ? "/ night" : key === "rentperday" ? "/ day" : "/ hour"}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
+                        <span>{s.name}</span>
+                        <span>₹{s.price}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex justify-between text-gray-800 text-sm">
+                      <span>Room / House Rent</span>
+                      <span>₹{pg.price}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between border-t pt-2 font-semibold">
+                    <span>Total Rent / month</span>
+                    <span>₹{pg.price}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ================= ADVANCE ================= */}
+              {pg.advancedmonth > 0 && (
+                <div>
+                  <h4 className="text-gray-700 font-semibold text-lg mb-2">
+                    Advance Payment
+                  </h4>
+
+                  <div className="flex justify-between bg-gray-50 px-3 py-2 rounded-lg">
+                    <span>
+                      {pg.advancedmonth} Month
+                      {pg.advancedmonth > 1 ? "s" : ""} Advance
+                    </span>
+                    <span>₹{pg.price * pg.advancedmonth}</span>
+                  </div>
                 </div>
               )}
-            </div>
 
+              {/* ================= TOTAL ================= */}
+              {(() => {
+                const totalRent =
+                  pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0);
+
+                const maxWalletAllowed = totalRent * 0.1;
+                const walletDiscount = Math.min(
+                  user?.walletBalance || 0,
+                  maxWalletAllowed
+                );
+
+                const finalAfterWallet = totalRent - walletDiscount;
+                const isWalletApplicable = finalAfterWallet > 1;
+
+                return (
+                  <>
+                    <div className="border-t pt-3 flex justify-between text-lg font-bold">
+                      <span>Total Payable</span>
+                      <span>₹{totalRent}</span>
+                    </div>
+
+                    {/* ================= WALLET CASES ================= */}
+                    {isAuthenticated && pg.availabilityStatus === "Available" && (
+                      <>
+                        {user?.walletBalance > 0 && (
+                          <div
+                            className={`mt-3 flex items-center gap-3 px-4 py-3 rounded-xl border
+                  ${isWalletApplicable
+                                ? "bg-green-50 border-green-200"
+                                : "bg-gray-50 border-gray-300"
+                              }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={useWallet}
+                              disabled={!isWalletApplicable}
+                              onChange={() => setUseWallet(!useWallet)}
+                              className="h-5 w-5 accent-green-600 disabled:opacity-50"
+                            />
+
+                            <div className="flex flex-col">
+                              <span className="text-sm font-semibold">
+                                Use Wallet Balance
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                Available: ₹{user.walletBalance}
+                              </span>
+                            </div>
+
+                            <span className="ml-auto text-sm font-semibold">
+                              {isWalletApplicable ? (
+                                useWallet ? (
+                                  <span className="text-green-700">
+                                    −₹{walletDiscount}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-500">Optional</span>
+                                )
+                              ) : (
+                                <span className="text-red-500">
+                                  Not Applicable 
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* ================= FINAL PAYABLE ================= */}
+                        <div className="flex justify-between font-bold text-lg mt-2">
+                          <span>Final Payable</span>
+                          <span>
+                            ₹
+                            {totalRent -
+                              (useWallet && isWalletApplicable
+                                ? walletDiscount
+                                : 0)}
+                          </span>
+                        </div>
+
+                        {/* ================= CONFIRM ================= */}
+                        <button
+                          onClick={() =>
+                            handleBook({
+                              totalAmount: totalRent,
+                              walletUsed:
+                                useWallet && isWalletApplicable
+                                  ? walletDiscount
+                                  : 0,
+                              payableAmount:
+                                totalRent -
+                                (useWallet && isWalletApplicable
+                                  ? walletDiscount
+                                  : 0),
+                            })
+                          }
+                          className="w-full mt-4 py-4 rounded-xl font-semibold
+                text-white bg-blue-600 hover:bg-blue-700 transition"
+                        >
+                          Confirm Booking
+                        </button>
+                      </>
+                    )}
+
+                    {!isAuthenticated && (
+                      <button
+                        disabled
+                        className="w-full mt-4 py-4 rounded-xl font-semibold
+              bg-gray-300 text-white cursor-not-allowed"
+                      >
+                        Login to Book
+                      </button>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
           </InfoBlock>
+
+
+
+
+
+
 
           {/* ================== ACTION BUTTONS ================== */}
           <InfoBlock title="Actions">

@@ -16,7 +16,7 @@ import Login from "./pages/auth/loginpage";
 import TenantDetails from "./pages/c-xyz/tenantdetail";
 import EditTenant from "./pages/c-xyz/Editingtenant";
 import NotPaidTenants from "./pages/c-xyz/notpaidtenant";
-import AddRoomForm from "./pages/c-xyz/addroom";
+import AddRoomForm from "./pages/c-xyz/addrooms/addroom";
 import ShowRooms from "./pages/c-xyz/showallroom";
 import { AddHotelRoom } from "./pages/c-xyz/hotelroom";
 import EditRoomForm from "./pages/c-xyz/editpage";
