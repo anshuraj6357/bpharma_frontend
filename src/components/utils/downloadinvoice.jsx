@@ -22,7 +22,7 @@ export const downloadInvoice = ({ branchName, roomNumber, amount, bookingId }) =
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
   doc.setTextColor(PRIMARY);
-  doc.text("PG Booking Invoice", pageWidth / 2, 45, { align: "center" });
+  doc.text(" Booking Invoice", pageWidth / 2, 45, { align: "center" });
 
   // Company Info
   doc.setFont("helvetica", "normal");

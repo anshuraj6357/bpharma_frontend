@@ -21,63 +21,161 @@ import {
 /* ============================
    RAZORPAY SCRIPT LOADER
 ============================ */
+/* ============================
+   RAZORPAY SCRIPT LOADER
+============================ */
 function loadRazorpayScript() {
   return new Promise((resolve) => {
-    if (window.Razorpay) return resolve(true);
-
+    console.log("💡 Loading Razorpay script...");
+    if (window.Razorpay) {
+      console.log("✅ Razorpay script already loaded");
+      return resolve(true);
+    }
 
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
+    script.async = true;
+
+    script.onload = () => {
+      console.log("✅ Razorpay script loaded successfully");
+      resolve(true);
+    };
+    script.onerror = () => {
+      console.error("❌ Razorpay script failed to load");
+      resolve(false);
+    };
+
     document.body.appendChild(script);
   });
 }
 
+/* ============================
+   BOOKING STATUS POLLING
+============================ */
+function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) {
+  console.log("🔁 Starting booking status polling for bookingId:", bookingId);
+  const MAX_RETRIES = 20; // ~1 minute
+  let attempts = 0;
 
+  const interval = setInterval(async () => {
+    attempts++;
+    console.log(`⏳ Polling attempt ${attempts} for bookingId ${bookingId}`);
 
+    try {
+      const res = await fetch(
+        `https://roomgi-backend-project-2.onrender.com/api/payment/status/${bookingId}`,
+        { credentials: "include" }
+      );
+      console.log("📦 Polling response status:", res.status);
+
+      if (!res.ok) throw new Error("Status API failed");
+
+      const data = await res.json();
+      console.log("📊 Polling data:", data);
+
+      if (data.status === "paid") {
+        clearInterval(interval);
+        setIsConfirmingBooking(false);
+        console.log("🎉 Booking confirmed!");
+
+        toast.success("Booking confirmed 🎉");
+
+        navigate("/bookingssuccess", {
+          replace: true,
+          state: {
+            bookingId: data.bookingId,
+            branchName: data.branchName,
+            roomNumber: data.roomNumber,
+            amount: data.amount,
+          },
+        });
+      }
+
+      if (data.status === "failed") {
+        clearInterval(interval);
+        setIsConfirmingBooking(false);
+        console.error("❌ Payment failed / refunded");
+        toast.error("Payment failed / refunded");
+        navigate(-1);
+      }
+
+      if (attempts >= MAX_RETRIES) {
+        clearInterval(interval);
+        setIsConfirmingBooking(false);
+        console.warn("⚠ Verification taking longer than usual");
+        toast.warning("Verification taking longer than usual");
+      }
+    } catch (err) {
+      console.error("Polling error:", err);
+    }
+  }, 3000);
+}
+
+/* =========================
+   START PAYMENT
+========================= */
 async function startPayment(
   amount,
   razorpayPayment,
   razorpayPaymentVerify,
   roomId,
   navigate,
-  setIsConfirmingBooking
+  setIsConfirmingBooking,
+  user
 ) {
+  console.log("💳 Initiating payment for roomId:", roomId, "amount:", amount);
+
   try {
     // 1️⃣ Load Razorpay SDK
     const loaded = await loadRazorpayScript();
     if (!loaded) {
-      toast.error("Razorpay SDK failed to load");
+      toast.error("Payment SDK failed to load");
+      console.error("❌ Razorpay SDK failed to load");
       return;
     }
+    console.log("✅ Razorpay SDK loaded");
 
-    // 2️⃣ Create Order (Backend)
+    // 2️⃣ Create Razorpay order on backend
+    console.log("📦 Creating Razorpay order...");
     const response = await razorpayPayment({
-      amount: amount.payableAmount * 100, // paisa
+      amount: amount.payableAmount, // amount in INR
       receipt: `receipt_${Date.now()}_${roomId}`,
     }).unwrap();
+
+    console.log("📦 Razorpay order response:", response);
 
     const order = response?.order;
     if (!order) {
       toast.error("Order creation failed");
+      console.error("❌ Order creation failed, response:", response);
       return;
     }
 
-    // 3️⃣ Razorpay Options
+    // 3️⃣ Minimum amount check
+    if (order.amount < 100) { // Razorpay minimum 1 INR = 100 paise
+      toast.error("Amount too low. Minimum 1 INR required.");
+      console.error("❌ Order amount too low:", order.amount);
+      return;
+    }
+    console.log("✅ Order amount OK (paise):", order.amount);
+
+    // 4️⃣ Razorpay payment modal options
     const options = {
-      key: "rzp_live_Rn8nwfw3Hdmb8E", // 🔐 env me rakho ideally
-      amount: order.amount,
+      key: "rzp_live_Rn8nwfw3Hdmb8E",
+      amount: order.amount, // already in paise from backend
       currency: order.currency,
-      name: "Roomgi.com",
+      name: "Roomgi",
       description: "Room Booking Payment",
       order_id: order.id,
 
-      // ✅ PAYMENT SUCCESS (GPay / UPI / Card sab ke liye)
       handler: async (rzpResponse) => {
-        try {
-          setIsConfirmingBooking(true); // 🔥 loader ON
+        console.log("💡 Razorpay handler called with response:", rzpResponse);
 
+        try {
+          setIsConfirmingBooking(true);
+          toast.info("Confirming your booking ⏳");
+
+          // 5️⃣ Verify payment on backend
           const verifyData = await razorpayPaymentVerify({
             razorpay_order_id: rzpResponse.razorpay_order_id,
             razorpay_payment_id: rzpResponse.razorpay_payment_id,
@@ -86,56 +184,53 @@ async function startPayment(
             amount,
           }).unwrap();
 
+          console.log("📦 Payment verification data:", verifyData);
+
           if (!verifyData?.success) {
-            toast.error("Payment verification failed ❌");
+            toast.error("Payment verification failed");
+            console.error("❌ Payment verification failed");
             setIsConfirmingBooking(false);
             return;
           }
 
-          toast.success("Payment successful 🎉");
-
-          const bookingInfo = {
-            bookingId: verifyData?.bookingId || order.id,
-            branchName: verifyData?.branchName || "PG Name",
-            roomNumber: verifyData?.roomNumber || roomId,
-            amount: amount.payableAmount,
-          };
-
-          navigate("/bookingssuccess", { state: bookingInfo, replace: true });
+          // 6️⃣ Start webhook-based booking status polling
+          console.log("🔁 Starting booking status polling for:", verifyData.booking._id);
+          startBookingStatusPolling(verifyData.booking._id, navigate, setIsConfirmingBooking);
 
         } catch (err) {
-          console.error(err);
-          toast.error("Verification error ❌");
+          console.error("❌ Payment verification error:", err);
+          toast.error("Verification error");
           setIsConfirmingBooking(false);
         }
       },
 
-      // ❌ Payment cancelled
       modal: {
         ondismiss: () => {
-          setIsConfirmingBooking(false);
+          console.log("⚠ Payment modal dismissed by user");
           toast.info("Payment cancelled");
+          setIsConfirmingBooking(false);
         },
       },
 
       prefill: {
-        name: "Guest User",
-        email: "guest@example.com",
+        name: user?.name || "Guest User",
+        email: user?.email || "guest@roomgi.com",
+        contact: user?.phone || "",
       },
 
       theme: { color: "#2563eb" },
     };
 
-    // 4️⃣ Open Razorpay
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+    console.log("💡 Opening Razorpay modal with options:", options);
+    new window.Razorpay(options).open();
 
   } catch (err) {
-    console.error(err);
-    toast.error("Payment error ❌");
+    console.error("❌ Payment failed:", err);
+    toast.error("Payment failed");
     setIsConfirmingBooking(false);
   }
 }
+
 
 
 
@@ -143,6 +238,14 @@ async function startPayment(
    MAIN COMPONENT
 ========================= */
 export default function PGDetailsPage() {
+  const { data: userdata } = useProfileQuery();
+
+
+
+
+  const user = userdata?.profile;
+  console.log(user)
+
   const navigate = useNavigate();
   const { id } = useParams();
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -183,7 +286,6 @@ export default function PGDetailsPage() {
   }, []);
 
   const handleBook = (amount) => {
-
     if (!isAuthenticated) {
       toast.error("Login first");
       return;
@@ -195,11 +297,16 @@ export default function PGDetailsPage() {
       razorpayPaymentVerify,
       id,
       navigate,
-      setIsConfirmingBooking
+      setIsConfirmingBooking,
+      user
     );
   };
 
+
   const handleGetDirections = () => {
+
+
+
     if (!isAuthenticated) return setIsAuthModalOpen(true);
 
     const [lng, lat] = pg?.branch?.location?.coordinates || [];
@@ -221,15 +328,6 @@ export default function PGDetailsPage() {
       })
       : toast.info("Sharing not supported");
   };
-  const { data: userdata } = useProfileQuery();
-
-
-
-
-  const user = userdata?.profile;
-  console.log(user)
-
-
 
   if (isLoading) {
     return (

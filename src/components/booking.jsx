@@ -12,6 +12,8 @@ import {
   AlertCircle,
   Star,
   X,
+  Copy,
+  User,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -19,6 +21,7 @@ import { toast } from "react-toastify";
 
 export default function Booking() {
   const { data, isLoading } = useGetbookingQuery();
+  const bookings = data?.bookings || [];
 
   if (isLoading) {
     return (
@@ -30,8 +33,6 @@ export default function Booking() {
     );
   }
 
-  const bookings = data?.bookings || [];
-
   if (!bookings.length) {
     return (
       <div className="text-center py-20 text-gray-500 text-lg">
@@ -42,9 +43,7 @@ export default function Booking() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold text-center mb-10">
-        My Bookings
-      </h1>
+      <h1 className="text-3xl font-bold text-center mb-10">My Bookings</h1>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {bookings.map((booking) => (
@@ -60,8 +59,9 @@ export default function Booking() {
 function BookingCard({ booking }) {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-
   const [showReview, setShowReview] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
+
   const [createReview, { isLoading: reviewLoading }] =
     useCreateReviewMutation();
 
@@ -73,6 +73,12 @@ function BookingCard({ booking }) {
 
   const hasReviewed = !!userReview;
 
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(text);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   const handleSubmitReview = async (rating, review) => {
     try {
       await createReview({
@@ -80,12 +86,18 @@ function BookingCard({ booking }) {
         rating,
         review,
       }).unwrap();
-
       toast.success("Review submitted successfully");
       setShowReview(false);
     } catch (err) {
       toast.error(err?.data?.message || "Failed to submit review");
     }
+  };
+
+  const statusColors = {
+    processing: "bg-yellow-100 text-yellow-800",
+    success: "bg-green-100 text-green-800",
+    failed: "bg-red-100 text-red-800",
+    "In-Active": "bg-gray-100 text-gray-700",
   };
 
   return (
@@ -106,14 +118,56 @@ function BookingCard({ booking }) {
           <p className="text-sm text-gray-500 flex items-center gap-1">
             <MapPin size={14} /> {booking.branch?.city}
           </p>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs text-gray-400">Booking ID: {booking.bookingId}</span>
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${statusColors[booking.status]}`}
+            >
+              {booking.status}
+            </span>
+          </div>
         </div>
 
         {/* DETAILS */}
         <div className="grid grid-cols-2 gap-4 mt-5 text-sm">
           <Detail label="Room" value={booking.roomNumber} icon={<BedDouble size={14} />} />
-          <Detail label="Rent" value={`₹${booking.Rent}`} icon={<Wallet size={14} />} />
+          <Detail label="Payment Source" value={booking.paymentSource} icon={<Wallet size={14} />} />
+          <Detail label="User" value={booking.username} icon={<User size={14} />} />
+          <Detail label="Email" value={booking.email} icon={<User size={14} />} />
           <Detail label="Check-in" value={formatDate(booking.checkInDate)} icon={<Calendar size={14} />} />
           <Detail label="Check-out" value={booking.checkedoutdate ? formatDate(booking.checkedoutdate) : "—"} icon={<Calendar size={14} />} />
+        </div>
+
+        {/* AMOUNT */}
+        <div className="mt-4 border-t pt-4 space-y-2 text-sm">
+          <p className="flex justify-between">
+            <span>Total Amount</span>
+            <span className="font-semibold">₹{booking.amount?.totalAmount}</span>
+          </p>
+          <p className="flex justify-between">
+            <span>Wallet Used</span>
+            <span className="font-semibold text-green-600">₹{booking.amount?.walletUsed}</span>
+          </p>
+          <p className="flex justify-between">
+            <span>Payable</span>
+            <span className="font-bold text-blue-600">₹{booking.amount?.payableAmount}</span>
+          </p>
+        </div>
+
+        {/* RAZORPAY DETAILS */}
+        <div className="mt-4 border-t pt-4 text-xs space-y-1 text-gray-600">
+          <p className="flex items-center justify-between">
+            <span>Order ID: {booking.razorpay?.orderId}</span>
+            <button onClick={() => handleCopy(booking.razorpay?.orderId)}>
+              <Copy size={14} className={copiedId === booking.razorpay?.orderId ? "text-green-600" : ""} />
+            </button>
+          </p>
+          <p className="flex items-center justify-between">
+            <span>Payment ID: {booking.razorpay?.paymentId}</span>
+            <button onClick={() => handleCopy(booking.razorpay?.paymentId)}>
+              <Copy size={14} className={copiedId === booking.razorpay?.paymentId ? "text-green-600" : ""} />
+            </button>
+          </p>
         </div>
 
         {/* ACTIONS */}
@@ -136,12 +190,11 @@ function BookingCard({ booking }) {
             </button>
           )}
 
-          {hasReviewed &&isCheckedOut&& (
+          {hasReviewed && isCheckedOut && (
             <div className="bg-green-50 border border-green-300 text-green-800 rounded-xl p-3 text-center shadow-sm flex flex-col items-center gap-2 hover:shadow-md transition">
               <p className="font-semibold flex items-center gap-2">
                 <Star size={16} className="text-yellow-400" /> Already Reviewed
               </p>
-              
               <div className="flex gap-1">
                 {Array.from({ length: userReview.rating }).map((_, i) => (
                   <Star key={i} size={16} className="text-yellow-400" />
@@ -166,7 +219,6 @@ function BookingCard({ booking }) {
   );
 }
 
-
 /* ===================== REVIEW MODAL ===================== */
 
 function ReviewModal({ onClose, onSubmit, loading }) {
@@ -180,9 +232,7 @@ function ReviewModal({ onClose, onSubmit, loading }) {
           <X />
         </button>
 
-        <h2 className="text-xl font-bold text-center mb-4">
-          Rate your stay
-        </h2>
+        <h2 className="text-xl font-bold text-center mb-4">Rate your stay</h2>
 
         {/* STARS */}
         <div className="flex justify-center gap-2 mb-4">
@@ -191,10 +241,7 @@ function ReviewModal({ onClose, onSubmit, loading }) {
               key={n}
               size={30}
               onClick={() => setRating(n)}
-              className={`cursor-pointer ${n <= rating
-                  ? "text-yellow-400 fill-yellow-400"
-                  : "text-gray-300"
-                }`}
+              className={`cursor-pointer ${n <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
             />
           ))}
         </div>

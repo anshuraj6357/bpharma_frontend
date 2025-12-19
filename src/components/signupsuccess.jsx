@@ -23,20 +23,7 @@ export default function SignupSuccess() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Auto redirect
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSeconds((prev) => {
-        if (prev === 3) {
-          navigate("/");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
 
-    return () => clearInterval(timer);
-  }, [navigate]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center
