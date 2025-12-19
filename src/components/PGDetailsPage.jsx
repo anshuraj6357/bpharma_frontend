@@ -138,7 +138,7 @@ async function startPayment(
     // 2️⃣ Create Razorpay order on backend
     console.log("📦 Creating Razorpay order...");
     const response = await razorpayPayment({
-      amount: amount.payableAmount, // amount in INR
+      amount: amount.payableAmount*100, // amount in INR
       receipt: `receipt_${Date.now()}_${roomId}`,
     }).unwrap();
 

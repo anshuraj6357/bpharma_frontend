@@ -23,6 +23,23 @@ export default function Booking() {
   const { data, isLoading } = useGetbookingQuery();
   const bookings = data?.bookings || [];
 
+
+  const statusColors = {
+    paid: `
+    bg-gradient-to-r from-emerald-500 via-green-500 to-teal-600
+    text-white shadow-emerald-400/40
+  `,
+    processing: `
+    bg-gradient-to-r from-amber-400 via-orange-500 to-yellow-500
+    text-white shadow-orange-400/40 animate-pulse
+  `,
+    cancelled: `
+    bg-gradient-to-r from-rose-500 via-red-500 to-pink-600
+    text-white shadow-red-400/40
+  `,
+  };
+
+
   if (isLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -102,111 +119,195 @@ function BookingCard({ booking }) {
 
   return (
     <>
-      <div className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition p-5 border">
-        {/* IMAGE */}
-        <img
-          src={booking?.room?.roomImages?.[0] || "/room-placeholder.jpg"}
-          alt="Room"
-          className="h-44 w-full object-cover rounded-2xl"
-        />
+    <div
+  className="
+    bg-white/90 backdrop-blur-xl
+    rounded-3xl
+    border border-gray-200/50
+    shadow-lg hover:shadow-2xl
+    hover:-translate-y-1
+    transition-all duration-300
+    p-6
+    group
+    relative
+  "
+>
+  {/* STATUS BADGE */}
+  <span
+    className={`
+      absolute top-4 right-4
+      inline-flex items-center gap-2
+      px-4 py-1.5
+      text-xs font-semibold uppercase tracking-wider
+      rounded-full
+      shadow-lg
+      ring-1 ring-white/30
+      backdrop-blur-md
+      transition-all duration-300
+      group-hover:scale-105
+      ${statusColors[booking.status]}
+    `}
+  >
+    <span
+      className={`
+        w-2.5 h-2.5 rounded-full
+        ${booking.status === "paid" && "bg-green-300 animate-pulse"}
+        ${booking.status === "processing" && "bg-yellow-300 animate-pulse"}
+        ${booking.status === "cancelled" && "bg-red-300"}
+      `}
+    />
+    <span className="capitalize">{booking.status}</span>
+  </span>
 
-        {/* INFO */}
-        <div className="mt-4 space-y-1">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <Home size={18} /> {booking.branch?.name}
-          </h2>
-          <p className="text-sm text-gray-500 flex items-center gap-1">
-            <MapPin size={14} /> {booking.branch?.city}
-          </p>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs text-gray-400">Booking ID: {booking.bookingId}</span>
-            <span
-              className={`text-xs px-2 py-1 rounded-full ${statusColors[booking.status]}`}
-            >
-              {booking.status}
-            </span>
-          </div>
-        </div>
+  {/* INFO */}
+  <div className="space-y-1 pr-20">
+    <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+      <Home size={18} className="text-indigo-600" />
+      {booking.branch?.name}
+    </h2>
 
-        {/* DETAILS */}
-        <div className="grid grid-cols-2 gap-4 mt-5 text-sm">
-          <Detail label="Room" value={booking.roomNumber} icon={<BedDouble size={14} />} />
-          <Detail label="Payment Source" value={booking.paymentSource} icon={<Wallet size={14} />} />
-          <Detail label="User" value={booking.username} icon={<User size={14} />} />
-          <Detail label="Email" value={booking.email} icon={<User size={14} />} />
-          <Detail label="Check-in" value={formatDate(booking.checkInDate)} icon={<Calendar size={14} />} />
-          <Detail label="Check-out" value={booking.checkedoutdate ? formatDate(booking.checkedoutdate) : "—"} icon={<Calendar size={14} />} />
-        </div>
+    <p className="text-sm text-gray-500 flex items-center gap-1">
+      <MapPin size={14} />
+      {booking.branch?.city}
+    </p>
 
-        {/* AMOUNT */}
-        <div className="mt-4 border-t pt-4 space-y-2 text-sm">
-          <p className="flex justify-between">
-            <span>Total Amount</span>
-            <span className="font-semibold">₹{booking.amount?.totalAmount}</span>
-          </p>
-          <p className="flex justify-between">
-            <span>Wallet Used</span>
-            <span className="font-semibold text-green-600">₹{booking.amount?.walletUsed}</span>
-          </p>
-          <p className="flex justify-between">
-            <span>Payable</span>
-            <span className="font-bold text-blue-600">₹{booking.amount?.payableAmount}</span>
-          </p>
-        </div>
+    <p className="text-xs text-gray-400">
+      Booking ID:
+      <span className="ml-1 font-medium text-gray-600">
+        {booking.bookingId}
+      </span>
+    </p>
+  </div>
 
-        {/* RAZORPAY DETAILS */}
-        <div className="mt-4 border-t pt-4 text-xs space-y-1 text-gray-600">
-          <p className="flex items-center justify-between">
-            <span>Order ID: {booking.razorpay?.orderId}</span>
-            <button onClick={() => handleCopy(booking.razorpay?.orderId)}>
-              <Copy size={14} className={copiedId === booking.razorpay?.orderId ? "text-green-600" : ""} />
-            </button>
-          </p>
-          <p className="flex items-center justify-between">
-            <span>Payment ID: {booking.razorpay?.paymentId}</span>
-            <button onClick={() => handleCopy(booking.razorpay?.paymentId)}>
-              <Copy size={14} className={copiedId === booking.razorpay?.paymentId ? "text-green-600" : ""} />
-            </button>
-          </p>
-        </div>
+  <hr className="my-5 border-gray-200/70" />
 
-        {/* ACTIONS */}
-        <div className="mt-6 flex flex-col gap-3">
-          {!isCheckedOut && (
-            <button
-              onClick={() => navigate(`/complain/${booking.branch?._id}`)}
-              className="bg-red-50 text-red-600 py-2.5 rounded-xl hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-1"
-            >
-              <AlertCircle size={16} /> Raise Complaint
-            </button>
-          )}
+  {/* DETAILS */}
+  <div className="grid grid-cols-2 gap-4 text-sm">
+    <Detail label="Room" value={booking.roomNumber} icon={<BedDouble size={15} />} />
+    <Detail label="Payment" value={booking.paymentSource} icon={<Wallet size={15} />} />
+    <Detail label="User" value={booking.username} icon={<User size={15} />} />
+    <Detail label="Email" value={booking.email} icon={<User size={15} />} />
+    <Detail label="Check-in" value={formatDate(booking.checkInDate)} icon={<Calendar size={15} />} />
+    <Detail
+      label="Check-out"
+      value={booking.checkedoutdate ? formatDate(booking.checkedoutdate) : "—"}
+      icon={<Calendar size={15} />}
+    />
+  </div>
 
-          {isCheckedOut && !hasReviewed && (
-            <button
-              onClick={() => setShowReview(true)}
-              className="bg-yellow-500 text-white py-2.5 rounded-xl hover:bg-yellow-600 transition flex items-center justify-center gap-1"
-            >
-              <Star size={16} /> Rate & Review
-            </button>
-          )}
+  {/* AMOUNT */}
+  <div className="mt-6 rounded-2xl bg-gray-50 p-4 space-y-2 text-sm">
+    <p className="flex justify-between">
+      <span className="text-gray-500">Total Amount</span>
+      <span className="font-semibold text-gray-900">
+        ₹{booking.amount?.totalAmount}
+      </span>
+    </p>
 
-          {hasReviewed && isCheckedOut && (
-            <div className="bg-green-50 border border-green-300 text-green-800 rounded-xl p-3 text-center shadow-sm flex flex-col items-center gap-2 hover:shadow-md transition">
-              <p className="font-semibold flex items-center gap-2">
-                <Star size={16} className="text-yellow-400" /> Already Reviewed
-              </p>
-              <div className="flex gap-1">
-                {Array.from({ length: userReview.rating }).map((_, i) => (
-                  <Star key={i} size={16} className="text-yellow-400" />
-                ))}
-                {Array.from({ length: 5 - userReview.rating }).map((_, i) => (
-                  <Star key={i} size={16} className="text-gray-300" />
-                ))}
-              </div>
-            </div>
-          )}
+    <p className="flex justify-between">
+      <span className="text-gray-500">Wallet Used</span>
+      <span className="font-semibold text-green-600">
+        ₹{booking.amount?.walletUsed}
+      </span>
+    </p>
+
+    <p className="flex justify-between text-base">
+      <span className="font-medium text-gray-700">Payable</span>
+      <span className="
+        font-extrabold
+        text-transparent bg-clip-text
+        bg-gradient-to-r from-indigo-600 to-purple-600
+      ">
+        ₹{booking.amount?.payableAmount}
+      </span>
+    </p>
+  </div>
+
+  {/* RAZORPAY */}
+  <div className="mt-5 text-xs text-gray-500 space-y-2">
+    {[
+      { label: "Order ID", value: booking.razorpay?.orderId },
+      { label: "Payment ID", value: booking.razorpay?.paymentId },
+    ].map(({ label, value }) => (
+      <div key={label} className="flex justify-between items-center">
+        <span>
+          {label}: <span className="font-medium">{value}</span>
+        </span>
+        <button
+          onClick={() => handleCopy(value)}
+          className="hover:text-indigo-600 transition"
+          title="Copy"
+        >
+          <Copy
+            size={14}
+            className={
+              copiedId === value ? "text-green-600" : "text-gray-400"
+            }
+          />
+        </button>
+      </div>
+    ))}
+  </div>
+
+  {/* ACTIONS */}
+  <div className="mt-6 flex flex-col gap-3">
+    {!isCheckedOut && booking.status === "paid" && (
+      <button
+        onClick={() => navigate(`/complain/${booking.branch?._id}`)}
+        className="
+          bg-gradient-to-r from-red-500 to-red-600
+          text-white py-3 rounded-xl
+          hover:from-red-600 hover:to-red-700
+          transition
+          flex items-center justify-center gap-2
+          font-semibold
+          shadow-md hover:shadow-xl
+        "
+      >
+        <AlertCircle size={16} /> Raise Complaint
+      </button>
+    )}
+
+    {isCheckedOut && !hasReviewed && (
+      <button
+        onClick={() => setShowReview(true)}
+        className="
+          bg-gradient-to-r from-yellow-500 to-yellow-600
+          text-white py-3 rounded-xl
+          hover:from-yellow-600 hover:to-yellow-700
+          transition
+          flex items-center justify-center gap-2
+          font-semibold
+          shadow-md hover:shadow-xl
+        "
+      >
+        <Star size={16} /> Rate & Review
+      </button>
+    )}
+
+    {hasReviewed && isCheckedOut && (
+      <div className="
+        bg-green-50 border border-green-300
+        text-green-800 rounded-xl p-4
+        text-center shadow-sm
+        flex flex-col items-center gap-2
+      ">
+        <p className="font-semibold flex items-center gap-2">
+          <Star size={16} className="text-yellow-400" /> Already Reviewed
+        </p>
+        <div className="flex gap-1">
+          {Array.from({ length: userReview.rating }).map((_, i) => (
+            <Star key={i} size={16} className="text-yellow-400" />
+          ))}
+          {Array.from({ length: 5 - userReview.rating }).map((_, i) => (
+            <Star key={i} size={16} className="text-gray-300" />
+          ))}
         </div>
       </div>
+    )}
+  </div>
+</div>
+
 
       {showReview && (
         <ReviewModal
