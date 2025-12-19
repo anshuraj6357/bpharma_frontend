@@ -357,6 +357,18 @@ export default function PGDetailsPage() {
   const isWalletApplicable = finalAfterWallet > 1;
 
 
+  const ShowAllButton = () => (
+    <button
+      onClick={() => navigate(`/allpotos/${id}`)}
+      className="absolute bottom-4 right-4 bg-white/90 backdrop-blur
+    px-4 py-2 rounded-lg shadow-md text-sm font-semibold
+    hover:bg-white transition z-10"
+    >
+      Show all photos
+    </button>
+  );
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -384,91 +396,156 @@ export default function PGDetailsPage() {
       <div className="max-w-6xl mx-auto mt-6 relative h-auto">
 
         {/* ------- MOBILE LAYOUT (hidden on md+) ------- */}
-        <div className="md:hidden grid grid-cols-2 grid-rows-3 gap-2 h-[400px]">
+        <div className="md:hidden w-full h-[400px] relative overflow-hidden rounded-2xl">
 
-          {/* Big top image */}
-          <div className="col-span-2 row-span-2 overflow-hidden rounded-t-2xl">
+          {/* ===== SINGLE IMAGE ===== */}
+          {allImages.length === 1 && (
             <img
               src={allImages[0]}
               className="w-full h-full object-cover"
             />
-          </div>
+          )}
 
-          {/* Bottom 2 small images */}
-          <div className="overflow-hidden">
-            <img
-              src={allImages[1]}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {/* ===== TWO IMAGES ===== */}
+          {allImages.length === 2 && (
+            <div className="grid grid-cols-2 h-full gap-1">
+              {allImages.map((img, i) => (
+                <img
+                  key={i}
+                  src={img}
+                  className="w-full h-full object-cover"
+                />
+              ))}
+            </div>
+          )}
 
-          <div className="overflow-hidden relative">
+          {/* ===== THREE OR MORE IMAGES ===== */}
+          {allImages.length >= 3 && (
+            <div className="grid grid-cols-2 grid-rows-3 gap-1 h-full">
 
-            <img
-              src={allImages[2]}
-              className="w-full h-full object-cover rounded-b-2xl"
-            />
+              {/* Big top image */}
+              <div className="col-span-2 row-span-2 overflow-hidden">
+                <img
+                  src={allImages[0]}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
-            {/* Show all button */}
+              {/* Bottom left */}
+              <div className="overflow-hidden">
+                <img
+                  src={allImages[1]}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Bottom right */}
+              <div className="overflow-hidden relative">
+                <img
+                  src={allImages[2]}
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Overlay */}
+                {allImages.length > 3 && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <span className="text-white font-semibold text-lg">
+                      +{allImages.length - 3} more
+                    </span>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
+
+          {/* ===== SHOW ALL BUTTON (ALWAYS VISIBLE) ===== */}
+          {allImages.length > 1 && (
             <button
               onClick={() => navigate(`/allpotos/${id}`)}
-              className="absolute bottom-3 right-3 bg-white/90 px-3 py-2 rounded-lg shadow"
+              className="absolute bottom-3 right-3
+        bg-white/90 backdrop-blur
+        px-4 py-2 rounded-xl
+        text-sm font-semibold shadow-lg"
             >
               Show all photos
             </button>
-          </div>
-
+          )}
         </div>
+
 
 
 
         {/* ------- DESKTOP LAYOUT (hidden on mobile) ------- */}
-        <div className="hidden md:grid grid-cols-4 grid-rows-2 gap-2 h-[500px]">
+        {/* ================= IMAGE GRID ================= */}
+        <div className="hidden md:block h-[500px]">
 
-          {/* Big left image */}
-          <div className="col-span-2 row-span-2 overflow-hidden rounded-l-2xl">
-            <img
-              src={allImages[0]}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {/* ===== 1 IMAGE ===== */}
+          {allImages.length === 1 && (
+            <div className="relative h-full rounded-2xl overflow-hidden">
+              <img src={allImages[0]} className="w-full h-full object-cover" />
 
-          <div className="overflow-hidden">
-            <img
-              src={allImages[1]}
-              className="w-full h-full object-cover"
-            />
-          </div>
+              <ShowAllButton />
+            </div>
+          )}
 
-          <div className="overflow-hidden rounded-tr-2xl">
-            <img
-              src={allImages[2]}
-              className="w-full h-full object-cover"
-            />
-          </div>
+          {/* ===== 2 IMAGES ===== */}
+          {allImages.length === 2 && (
+            <div className="grid grid-cols-2 gap-2 h-full">
+              {allImages.map((img, i) => (
+                <div key={i} className="relative rounded-2xl overflow-hidden">
+                  <img src={img} className="w-full h-full object-cover" />
+                </div>
+              ))}
 
-          <div className="overflow-hidden">
-            <img
-              src={allImages[3]}
-              className="w-full h-full object-cover"
-            />
-          </div>
+              <ShowAllButton />
+            </div>
+          )}
 
-          <div className="overflow-hidden rounded-br-2xl relative">
-            <img
-              src={allImages[4]}
-              className="w-full h-full object-cover"
-            />
+          {/* ===== 3 IMAGES (PERFECT LAYOUT) ===== */}
+          {allImages.length === 3 && (
+            <div className="grid grid-cols-3 grid-rows-2 gap-2 h-full relative">
 
-            <button
-              onClick={() => navigate(`/allpotos/${id}`)}
-              className="absolute bottom-3 right-3 bg-white/90 px-4 py-2 rounded-lg shadow"
-            >
-              Show all photos
-            </button>
-          </div>
+              <div className="col-span-2 row-span-2 rounded-l-2xl overflow-hidden">
+                <img src={allImages[0]} className="w-full h-full object-cover" />
+              </div>
 
+              <div className="rounded-tr-2xl overflow-hidden">
+                <img src={allImages[1]} className="w-full h-full object-cover" />
+              </div>
+
+              <div className="rounded-br-2xl overflow-hidden">
+                <img src={allImages[2]} className="w-full h-full object-cover" />
+              </div>
+
+              <ShowAllButton />
+            </div>
+          )}
+
+          {/* ===== 4 OR MORE IMAGES ===== */}
+          {allImages.length >= 4 && (
+            <div className="grid grid-cols-4 grid-rows-2 gap-2 h-full relative">
+
+              <div className="col-span-2 row-span-2 rounded-l-2xl overflow-hidden">
+                <img src={allImages[0]} className="w-full h-full object-cover" />
+              </div>
+
+              {allImages.slice(1, 5).map((img, i) => (
+                <div
+                  key={i}
+                  className={`overflow-hidden ${i === 1 ? "rounded-tr-2xl" : ""
+                    } ${i === 3 ? "rounded-br-2xl" : ""}`}
+                >
+                  <img src={img} className="w-full h-full object-cover" />
+                </div>
+              ))}
+
+              <ShowAllButton />
+            </div>
+          )}
         </div>
+
+
 
       </div>
 
@@ -481,128 +558,130 @@ export default function PGDetailsPage() {
 
           {/* BASIC INFORMATION */}
           <InfoBlock title="Basic Information">
-            <div className="space-y-4">
+            <div className="space-y-8">
 
-              <h2 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
-                {pg.branch.name}
-                {pg.verified && (
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm flex items-center gap-1">
-                    <BadgeCheck className="w-4 h-4" /> Verified
-                  </span>
-                )}
-              </h2>
+              {/* ================= TITLE + VERIFIED ================= */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h2 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
+                  {pg.branch.name}
 
-              <div className="flex items-center gap-3 mt-3 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-xl w-fit shadow-sm">
-                {/* Star Icon */}
-                <div className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100">
-                  <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                </div>
+                  {pg.verified && (
+                    <span className="flex items-center gap-1 px-3 py-1
+          bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                      <BadgeCheck className="w-4 h-4" /> Verified
+                    </span>
+                  )}
+                </h2>
 
-                {/* Rating Info */}
-                <div className="flex flex-col leading-tight">
-                  <span className="text-lg font-bold text-gray-900">
-                    {pg.personalreview && pg.personalreview.length > 0
-                      ? (pg.totalrating / pg.personalreview.length).toFixed(1)
-                      : "0.0"}
-                    <span className="text-sm font-medium text-gray-600"> / 5</span>
-                  </span>
+                {/* ================= RATING CARD ================= */}
+                <div className="flex items-center gap-3 bg-yellow-50
+        border border-yellow-200 px-4 py-2 rounded-xl shadow-sm">
 
-                  <span className="text-sm text-gray-600">
-                    {pg.personalreview && pg.personalreview.length || 0} Reviews
-                  </span>
+                  <div className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100">
+                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                  </div>
+
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-lg font-bold text-gray-900">
+                      {pg.personalreview?.length > 0
+                        ? (pg.totalrating / pg.personalreview.length).toFixed(1)
+                        : "0.0"}
+                      <span className="text-sm text-gray-600"> / 5</span>
+                    </span>
+
+                    <span className="text-sm text-gray-600">
+                      {pg.personalreview?.length || 0} Reviews
+                    </span>
+                  </div>
                 </div>
               </div>
 
+              {/* ================= PROPERTY DETAILS CARD ================= */}
+              <div className="bg-gradient-to-br from-white to-gray-50
+      rounded-3xl border border-gray-200 shadow-xl p-8 space-y-8">
 
-              {/* Room Overview */}
-              <div className="mt-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg p-8 border border-gray-200 space-y-4">
+                <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  🏠 Property & Room Details
+                </h3>
 
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">🏠 Property & Room Information</h2>
+                {/* ================= INFO GRID ================= */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <InfoItem label="Address" value={data?.roomz} />
+                  <InfoItem label="City" value={pg.city} />
+                  <InfoItem label="Room Number" value={pg.roomNumber} />
 
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-500 font-medium">Address</span>
-                    <p className="text-lg font-semibold text-gray-800 tracking-wide">{data?.roomz}</p>
+                  <InfoItem
+                    label="Room Type"
+                    value={
+                      pg.category === "Hotel"
+                        ? pg.hoteltype
+                        : pg.category === "Pg"
+                          ? pg.type
+                          : pg.category === "Rented-Room"
+                            ? pg.renttype === "Flat-Rent"
+                              ? pg.flattype
+                              : pg.roomtype
+                            : ""
+                    }
+                  />
+
+                  <InfoItem label="Furnished" value={pg.furnishedType} />
+
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm text-gray-500 font-medium">Advance</span>
+
+                    {pg.advancedmonth > 0 ? (
+                      <p className="text-xl font-bold text-indigo-700">
+                        {pg.advancedmonth} month{pg.advancedmonth > 1 ? "s" : ""}
+                      </p>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm px-3 py-1 rounded-full
+        bg-green-100 text-green-700 font-semibold">
+                          No Advance Required
+                        </span>
+                      </div>
+                    )}
                   </div>
-
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-500 font-medium">City</span>
-                    <p className="text-lg font-semibold text-gray-800 tracking-wide">{pg.city}</p>
-                  </div>
-
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-500 font-medium">Room Number</span>
-                    <p className="text-lg font-semibold text-gray-800 tracking-wide">{pg.roomNumber}</p>
-                  </div>
-
-
-
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-500 font-medium">Room Type</span>
-
-                    <p className="text-lg font-semibold text-gray-800 tracking-wide">
-                      {
-                        pg.category === "Hotel" ? (
-                          pg.hoteltype
-                        ) : pg.category === "Pg" ? (
-                          pg.type
-                        ) : pg.category === "Rented-Room" ? (
-                          pg.renttype === "Flat-Rent"
-                            ? pg.flattype
-                            : pg.renttype === "Room-Rent"
-                              ? pg.roomtype
-                              : ""
-                        ) : ""
-                      }
-                    </p>
-
-                  </div>
-
-
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-500 font-medium">Furnished</span>
-                    <p className="text-lg font-semibold text-gray-800 tracking-wide">{pg.furnishedType}</p>
-                  </div>
-
-
 
 
                   <div className="flex flex-col">
                     <span className="text-sm text-gray-500 font-medium">Availability</span>
-                    <p className={`text-xl font-bold tracking-wide ${pg.availabilityStatus === "Available" ? "text-green-600" : "text-red-600"}`}>
+                    <p
+                      className={`text-xl font-bold ${pg.availabilityStatus === "Available"
+                        ? "text-green-600"
+                        : "text-red-600"
+                        }`}
+                    >
                       {pg.availabilityStatus}
                     </p>
                   </div>
+                </div>
 
-                  <div className="flex gap-6 mt-4">
+                {/* ================= OCCUPANCY STATS ================= */}
+                <div className="flex flex-wrap gap-6 pt-6 border-t border-gray-200">
 
-                    <div className="flex flex-col items-center backdrop-blur-xl bg-white/40 px-6 py-3 rounded-2xl shadow-lg border border-white/30">
-                      <span className="text-sm font-medium text-gray-600">Occupied</span>
-                      <p className="text-3xl font-extrabold text-red-600 drop-shadow-sm">{pg.occupied || "0"}</p>
-                    </div>
+                  <StatCard
+                    label="Occupied"
+                    value={pg.occupied || "0"}
+                    color="red"
+                  />
 
-                    <div className="flex flex-col items-center backdrop-blur-xl bg-white/40 px-6 py-3 rounded-2xl shadow-lg border border-white/30">
-                      <span className="text-sm font-medium text-gray-600">Vacant</span>
-
-                      {pg?.category === "Pg" ? (
-                        <p className="text-3xl font-extrabold text-green-600 drop-shadow-sm">
-                          {pg.vacant}
-                        </p>
-                      ) : (
-                        <p className="text-3xl font-extrabold text-green-600 drop-shadow-sm">
-                          {Math.max(0, pg.vacant - pg.occupied)}
-                        </p>
-                      )}
-                    </div>
-
-
-                  </div>
+                  <StatCard
+                    label="Vacant"
+                    value={
+                      pg.category === "Pg"
+                        ? pg.vacant
+                        : Math.max(0, pg.vacant - pg.occupied)
+                    }
+                    color="green"
+                  />
                 </div>
               </div>
-
             </div>
           </InfoBlock>
+
 
           {/* DESCRIPTION */}
           {pg.description && (
@@ -777,7 +856,7 @@ export default function PGDetailsPage() {
                                 )
                               ) : (
                                 <span className="text-red-500">
-                                  Not Applicable 
+                                  Not Applicable
                                 </span>
                               )}
                             </span>
@@ -919,3 +998,27 @@ function Action({ icon, label, onClick, whatsappNumber, isAuthenticated, onAuthO
     </button>
   );
 }
+
+const InfoItem = ({ label, value }) => (
+  <div className="flex flex-col">
+    <span className="text-sm text-gray-500 font-medium">{label}</span>
+    <p className="text-lg font-semibold text-gray-800 tracking-wide">
+      {value || "—"}
+    </p>
+  </div>
+);
+
+const StatCard = ({ label, value, color }) => (
+  <div className="flex flex-col items-center
+    bg-white/70 backdrop-blur-xl
+    px-6 py-4 rounded-2xl shadow-lg border border-white/30">
+    <span className="text-sm font-medium text-gray-600">{label}</span>
+    <p
+      className={`text-3xl font-extrabold ${color === "green" ? "text-green-600" : "text-red-600"
+        }`}
+    >
+      {value}
+    </p>
+  </div>
+);
+
