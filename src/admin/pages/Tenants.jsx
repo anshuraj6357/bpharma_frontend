@@ -699,7 +699,7 @@ export default function Tenants() {
 
 
     const handleAddTenant = () => {
-    setadding(true)
+    setAdding(true)
   };
 
 

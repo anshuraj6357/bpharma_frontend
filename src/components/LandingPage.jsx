@@ -206,6 +206,14 @@ export default function LandingPage() {
         )}
       </div>
 
+
+
+
+
+
+
+
+
       {/* ---------------------- POPULAR CITIES ---------------------- */}
       <section className="w-full py-16 bg-gradient-to-b from-white via-gray-50 to-gray-100 text-center">
         <h2 className="text-3xl font-bold mb-3">Rooms in Popular Cities</h2>
