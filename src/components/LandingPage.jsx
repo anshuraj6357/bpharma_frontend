@@ -232,7 +232,7 @@ export default function LandingPage() {
       </section>
 
       {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
-      <Footer />
+      
     </div>
   );
 }
