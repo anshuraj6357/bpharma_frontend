@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
 import LandingPage from './components/LandingPage';
-import WishlistDetails from "./components/mywishlist";
+import TenantDashboard from "./components/mywishlist";
 import PGDetailsPage from './components/PGDetailsPage';
 import PGMap from "./components/pgmap.jsx";
 import AuthModal from "./components/AuthModal";
@@ -35,6 +35,24 @@ import Profile from "./components/myprofile"
 import SignupSuccess from "./components/signupsuccess";
 import ScrollToTop from "./components/ScrollToTop";
 import BookingSuccess from "./components/bookingssuccess"
+import PayRentPanel from "./components/payrent";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function App() {
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
@@ -90,7 +108,7 @@ function App() {
             <Route path="/pg/:id" element={<PGDetailsPage />} />
             <Route path="/PGMap/:branchId" element={<PGMap />} />
             <Route path="/Wishlist" element={<Wishlist />} />
-            <Route path="/Wishlistdetails" element={<WishlistDetails />} />
+            <Route path="/Wishlistdetails/:id" element={<TenantDashboard />} />
             <Route path="/search/:city" element={<Searched />} />
             <Route path="/complain/:branchId" element={<CreateComplaint />} />
             <Route path="/mycomplain" element={<ComplaintsPage />} />
@@ -115,6 +133,8 @@ function App() {
           <Route path="/aboutus" element={<AboutUs />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/payrent/:id" element={<PayRentPanel />} />
+
 
           {/* Admin */}
           <Route path="/admin/*" element={<AdminApp />} />

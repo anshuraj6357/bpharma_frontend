@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/tenant/";
+const USER_API = "http://localhost:5000/api/tenant/";
 
 
 const TenantApi = createApi({
@@ -55,6 +55,9 @@ const TenantApi = createApi({
             query: (id) => `GetTenantByid/${id}`,
             providesTags: ["Tenant"],
         }),
+        getpayrenttenantdashboard:builder.query({
+            query:(id)=>`getdashboard/${id}`
+        }),
 
         updateTenant: builder.mutation({
             query: ({ formdata, id }) => ({
@@ -83,6 +86,7 @@ const TenantApi = createApi({
 
 export const {
     useAddTenantMutation,
+    useGetpayrenttenantdashboardQuery,
     useGetbookingQuery,
     useOnlinepaidtenantMutation,
     useGetallactivetenantQuery,

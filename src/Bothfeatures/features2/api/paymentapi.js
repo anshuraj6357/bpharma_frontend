@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/payment";
+const USER_API = "http://localhost:5000/api/payment";
 
 export const paymentApi = createApi({
   reducerPath: "paymentApi",
@@ -41,6 +41,7 @@ export const paymentApi = createApi({
         const body = {
           razorpay_order_id: response.razorpay_order_id,
           roomId: response.roomId,
+          walletUsed:response.walletUsed,
         };
         if (response.razorpay_payment_id) body.razorpay_payment_id = response.razorpay_payment_id;
         if (response.razorpay_signature) body.razorpay_signature = response.razorpay_signature;
@@ -73,6 +74,24 @@ export const paymentApi = createApi({
       },
       providesTags: ["Payment"], // ✅ refetch if Payment data changes
     }),
+     razorpayrentPaymentVerify: builder.mutation({
+      query: (response) => {
+        const body = {
+          razorpay_order_id: response.razorpay_order_id,
+          tenantId: response.tenantId,
+        };
+        if (response.razorpay_payment_id) body.razorpay_payment_id = response.razorpay_payment_id;
+        if (response.razorpay_signature) body.razorpay_signature = response.razorpay_signature;
+        if (response.amount) body.amount = response.amount;
+
+        return {
+          url: "verify-Rent-payment",
+          method: "POST",
+          body,
+        };
+      },
+      invalidatesTags: ["Payment"], // ✅ invalidate cache after verification
+    }),
 
       getAllExpense: builder.query({
       query: () => "/expense",
@@ -89,7 +108,8 @@ export const {
   useCreatePaymentMutation,
   useCreateExpenseMutation,
   useGetRevenueDetailsQuery,
-  useGetAllExpenseQuery
+  useGetAllExpenseQuery,
+  useRazorpayrentPaymentVerifyMutation
 } = paymentApi;
 
 export default paymentApi;
