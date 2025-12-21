@@ -10,15 +10,15 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetpayrenttenantdashboardQuery } from "../Bothfeatures/features2/api/tenant";
-
+import downloadPaymentInvoice from "../components/utils/downloadrentinvoice"
 /* ================= HELPERS ================= */
 const formatDate = (date) =>
   date
     ? new Date(date).toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric"
-      })
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    })
     : "--";
 
 const getTier = (percent) => {
@@ -85,11 +85,13 @@ export default function TenantDashboard() {
   }
 
   const data = apiRes?.data;
+
   if (!data) {
     return <div className="text-center text-red-500">Failed to load dashboard</div>;
   }
 
   const { tenant, branch, room, finance, payments = [] } = data;
+  console.log(tenant)
 
   // ================= SAFE NUMERIC CALCULATIONS =================
   const monthlyRent = Number(finance?.monthlyRent || room?.price || 0);
@@ -125,13 +127,11 @@ export default function TenantDashboard() {
           <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
             <StatusBadge status={tenant?.status} />
             <button
-              onClick={() => navigate(`/payrent/${tenant?._id}`)}
-              disabled={!isOverDue}
-              className={`px-6 py-3 rounded-xl font-bold shadow ${
-                isOverDue
-                  ? "bg-white text-indigo-600 hover:bg-gray-100"
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
-              }`}
+              onClick={() => navigate(`/payrent/${tenant?.id}`)}
+              className={`px-6 py-3 rounded-xl font-bold shadow ${isOverDue
+                ? "bg-white text-indigo-600 hover:bg-gray-100"
+                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                }`}
             >
               Pay Rent
             </button>
@@ -193,25 +193,79 @@ export default function TenantDashboard() {
       {/* ================= PAYMENT HISTORY ================= */}
       <div className="bg-white rounded-3xl shadow p-8">
         <h3 className="text-2xl font-bold mb-6">Payment History</h3>
+
         {payments.length === 0 ? (
           <p className="text-gray-500 text-sm">No payments recorded yet</p>
         ) : (
           <div className="space-y-4">
             {payments.map((p) => (
-              <div key={p._id} className="flex items-center gap-4 p-4 rounded-xl border hover:bg-gray-50">
-                <CheckCircle className={p.status === "paid" ? "text-green-600" : "text-yellow-500"} />
+              <div
+                key={p._id}
+                className="flex items-center gap-4 p-4 rounded-xl border hover:bg-gray-50"
+              >
+                <CheckCircle
+                  className={
+                    p.status === "paid"
+                      ? "text-green-600"
+                      : "text-yellow-500"
+                  }
+                />
+
                 <div className="flex-1">
-                  <p className="font-semibold">₹{p.amount} • {p.mode}</p>
-                  <p className="text-sm text-gray-500">{formatDate(p.date)}</p>
+                  <p className="font-semibold">
+                    ₹{p.amountpaid} • {p.mode}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {formatDate(p.createdAt)}
+                  </p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${p.status === "paid" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
-                  {p.status}
-                </span>
+
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-semibold ${p.status === "paid"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
+                      }`}
+                  >
+                    {p.status}
+                  </span>
+
+                  {/* DOWNLOAD INVOICE */}
+                  {p.status === "paid" && (
+                    <button
+                      onClick={() => {
+                        console.log(p);
+                        downloadPaymentInvoice({
+                          paymentId: p._id,
+                          tenantName: tenant.name || "-",
+                          email: p.email || "-",
+                          branchName: branch.name || "-",
+                          roomNumber: p.roomNumber || "-",
+                          amountpaid: p.amountpaid || 0,
+                          walletused: p.walletused || 0,
+                          totalAmount: p.totalAmount || 0,
+                          mode: p.mode || "-",
+                          paymentStatus: p.status || "-",
+                          razorpay_payment_id: p.razorpay_payment_id || "-",
+                          razorpay_order_id: p.razorpay_order_id || "-",
+                          paymentInMonth: p.paymentInMonth || "-",
+                          createdAt: p.createdAt,
+                        });
+                      }}
+                      className="px-3 py-1 text-sm font-semibold text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50"
+                    >
+                      Download
+                    </button>
+
+
+                  )}
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
     </div>
   );
 }
