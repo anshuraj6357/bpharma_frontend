@@ -136,10 +136,15 @@ export default function downloadPaymentInvoice({
     doc.addImage(companyStamp, "PNG", margin + 5, 230, 35, 35);
 
     /* ---------- DIRECTOR SIGNATURE ---------- */
-    doc.addImage(directorSignature, "PNG", pageWidth - 65, 240, 50, 20);
-    doc.setFontSize(9);
+    const signatureY = 240;
+    doc.addImage(directorSignature, "PNG", pageWidth - 65, signatureY, 50, 20);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
     doc.setTextColor("#111827");
-    doc.text("Authorized Signature", pageWidth - 58, 274);
+    doc.text("Ashu Raj", pageWidth - 42, signatureY + 22); // name below signature
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text("Authorized Signature", pageWidth - 58, signatureY + 28); // authorized signature text below name
 
     /* ---------- FOOTER ---------- */
     doc.setDrawColor("#e5e7eb");
@@ -148,7 +153,6 @@ export default function downloadPaymentInvoice({
     doc.setFontSize(9);
     doc.setTextColor("#6b7280");
     doc.text(`Generated on ${formattedDate} at ${formattedTime}`, margin, 276);
-
     doc.text("This is a system-generated invoice. No signature required.", pageWidth - margin, 276, { align: "right" });
 
     /* ---------- SAVE ---------- */
