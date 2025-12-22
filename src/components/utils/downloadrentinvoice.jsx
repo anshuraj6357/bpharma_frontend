@@ -4,7 +4,8 @@ import companyStamp from "../../assets/company-stamp.png";
 import directorSignature from "../../assets/director-anshu-sign.png";
 
 /* ---------- SAFE VALUE ---------- */
-const safe = (val) => (val === undefined || val === null || val === "" ? "-" : String(val));
+const safe = (val) =>
+    val === undefined || val === null || val === "" ? "-" : String(val);
 
 export default function downloadPaymentInvoice({
     paymentId,
@@ -25,136 +26,154 @@ export default function downloadPaymentInvoice({
     const doc = new jsPDF("p", "mm", "a4");
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 15;
+    const margin = 18;
+    let y = 22;
 
-    const formattedDate = createdAt ? new Date(createdAt).toLocaleDateString("en-IN") : "-";
-    const formattedTime = createdAt ? new Date(createdAt).toLocaleTimeString("en-IN") : "-";
+    const formattedDate = createdAt
+        ? new Date(createdAt).toLocaleDateString("en-IN")
+        : "-";
+    const formattedTime = createdAt
+        ? new Date(createdAt).toLocaleTimeString("en-IN")
+        : "-";
 
-    /* ---------- WATERMARK ---------- */
-    doc.setFontSize(80);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor("#cccccc");
-    doc.setGState(new doc.GState({ opacity: 0.08 }));
-    doc.text("ROOMGI", pageWidth / 2, pageHeight / 2 + 20, {
+    /* ======================
+       🔖 STAMP WATERMARK (DARKER)
+    ====================== */
+    if (doc.setGState) {
+        doc.setGState(new doc.GState({ opacity: 0.14 }));
+    }
+    doc.addImage(
+        companyStamp,
+        "PNG",
+        pageWidth / 2 - 48,
+        pageHeight / 2 - 48,
+        96,
+        96
+    );
+    if (doc.setGState) {
+        doc.setGState(new doc.GState({ opacity: 1 }));
+    }
+
+    /* ======================
+       TEXT WATERMARK
+    ====================== */
+    doc.setFontSize(72);
+    doc.setTextColor(230);
+    doc.text("ROOMGI", pageWidth / 2, pageHeight / 2 + 58, {
         align: "center",
         angle: 45,
     });
-    doc.setGState(new doc.GState({ opacity: 1 }));
+    doc.setTextColor(0);
 
-    /* ---------- LOGO ---------- */
-    doc.addImage(companyLogo, "PNG", pageWidth / 2 - 20, 10, 40, 18);
+    /* ======================
+       HEADER
+    ====================== */
+    doc.addImage(companyLogo, "PNG", margin, y - 6, 36, 16);
 
-    /* ---------- HEADER ---------- */
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor("#111827");
-    doc.text("Payment Invoice", pageWidth / 2, 36, { align: "center" });
+    doc.setFontSize(14);
+    doc.text("ROOMGI PRIVATE LIMITED", pageWidth / 2, y, { align: "center" });
 
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor("#6b7280");
-    doc.text("Roomgi Pvt. Ltd. | support@roomgi.com", pageWidth / 2, 42, { align: "center" });
-
-    doc.setDrawColor("#e5e7eb");
-    doc.line(margin, 46, pageWidth - margin, 46);
-
-    /* ---------- TENANT DETAILS ---------- */
-    let y = 50;
-    const sectionHeight = 42;
-    doc.setFillColor(245, 245, 245);
-    doc.roundedRect(margin, y, pageWidth - 2 * margin, sectionHeight, 3, 3, "F");
-
-    doc.setFontSize(13);
-    doc.setFont(undefined, "bold");
-    doc.setTextColor("#111827");
-    doc.text("Tenant & Property Details", margin + 5, y + 8);
-
-    doc.setFontSize(10);
-    doc.setFont(undefined, "normal");
-
-    doc.text("Tenant:", margin + 5, y + 18);
-    doc.text(safe(tenantName), margin + 50, y + 18);
-
-    doc.text("Email:", margin + 5, y + 26);
-    doc.text(safe(email), margin + 50, y + 26);
-
-    doc.text("Branch:", margin + 5, y + 34);
-    doc.text(`${safe(branchName)} | Room ${safe(roomNumber)}`, margin + 50, y + 34);
-
-    /* ---------- PAYMENT SUMMARY ---------- */
-    y += sectionHeight + 6;
-    const paymentHeight = 44;
-    doc.setFillColor(245, 245, 245);
-    doc.roundedRect(margin, y, pageWidth - 2 * margin, paymentHeight, 3, 3, "F");
-
-    doc.setFontSize(13);
-    doc.setFont(undefined, "bold");
-    doc.text("Payment Summary", margin + 5, y + 8);
-
-    doc.setFontSize(10);
-    doc.setFont(undefined, "normal");
-
-    doc.text("Amount Paid:", margin + 5, y + 18);
-    doc.text(`INR ${safe(amountpaid)}`, pageWidth - margin - 5, y + 18, { align: "right" });
-
-    doc.text("Wallet Used:", margin + 5, y + 26);
-    doc.text(`INR ${safe(walletused)}`, pageWidth - margin - 5, y + 26, { align: "right" });
-
-    doc.text("Total Amount:", margin + 5, y + 34);
-    doc.text(`INR ${safe(totalAmount)}`, pageWidth - margin - 5, y + 34, { align: "right" });
-
-    /* ---------- TRANSACTION DETAILS ---------- */
-    y += paymentHeight + 6;
-    const txnHeight = 44;
-    doc.setFillColor(245, 245, 245);
-    doc.roundedRect(margin, y, pageWidth - 2 * margin, txnHeight, 3, 3, "F");
-
-    doc.setFontSize(13);
-    doc.setFont(undefined, "bold");
-    doc.text("Transaction Details", margin + 5, y + 8);
-
-    doc.setFontSize(10);
-    doc.setFont(undefined, "normal");
-
-    doc.text("Payment Mode:", margin + 5, y + 18);
-    doc.text(safe(mode).toUpperCase(), margin + 45, y + 18);
-
-    doc.text("Payment Status:", margin + 5, y + 26);
-    doc.text(safe(paymentStatus).toUpperCase(), margin + 45, y + 26);
-
-    doc.text("Payment Month:", margin + 5, y + 34);
-    doc.text(safe(paymentInMonth), margin + 45, y + 34);
-
-    /* ---------- IDS ---------- */
-    y += txnHeight + 6;
-    doc.setFontSize(9);
-    doc.setTextColor("#111827");
-    doc.text(`Razorpay Payment ID: ${safe(razorpay_payment_id)}`, margin + 5, y);
-    doc.text(`Razorpay Order ID: ${safe(razorpay_order_id)}`, margin + 5, y + 6);
-
-    /* ---------- COMPANY STAMP ---------- */
-    doc.addImage(companyStamp, "PNG", margin + 5, 230, 35, 35);
-
-    /* ---------- DIRECTOR SIGNATURE ---------- */
-    const signatureY = 240;
-    doc.addImage(directorSignature, "PNG", pageWidth - 65, signatureY, 50, 20);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor("#111827");
-    doc.text("Ashu Raj", pageWidth - 42, signatureY + 22); // name below signature
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    doc.text("Authorized Signature", pageWidth - 58, signatureY + 28); // authorized signature text below name
+    doc.text("PAYMENT RECEIPT", pageWidth / 2, y + 6, { align: "center" });
 
-    /* ---------- FOOTER ---------- */
-    doc.setDrawColor("#e5e7eb");
-    doc.line(margin, 270, pageWidth - margin, 270);
+    doc.line(margin, y + 11, pageWidth - margin, y + 11);
+    y += 22;
+
+    /* ======================
+       RECEIPT META
+    ====================== */
+    doc.setFontSize(9);
+    doc.text(`Receipt No: ${safe(paymentId)}`, margin, y);
+    doc.text(`Date: ${formattedDate}`, pageWidth - margin, y, { align: "right" });
+    y += 6;
+    doc.text(`Time: ${formattedTime}`, pageWidth - margin, y, { align: "right" });
+
+    y += 12;
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    /* ======================
+       ROW HELPER
+    ====================== */
+    const row = (label, value) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(label, margin, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(value, pageWidth - margin, y, { align: "right" });
+        y += 8;
+    };
+
+    /* ======================
+       TENANT DETAILS
+    ====================== */
+    row("Tenant Name", safe(tenantName));
+    row("Email ID", safe(email));
+    row("Branch / Room", `${safe(branchName)} - Room ${safe(roomNumber)}`);
+
+    y += 6;
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    /* ======================
+       PAYMENT DETAILS
+    ====================== */
+    row("Payment Mode", safe(mode).toUpperCase());
+    row("Payment Status", safe(paymentStatus).toUpperCase());
+    row("Payment Month", safe(paymentInMonth));
+
+    y += 6;
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    /* ======================
+       AMOUNT DETAILS
+    ====================== */
+    row("Amount Paid (INR)", `INR ${safe(amountpaid)}`);
+    row("Wallet Used (INR)", `INR ${safe(walletused)}`);
+    row("Total Amount (INR)", `INR ${safe(totalAmount)}`);
+
+    y += 6;
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
+    /* ======================
+       TRANSACTION IDS
+    ====================== */
+    row("Razorpay Payment ID", safe(razorpay_payment_id));
+    row("Razorpay Order ID", safe(razorpay_order_id));
+
+    y += 22;
+
+    /* ======================
+       AUTHORIZATION
+    ====================== */
+    doc.addImage(directorSignature, "PNG", pageWidth - 72, y, 48, 18);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Anshu Raj", pageWidth - 48, y + 22);
 
     doc.setFontSize(9);
-    doc.setTextColor("#6b7280");
-    doc.text(`Generated on ${formattedDate} at ${formattedTime}`, margin, 276);
-    doc.text("This is a system-generated invoice. No signature required.", pageWidth - margin, 276, { align: "right" });
+    doc.setFont("helvetica", "normal");
+    doc.text("Authorized Signatory", pageWidth - 58, y + 28);
 
-    /* ---------- SAVE ---------- */
-    doc.save(`Payment-Invoice-${safe(paymentId)}.pdf`);
+    y += 42;
+
+    /* ======================
+       FOOTER
+    ====================== */
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.text(
+        "This is a system-generated receipt and does not require physical signature.",
+        pageWidth / 2,
+        y,
+        { align: "center" }
+    );
+
+    /* ======================
+       SAVE
+    ====================== */
+    doc.save(`Payment-Receipt-${safe(paymentId)}.pdf`);
 }

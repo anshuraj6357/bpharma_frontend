@@ -73,6 +73,8 @@ const DueCountdown = ({ extduesdate }) => {
 export default function TenantDashboard() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [invoiceLoadingId, setInvoiceLoadingId] = useState(null);
+
 
   const { data: apiRes, isLoading } = useGetpayrenttenantdashboardQuery(id);
 
@@ -231,11 +233,18 @@ export default function TenantDashboard() {
                   </span>
 
                   {/* DOWNLOAD INVOICE */}
-                  {p.status === "paid" && (
-                    <button
-                      onClick={() => {
-                        console.log(p);
-                        downloadPaymentInvoice({
+                  <button
+                    disabled={invoiceLoadingId === p._id}
+                    onClick={async () => {
+                      if (invoiceLoadingId) return;
+
+                      try {
+                        setInvoiceLoadingId(p._id);
+
+                        // ✅ VERY IMPORTANT — allow UI to render spinner
+                        await new Promise((resolve) => setTimeout(resolve, 0));
+
+                        await downloadPaymentInvoice({
                           paymentId: p._id,
                           tenantName: tenant.name || "-",
                           email: p.email || "-",
@@ -251,14 +260,31 @@ export default function TenantDashboard() {
                           paymentInMonth: p.paymentInMonth || "-",
                           createdAt: p.createdAt,
                         });
-                      }}
-                      className="px-3 py-1 text-sm font-semibold text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50"
-                    >
-                      Download
-                    </button>
+
+                      } catch (err) {
+                        console.error("Invoice download failed", err);
+                      } finally {
+                        setInvoiceLoadingId(null);
+                      }
+                    }}
+                    className={`px-3 py-1 text-sm font-semibold rounded-lg border flex items-center gap-2
+    ${invoiceLoadingId === p._id
+                        ? "cursor-not-allowed opacity-60 border-gray-300 text-gray-500"
+                        : "text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                      }`}
+                  >
+                    {invoiceLoadingId === p._id ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
+                        Generating...
+                      </>
+                    ) : (
+                      "Download"
+                    )}
+                  </button>
 
 
-                  )}
+
                 </div>
               </div>
             ))}
