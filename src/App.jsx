@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 
 import LandingPage from './components/LandingPage';
-import TenantDashboard from "./components/mywishlist";
+import TenantDashboard from "./components/trackrentdashboard";
 import PGDetailsPage from './components/PGDetailsPage';
 import PGMap from "./components/pgmap.jsx";
 import AuthModal from "./components/AuthModal";
@@ -36,7 +36,7 @@ import SignupSuccess from "./components/signupsuccess";
 import ScrollToTop from "./components/ScrollToTop";
 import BookingSuccess from "./components/bookingssuccess"
 import PayRentPanel from "./components/payrent";
-
+import WishlistPage from "./components/wishlistdetails";
 
 
 
@@ -117,6 +117,8 @@ function App() {
             <Route path="/bookingssuccess" element={<BookingSuccess />} />
 
             <Route path="/mybooking" element={<Bookings />} />
+            <Route path="/Wishlistdetails" element={<WishlistPage />} />
+
 
           </Route>
 

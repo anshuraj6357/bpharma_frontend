@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetpayrenttenantdashboardQuery } from "../Bothfeatures/features2/api/tenant";
-import downloadPaymentInvoice from "../components/utils/downloadrentinvoice"
+import downloadPaymentInvoice from "./utils/downloadrentinvoice"
 /* ================= HELPERS ================= */
 const formatDate = (date) =>
   date

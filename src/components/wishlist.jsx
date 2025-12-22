@@ -1,80 +1,101 @@
 import { Heart } from "lucide-react";
-import {
-  useToggleWishlistMutation,
-  useGetWishlistQuery,
-} from "../Bothfeatures/features/api/authapi";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import {
+  useToggleWishlistMutation,
+  useGetWishlistQuery
+} from "../Bothfeatures/features/api/authapi";
 
 export default function WishlistButton({ pg, onAuthOpen }) {
   const { isAuthenticated } = useSelector((state) => state.auth);
 
-  // Fetch wishlist from backend
-  const { data: wishlistData, isLoading } = useGetWishlistQuery();
-  const [toggleWishlist] = useToggleWishlistMutation();
+  const {
+    data: wishlistData,
+    refetch,
+    isFetching
+  } = useGetWishlistQuery(undefined, {
+    skip: !isAuthenticated
+  });
 
+  const [toggleWishlist] = useToggleWishlistMutation();
   const [isFav, setIsFav] = useState(false);
 
-  // Sync heart with backend wishlist
+  /* ---------- SYNC WISHLIST STATE ---------- */
   useEffect(() => {
-    if (wishlistData?.data && pg?._id && pg?.branch?._id) {
-      const exists = wishlistData.data.some((item) => {
-        // Handles both populated objects or plain ObjectIds
-        const pgId = item.pgId?._id || item.pgId;
-        const branchId = item.branchId?._id || item.branchId;
+    if (!isAuthenticated || isFetching) return;
 
-        return (
-          pgId?.toString() === pg._id?.toString() &&
-          branchId?.toString() === pg.branch?._id?.toString()
-        );
-      });
+    const wishlistItems = wishlistData?.items || [];
 
-      setIsFav(exists);
-    }
-  }, [wishlistData, pg?._id, pg?.branch?._id]);
+    const exists = wishlistItems.some(
+      (item) =>
+        item.room?._id === pg?._id &&
+        item.pgId?._id === pg?.branch?._id
+    );
 
-  // Add / Remove from wishlist
-  const addToFav = async (e) => {
+    setIsFav(exists);
+  }, [
+    wishlistData,
+    isAuthenticated,
+    isFetching,
+    pg?._id,
+    pg?.branch?._id
+  ]);
+
+  /* ---------- HANDLE TOGGLE ---------- */
+  const handleClick = async (e) => {
     e.stopPropagation();
 
-    // 🔐 Open login modal if not authenticated
     if (!isAuthenticated) {
-      toast.info("Please login to save PGs in wishlist");
-      onAuthOpen();
+      toast.info("Please login to use wishlist ❤️");
+      onAuthOpen?.();
       return;
     }
 
-    // Instant UI toggle
-    setIsFav((prev) => !prev);
-
     try {
+      // optimistic UI
+      setIsFav((prev) => !prev);
+
       await toggleWishlist({
-        pgId: pg._id,
-        branchId: pg.branch._id,
+        roomId: pg?._id,
+        branchId: pg?.branch?._id
       }).unwrap();
 
-      if (!isFav) toast.success("Added to wishlist ❤️");
-      else toast.warn("Removed from wishlist");
-    } catch (err) {
-      console.error("Wishlist toggle error:", err);
-      // Rollback UI toggle
+      await refetch();
+
+      toast.success(
+        !isFav ? "Saved to wishlist ❤️" : "Removed from wishlist"
+      );
+    } catch (error) {
       setIsFav((prev) => !prev);
-      toast.error("Something went wrong. Try again.");
+      toast.error("Wishlist action failed");
     }
   };
 
-  if (isLoading) return null; // optionally show a spinner
-
+  /* ---------- UI ---------- */
   return (
     <button
-      onClick={addToFav}
-      className="absolute top-2 right-2 bg-white/40 backdrop-blur-md p-2 rounded-full shadow-md"
+      onClick={handleClick}
+      aria-label="Wishlist"
+      className={`
+        absolute top-3 right-3 z-20
+        p-2 rounded-full
+        backdrop-blur-md
+        shadow-md
+        transition-all duration-300
+        hover:scale-110
+        ${isFav
+          ? "bg-gradient-to-br from-red-500 to-pink-500 text-white shadow-red-400/40"
+          : "bg-white/80 text-gray-500 hover:text-red-500"}
+      `}
     >
       <Heart
-        className={`h-5 w-5 ${
-          isFav ? "fill-red-600 text-red-600" : "text-white"
-        }`}
+        size={18}
+        strokeWidth={2}
+        className={`
+          transition-all duration-300
+          ${isFav ? "fill-white scale-110" : "fill-none"}
+        `}
       />
     </button>
   );
