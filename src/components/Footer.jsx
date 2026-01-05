@@ -100,7 +100,9 @@ export default function Footer() {
 
       {/* COPYRIGHT */}
       <div className="mt-14 border-t border-gray-700 pt-5 text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} Roomgi. All rights reserved.
+     
+        © 2026 Roomgi Private Limited | CIN: U68100UP2026PTC240368
+
       </div>
     </footer>
   );

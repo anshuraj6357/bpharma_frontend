@@ -1,17 +1,109 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
   <head>
+    <!-- ================= CORE META ================= -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>College PG Booking Website</title>
+
+    <!-- ================= PRIMARY SEO ================= -->
+    <title>Roomgi® | Roomgi Private Limited – Official Real Estate Platform</title>
+
+    <meta
+      name="description"
+      content="Roomgi Private Limited is a registered Indian Private Limited Company offering a trusted real estate and technology platform for rental rooms, PGs, offices and property services across India. CIN: U68100UP2026PTC240368."
+    />
+
+    <meta
+      name="keywords"
+      content="Roomgi, Roomgi Private Limited, Roomgi Pvt Ltd, rental rooms India, PG booking platform, office space booking, real estate technology company"
+    />
+
+    <meta name="author" content="Roomgi Private Limited" />
+    <meta name="publisher" content="Roomgi Private Limited" />
+    <meta name="copyright" content="© 2026 Roomgi Private Limited" />
+
+    <!-- ================= CRAWLING & INDEXING ================= -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta
+      name="googlebot"
+      content="index, follow, max-snippet:-1, max-image-preview:large"
+    />
+
+    <!-- ================= GEO & LANGUAGE ================= -->
+    <meta name="language" content="en-IN" />
+    <meta name="geo.region" content="IN" />
+    <meta name="geo.placename" content="India" />
+
+    <!-- ================= CANONICAL ================= -->
+    <link rel="canonical" href="https://roomgi.com/" />
+
+    <!-- ================= FAVICON ================= -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+    <!-- ================= OPEN GRAPH (SOCIAL SEO) ================= -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Roomgi" />
+    <meta property="og:title" content="Roomgi | Roomgi Private Limited" />
+    <meta
+      property="og:description"
+      content="Official website of Roomgi Private Limited – a registered Indian real estate & rental technology platform."
+    />
+    <meta property="og:url" content="https://roomgi.com/" />
+    <meta property="og:image" content="https://roomgi.com/og-image.png" />
+    <meta property="og:image:alt" content="Roomgi Private Limited Official Logo" />
+
+    <!-- ================= TWITTER CARD ================= -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Roomgi | Roomgi Private Limited" />
+    <meta
+      name="twitter:description"
+      content="Roomgi Private Limited – registered Indian real estate & rental technology platform."
+    />
+    <meta name="twitter:image" content="https://roomgi.com/og-image.png" />
+
+    <!-- ================= PERFORMANCE ================= -->
+    <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+    <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin />
+
+    <!-- ================= STRUCTURED DATA (GOOGLE TRUST) ================= -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Corporation",
+      "@id": "https://roomgi.com/#corporation",
+      "name": "Roomgi Private Limited",
+      "alternateName": ["Roomgi", "Roomgi Pvt Ltd"],
+      "url": "https://roomgi.com",
+      "logo": "https://roomgi.com/logo.png",
+      "description": "Roomgi Private Limited is a registered Indian real estate and rental technology platform.",
+      "identifier": {
+        "@type": "PropertyValue",
+        "propertyID": "CIN",
+        "value": "U68100UP2026PTC240368"
+      },
+      "foundingLocation": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "IN"
+        }
+      },
+      "sameAs": [
+        "https://www.linkedin.com/company/roomgi"
+      ]
+    }
+    </script>
   </head>
+
   <body>
+    <!-- ================= REACT ROOT ================= -->
     <div id="root"></div>
 
-    <!-- Razorpay Checkout Script -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <!-- ================= PAYMENT ================= -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 
+    <!-- ================= APP ENTRY ================= -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

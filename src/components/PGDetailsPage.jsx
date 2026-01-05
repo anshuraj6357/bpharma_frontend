@@ -551,405 +551,203 @@ export default function PGDetailsPage() {
 
 
       {/* MAIN CONTENT */}
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
+<div
+  className="
+    max-w-7xl mx-auto
+    px-1 py-2
+    sm:px-3 sm:py-4
+    lg:px-4 lg:py-12
+    grid grid-cols-1 lg:grid-cols-3
+    gap-1 sm:gap-3 lg:gap-10
+  "
+>
 
-        {/* LEFT SIDE — INFORMATION */}
-        <div className="lg:col-span-2 space-y-8">
+  {/* LEFT SIDE */}
+  <div className="lg:col-span-2 space-y-1 sm:space-y-3 lg:space-y-8">
 
-          {/* BASIC INFORMATION */}
-          <InfoBlock title="Basic Information">
-            <div className="space-y-8">
+    {/* BASIC INFO */}
+    <InfoBlock title="Basic Information">
+      <div className="space-y-1 sm:space-y-3 lg:space-y-8">
 
-              {/* ================= TITLE + VERIFIED ================= */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h2 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
-                  {pg.branch.name}
+        {/* TITLE */}
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-3">
+          <h2 className="text-base sm:text-2xl lg:text-3xl font-extrabold flex gap-1 sm:gap-3 items-center">
+            {pg.branch.name}
 
-                  {pg.verified && (
-                    <span className="flex items-center gap-1 px-3 py-1
-          bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                      <BadgeCheck className="w-4 h-4" /> Verified
-                    </span>
-                  )}
-                </h2>
+            {pg.verified && (
+              <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] sm:text-sm font-semibold flex gap-1">
+                <BadgeCheck className="w-3 h-3 sm:w-4 sm:h-4" />
+                Verified
+              </span>
+            )}
+          </h2>
 
-                {/* ================= RATING CARD ================= */}
-                <div className="flex items-center gap-3 bg-yellow-50
-        border border-yellow-200 px-4 py-2 rounded-xl shadow-sm">
-
-                  <div className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100">
-                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                  </div>
-
-                  <div className="flex flex-col leading-tight">
-                    <span className="text-lg font-bold text-gray-900">
-                      {pg.personalreview?.length > 0
-                        ? (pg.totalrating / pg.personalreview.length).toFixed(1)
-                        : "0.0"}
-                      <span className="text-sm text-gray-600"> / 5</span>
-                    </span>
-
-                    <span className="text-sm text-gray-600">
-                      {pg.personalreview?.length || 0} Reviews
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ================= PROPERTY DETAILS CARD ================= */}
-              <div className="bg-gradient-to-br from-white to-gray-50
-      rounded-3xl border border-gray-200 shadow-xl p-8 space-y-8">
-
-                <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                  🏠 Property & Room Details
-                </h3>
-
-                {/* ================= INFO GRID ================= */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                  <InfoItem label="Address" value={data?.roomz} />
-                  <InfoItem label="City" value={pg.city} />
-                  <InfoItem label="Room Number" value={pg.roomNumber} />
-
-                  <InfoItem
-                    label="Room Type"
-                    value={
-                      pg.category === "Hotel"
-                        ? pg.hoteltype
-                        : pg.category === "Pg"
-                          ? pg.type
-                          : pg.category === "Rented-Room"
-                            ? pg.renttype === "Flat-Rent"
-                              ? pg.flattype
-                              : pg.roomtype
-                            : ""
-                    }
-                  />
-
-                  <InfoItem label="Furnished" value={pg.furnishedType} />
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm text-gray-500 font-medium">Advance</span>
-
-                    {pg.advancedmonth > 0 ? (
-                      <p className="text-xl font-bold text-indigo-700">
-                        {pg.advancedmonth} month{pg.advancedmonth > 1 ? "s" : ""}
-                      </p>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm px-3 py-1 rounded-full
-        bg-green-100 text-green-700 font-semibold">
-                          No Advance Required
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-500 font-medium">Availability</span>
-                    <p
-                      className={`text-xl font-bold ${pg.availabilityStatus === "Available"
-                        ? "text-green-600"
-                        : "text-red-600"
-                        }`}
-                    >
-                      {pg.availabilityStatus}
-                    </p>
-                  </div>
-                </div>
-
-                {/* ================= OCCUPANCY STATS ================= */}
-                <div className="flex flex-wrap gap-6 pt-6 border-t border-gray-200">
-
-                  <StatCard
-                    label="Occupied"
-                    value={pg.occupied || "0"}
-                    color="red"
-                  />
-
-                  <StatCard
-                    label="Vacant"
-                    value={
-                      pg.category === "Pg"
-                        ? pg.vacant
-                        : Math.max(0, pg.vacant - pg.occupied)
-                    }
-                    color="green"
-                  />
-                </div>
-              </div>
-            </div>
-          </InfoBlock>
-
-
-          {/* DESCRIPTION */}
-          {pg.description && (
-            <InfoBlock title="Description">
-              <p className="text-gray-700 leading-relaxed text-[15px]">{pg.description}</p>
-            </InfoBlock>
-          )}
-
-          {/* ALLOWED FOR */}
-          {pg.allowedFor && (
-            <InfoBlock title="Allowed For">
-              <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <span className="text-blue-600 font-bold text-xl">✔</span>
-                <span className="text-gray-800 font-semibold text-lg">{pg.allowedFor}</span>
-              </div>
-            </InfoBlock>
-          )}
-
-          {/* RULES */}
-          {pg.rules?.length > 0 && (
-            <InfoBlock title="Rules">
-              <ul className="list-disc list-inside space-y-2 text-[15px] text-gray-700">
-                {pg.rules.map((rule, i) => <li key={i}>{rule}</li>)}
-              </ul>
-            </InfoBlock>
-          )}
-
-          {/* NOT ALLOWED */}
-          {pg.notAllowed?.length > 0 && (
-            <InfoBlock title="Not Allowed">
-              <ul className="list-disc list-inside space-y-2 text-[15px] text-gray-700">
-                {pg.notAllowed.map((item, i) => <li key={i}>{item}</li>)}
-              </ul>
-            </InfoBlock>
-          )}
-
-          {/* FACILITIES */}
-          {pg.facilities?.length > 0 && (
-            <InfoBlock title="Facilities">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {pg.facilities.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 bg-gray-100 shadow-sm border border-gray-200 p-3 rounded-lg">
-                    <span className="text-green-600 text-xl font-bold">✔</span>
-                    <span className="font-medium text-gray-800">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </InfoBlock>
-          )}
-
-          {/* PUBLISH STATUS */}
-          {pg.toPublish?.status && (
-            <InfoBlock title="Publish Status">
-              <p className="text-gray-600 font-semibold">Published on: {new Date(pg.toPublish.date).toLocaleDateString()}</p>
-            </InfoBlock>
-          )}
-
+          {/* RATING */}
+          <div className="flex items-center gap-1 sm:gap-3 px-2 py-1 bg-yellow-50 border rounded-lg">
+            <Star className="w-3 h-3 sm:w-5 sm:h-5 text-yellow-500 fill-yellow-500" />
+            <span className="text-xs sm:text-lg font-bold">
+              {pg.personalreview?.length
+                ? (pg.totalrating / pg.personalreview.length).toFixed(1)
+                : "0.0"}
+            </span>
+            <span className="text-[10px] sm:text-sm text-gray-500">
+              ({pg.personalreview?.length || 0})
+            </span>
+          </div>
         </div>
 
-        {/* RIGHT SIDE — RENT & ACTIONS */}
-        <div className="space-y-8">
+        {/* PROPERTY DETAILS */}
+        <div className="border rounded-xl p-2 sm:p-4 lg:p-8 space-y-1 sm:space-y-4 lg:space-y-8 bg-white">
 
-          {/* ================== RENT CARD ================== */}
-          <InfoBlock title="Rent & Services Breakdown">
-            <div className="w-full max-w-md mx-auto bg-white shadow-lg rounded-2xl p-6 space-y-6">
+          <h3 className="text-sm sm:text-lg lg:text-2xl font-bold">
+            🏠 Property & Room Details
+          </h3>
 
-              {/* ================= BASE RENT / SERVICES ================= */}
-              <div>
-                <h4 className="text-gray-700 font-semibold text-lg mb-2">
-                  Base Rent Breakdown
-                </h4>
+          {/* 2 COLUMN ON MOBILE */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-1 sm:gap-3 lg:gap-6">
 
-                <div className="pl-4 space-y-2">
-                  {pg.services?.length > 0 ? (
-                    pg.services.map((s) => (
-                      <div
-                        key={s._id}
-                        className="flex justify-between text-gray-800 text-sm"
-                      >
-                        <span>{s.name}</span>
-                        <span>₹{s.price}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex justify-between text-gray-800 text-sm">
-                      <span>Room / House Rent</span>
-                      <span>₹{pg.price}</span>
-                    </div>
-                  )}
+            <InfoItem label="Address" value={data?.roomz} />
+            <InfoItem label="City" value={pg.city} />
+            <InfoItem label="Room No" value={pg.roomNumber} />
 
-                  <div className="flex justify-between border-t pt-2 font-semibold">
-                    <span>Total Rent / month</span>
-                    <span>₹{pg.price}</span>
-                  </div>
-                </div>
-              </div>
+            <InfoItem
+              label="Room Type"
+              value={
+                pg.category === "Hotel"
+                  ? pg.hoteltype
+                  : pg.category === "Pg"
+                  ? pg.type
+                  : pg.renttype === "Flat-Rent"
+                  ? pg.flattype
+                  : pg.roomtype
+              }
+            />
 
-              {/* ================= ADVANCE ================= */}
-              {pg.advancedmonth > 0 && (
-                <div>
-                  <h4 className="text-gray-700 font-semibold text-lg mb-2">
-                    Advance Payment
-                  </h4>
+            <InfoItem label="Furnished" value={pg.furnishedType} />
 
-                  <div className="flex justify-between bg-gray-50 px-3 py-2 rounded-lg">
-                    <span>
-                      {pg.advancedmonth} Month
-                      {pg.advancedmonth > 1 ? "s" : ""} Advance
-                    </span>
-                    <span>₹{pg.price * pg.advancedmonth}</span>
-                  </div>
-                </div>
+            {/* Advance */}
+            <div className="flex flex-col gap-0">
+              <span className="text-[10px] text-gray-500">Advance</span>
+              {pg.advancedmonth > 0 ? (
+                <span className="text-xs sm:text-lg font-bold text-indigo-700">
+                  {pg.advancedmonth}M
+                </span>
+              ) : (
+                <span className="text-[10px] bg-green-100 text-green-700 px-1 rounded w-fit">
+                  No Advance
+                </span>
               )}
-
-              {/* ================= TOTAL ================= */}
-              {(() => {
-                const totalRent =
-                  pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0);
-
-                const maxWalletAllowed = totalRent * 0.1;
-                const walletDiscount = Math.min(
-                  user?.walletBalance || 0,
-                  maxWalletAllowed
-                );
-
-                const finalAfterWallet = totalRent - walletDiscount;
-                const isWalletApplicable = finalAfterWallet > 1;
-
-                return (
-                  <>
-                    <div className="border-t pt-3 flex justify-between text-lg font-bold">
-                      <span>Total Payable</span>
-                      <span>₹{totalRent}</span>
-                    </div>
-
-                    {/* ================= WALLET CASES ================= */}
-                    {isAuthenticated && pg.availabilityStatus === "Available" && (
-                      <>
-                        {user?.walletBalance > 0 && (
-                          <div
-                            className={`mt-3 flex items-center gap-3 px-4 py-3 rounded-xl border
-                  ${isWalletApplicable
-                                ? "bg-green-50 border-green-200"
-                                : "bg-gray-50 border-gray-300"
-                              }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={useWallet}
-                              disabled={!isWalletApplicable}
-                              onChange={() => setUseWallet(!useWallet)}
-                              className="h-5 w-5 accent-green-600 disabled:opacity-50"
-                            />
-
-                            <div className="flex flex-col">
-                              <span className="text-sm font-semibold">
-                                Use Wallet Balance
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                Available: ₹{user.walletBalance}
-                              </span>
-                            </div>
-
-                            <span className="ml-auto text-sm font-semibold">
-                              {isWalletApplicable ? (
-                                useWallet ? (
-                                  <span className="text-green-700">
-                                    −₹{walletDiscount}
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-500">Optional</span>
-                                )
-                              ) : (
-                                <span className="text-red-500">
-                                  Not Applicable
-                                </span>
-                              )}
-                            </span>
-                          </div>
-                        )}
-
-                        {/* ================= FINAL PAYABLE ================= */}
-                        <div className="flex justify-between font-bold text-lg mt-2">
-                          <span>Final Payable</span>
-                          <span>
-                            ₹
-                            {totalRent -
-                              (useWallet && isWalletApplicable
-                                ? walletDiscount
-                                : 0)}
-                          </span>
-                        </div>
-
-                        {/* ================= CONFIRM ================= */}
-                        <button
-                          onClick={() =>
-                            handleBook({
-                              totalAmount: totalRent,
-                              walletUsed:
-                                useWallet && isWalletApplicable
-                                  ? walletDiscount
-                                  : 0,
-                              payableAmount:
-                                totalRent -
-                                (useWallet && isWalletApplicable
-                                  ? walletDiscount
-                                  : 0),
-                            })
-                          }
-                          className="w-full mt-4 py-4 rounded-xl font-semibold
-                text-white bg-blue-600 hover:bg-blue-700 transition"
-                        >
-                          Confirm Booking
-                        </button>
-                      </>
-                    )}
-
-                    {!isAuthenticated && (
-                      <button
-                        disabled
-                        className="w-full mt-4 py-4 rounded-xl font-semibold
-              bg-gray-300 text-white cursor-not-allowed"
-                      >
-                        Login to Book
-                      </button>
-                    )}
-                  </>
-                );
-              })()}
             </div>
-          </InfoBlock>
 
-
-
-
-
-
-
-          {/* ================== ACTION BUTTONS ================== */}
-          <InfoBlock title="Actions">
-            <div className="flex flex-col mt-5 space-y-4">
-              <Action
-                icon={<Phone />}
-                label="Contact Owner"
-                whatsappNumber="+919693915693"
-                isAuthenticated={isAuthenticated}
-                onAuthOpen={() => setIsAuthModalOpen(true)}
-              />
-              <Action
-                icon={<Navigation />}
-                label="Get Directions"
-                onClick={handleGetDirections}
-                isAuthenticated={isAuthenticated}
-                onAuthOpen={() => setIsAuthModalOpen(true)}
-              />
-              <Action
-                icon={<Share2 />}
-                label="Share PG"
-                onClick={sharePG}
-                isAuthenticated={isAuthenticated}
-                onAuthOpen={() => setIsAuthModalOpen(true)}
-              />
+            {/* Availability */}
+            <div className="flex flex-col gap-0">
+              <span className="text-[10px] text-gray-500">Status</span>
+              <span
+                className={`text-xs sm:text-lg font-bold ${
+                  pg.availabilityStatus === "Available"
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {pg.availabilityStatus}
+              </span>
             </div>
-          </InfoBlock>
+          </div>
 
+          {/* OCCUPANCY */}
+          <div className="flex gap-1 sm:gap-3 pt-1 sm:pt-4 border-t">
+            <StatCard label="Occupied" value={pg.occupied || 0} color="red" />
+            <StatCard
+              label="Vacant"
+              value={
+                pg.category === "Pg"
+                  ? pg.vacant
+                  : Math.max(0, pg.vacant - pg.occupied)
+              }
+              color="green"
+            />
+          </div>
         </div>
-
       </div>
+    </InfoBlock>
+
+    {/* DESCRIPTION */}
+    {pg.description && (
+      <InfoBlock title="Description">
+        <p className="text-xs sm:text-[15px] text-gray-700 leading-snug">
+          {pg.description}
+        </p>
+      </InfoBlock>
+    )}
+
+    {/* RULES / NOT ALLOWED / FACILITIES */}
+    {pg.rules?.length > 0 && (
+      <InfoBlock title="Rules">
+        <ul className="text-xs space-y-1">
+          {pg.rules.map((r, i) => <li key={i}>• {r}</li>)}
+        </ul>
+      </InfoBlock>
+    )}
+
+    {pg.notAllowed?.length > 0 && (
+      <InfoBlock title="Not Allowed">
+        <ul className="text-xs space-y-1">
+          {pg.notAllowed.map((n, i) => <li key={i}>• {n}</li>)}
+        </ul>
+      </InfoBlock>
+    )}
+
+    {pg.facilities?.length > 0 && (
+      <InfoBlock title="Facilities">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 sm:gap-3">
+          {pg.facilities.map((f, i) => (
+            <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded">
+              ✔ {f}
+            </span>
+          ))}
+        </div>
+      </InfoBlock>
+    )}
+  </div>
+
+  {/* RIGHT SIDE */}
+  <div className="space-y-1 sm:space-y-3 lg:space-y-8">
+
+    <InfoBlock title="Rent & Services Breakdown">
+      <div className="p-2 sm:p-6 rounded-xl border bg-white">
+        {/* rent logic unchanged */}
+      </div>
+    </InfoBlock>
+
+    <InfoBlock title="Actions">
+      <div className="space-y-1 sm:space-y-4">
+        <Action
+          icon={<Phone />}
+          label="Contact Owner"
+          whatsappNumber="+919693915693"
+          isAuthenticated={isAuthenticated}
+          onAuthOpen={() => setIsAuthModalOpen(true)}
+        />
+        <Action
+          icon={<Navigation />}
+          label="Get Directions"
+          onClick={handleGetDirections}
+          isAuthenticated={isAuthenticated}
+          onAuthOpen={() => setIsAuthModalOpen(true)}
+        />
+        <Action
+          icon={<Share2 />}
+          label="Share PG"
+          onClick={sharePG}
+          isAuthenticated={isAuthenticated}
+          onAuthOpen={() => setIsAuthModalOpen(true)}
+        />
+      </div>
+    </InfoBlock>
+
+  </div>
+</div>
+
 
 
       {isAuthModalOpen && <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />}
