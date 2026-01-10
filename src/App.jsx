@@ -37,7 +37,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import BookingSuccess from "./components/bookingssuccess"
 import PayRentPanel from "./components/payrent";
 import WishlistPage from "./components/wishlistdetails";
-
+import FounderPage from "./components/founderpage.jsx"
+import Disclaimer from "./components/desclaimer.jsx";
 
 
 
@@ -136,6 +137,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/payrent/:id" element={<PayRentPanel />} />
+          <Route path="/founder" element={<FounderPage />} />
+ <Route path="/disclaimer" element={<Disclaimer />} />
 
 
           {/* Admin */}
