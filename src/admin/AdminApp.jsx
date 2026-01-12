@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import ProtectedRoute from "../adminprotectedroutes"; // import it
-
+import AppointManager from "./pages/appointingmanager/appointmanager"
 import Properties from "./pages/Properties";
 import Tenants from "./pages/Tenants";
 import Payments from "./pages/Payments";
@@ -19,10 +19,12 @@ import NotPaidTenants from "./pages/c-xyz/notpaidtenant";
 import AddRoomForm from "./pages/c-xyz/addrooms/addroom";
 import ShowRooms from "./pages/c-xyz/showallroom";
 import { AddHotelRoom } from "./pages/c-xyz/hotelroom";
+import AppointNewManager from "./pages/appointingmanager/newmanager"
 import EditRoomForm from "./pages/c-xyz/editpage";
 import Footer from "../components/Footer";
-
+import ExistingManager from "./pages/appointingmanager/appointexisting"
 import SetNewPassword from "./pages/resetaagerpassword";
+import ShowAllManager from "./pages/appointingmanager/showallmanager"
 
 export default function AdminApp() {
   return (
@@ -48,6 +50,15 @@ export default function AdminApp() {
           <Route path="staff" element={<StaffUtilities />} />
           <Route path="showrooms" element={<ShowRooms />} />
           <Route path="addhotelroom" element={<AddHotelRoom />} />
+               <Route path="appointexisting/:id" element={<ShowAllManager />} />
+                <Route path="showall" element={<ShowAllManager />} />
+
+
+          
+            <Route path="addmanager/:id" element={<AppointManager />} />
+                 <Route path="appointnewmanager/:id" element={<AppointNewManager />} />
+
+
 
           {/* fallback */}
           <Route path="*" element={<Navigate to="properties" replace />} />

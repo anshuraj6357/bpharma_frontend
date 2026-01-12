@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+
 import {
   Plus,
   Edit,
@@ -245,7 +246,7 @@ export default function Properties() {
                 <div className="absolute top-4 left-4">
                   {!property.branchmanager ? (
                     <button
-                      onClick={() => handleAppointManager(property._id)}
+                      onClick={() => navigate(`/admin/addmanager/${property._id}`)}
                       className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl shadow-md flex items-center gap-2 text-sm hover:scale-105 transition"
                     >
                       <UserPlus size={16} />
