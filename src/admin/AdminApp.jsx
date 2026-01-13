@@ -50,7 +50,7 @@ export default function AdminApp() {
           <Route path="staff" element={<StaffUtilities />} />
           <Route path="showrooms" element={<ShowRooms />} />
           <Route path="addhotelroom" element={<AddHotelRoom />} />
-               <Route path="appointexisting/:id" element={<ShowAllManager />} />
+               <Route path="appointexisting/:id" element={<ExistingManager />} />
                 <Route path="showall" element={<ShowAllManager />} />
 
 

@@ -1,10 +1,13 @@
-import React from "react";
+import React,{useState} from "react";
 import { useParams, useNavigate } from "react-router-dom";
+
 
 export default function AppointManager() {
   const { id } = useParams(); // property id
   const navigate = useNavigate();
-
+    const [managerData, setManagerData] = useState({ name: "", email: "", phone: "" });
+   
+ 
   const appointMe = () => {
     console.log("Appoint ME as Branch Manager for property:", id);
 
@@ -35,13 +38,7 @@ export default function AppointManager() {
           Appoint Existing Manager
         </button>
 
-        {/* Appoint Me */}
-        <button
-          className="px-6 py-3 rounded-xl bg-orange-600 text-white shadow hover:scale-105 transition"
-          onClick={appointMe}
-        >
-          Appoint Me as Branch Manager
-        </button>
+    
 
         {/* New Manager */}
         <button

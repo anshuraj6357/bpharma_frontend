@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/property/";
+const USER_API = "http://localhost:5000/api/property/";
 
 const propertyApi = createApi({
   reducerPath: "propertyapi",
@@ -39,6 +39,19 @@ const propertyApi = createApi({
       query: () => "getbranch/bybranchMnager",
       providesTags: ["Branch"],
     }),
+    getAllBranchbyproperty: builder.query({
+      query: () => "getproperty/all",
+      providesTags: ["Branch"],
+    }),
+    Removebranchmanager: builder.mutation({
+      query: (id) => ({
+        url: `/re/${id}`,
+        method: "delete",
+      }),
+      invalidatesTags: ["Branch"],
+    }),
+
+  
 
     addbranchmanager: builder.mutation({
       query: ({ managerData, branchid }) => ({
@@ -140,9 +153,11 @@ export const {
   useGetAllBranchQuery,
   useGetAllBranchByOwnerQuery,
   useGetAllBranchbybranchIdQuery,
+   useGetAllBranchbypropertyQuery,
   useAddbranchmanagerMutation,
   useChangemanagerpassMutation,
   useDeletePropertyMutation,
+  useRemovebranchmanagerMutation,
 
   useAddRoomMutation,
   useGetAllRoomQuery,

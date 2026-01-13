@@ -1,124 +1,128 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+  useGetAllBranchbypropertyQuery,
+  useRemovebranchmanagerMutation,
+} from "../../../Bothfeatures/features2/api/propertyapi";
+import { Trash2, Search } from "lucide-react";
 
 export default function ShowAllManager() {
-  const { id } = useParams(); // property id
+  const { id } = useParams();
 
-  const [managers, setManagers] = useState([]);
+  // 🔹 Queries
+  const {
+    data: Allbranchdata,
+    isLoading,
+    isError,
+  } = useGetAllBranchbypropertyQuery(id);
+
+  const [
+    Removebranchmanager,
+    { isLoading: removing },
+  ] = useRemovebranchmanagerMutation();
+
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch managers
-  useEffect(() => {
-    const fetchManagers = async () => {
-      try {
-        setLoading(true);
+  // 🔹 Remove manager handler
+  const removebranchmanager = async (managerId) => {
+    if (!window.confirm("Are you sure you want to remove this manager?")) return;
 
-        // 🔸 Dummy data (replace with API)
-        const data = [
-          { _id: "1", name: "Rahul Sharma", email: "rahul@gmail.com", assigned: false },
-          { _id: "2", name: "Neha Singh", email: "neha@gmail.com", assigned: true },
-        ];
+    try {
+      await Removebranchmanager(managerId).unwrap();
+      alert("Branch manager removed successfully");
+    } catch (error) {
+      alert(error?.data?.message || "Failed to remove manager");
+    }
+  };
 
-        setManagers(data);
-      } catch (err) {
-        console.error("Failed to fetch managers");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchManagers();
-  }, []);
-
-  // 🔹 Appoint manager
-  const appointManager = (managerId) => {
-    console.log("Appoint manager:", managerId, "to property:", id);
-
-    // axios.post(`/api/property/${id}/appoint-existing`, { managerId })
-
-    alert("Manager appointed successfully!");
-
-    setManagers((prev) =>
-      prev.map((m) =>
-        m._id === managerId ? { ...m, assigned: true } : m
-      )
+  // 🔹 Loading
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+      </div>
     );
-  };
+  }
 
-  // 🔹 Delete manager
-  const deleteManager = (managerId) => {
-    if (!window.confirm("Are you sure you want to delete this manager?")) return;
+  // 🔹 Error
+  if (isError) {
+    return (
+      <p className="text-center mt-10 text-red-500 font-medium">
+        Failed to load branch managers
+      </p>
+    );
+  }
 
-    console.log("Delete manager:", managerId);
-
-    // axios.delete(`/api/manager/${managerId}`)
-
-    setManagers((prev) => prev.filter((m) => m._id !== managerId));
-  };
+  // 🔹 Safe data fallback
+  const branchManagers = Allbranchdata?.branchManagers ?? [];
 
   // 🔹 Search filter
-  const filteredManagers = managers.filter((m) =>
+  const filteredManagers = branchManagers.filter((m) =>
     m.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) {
-    return <p className="text-center mt-10">Loading managers...</p>;
-  }
-
   return (
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">
-        Manage Branch Managers
-      </h1>
+    <div className="p-6 max-w-4xl mx-auto">
+      {/* 🔹 Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">
+          Branch Managers
+        </h1>
 
-      {/* Search */}
-      <input
-        type="text"
-        placeholder="Search manager..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="w-full border p-2 rounded mb-4"
-      />
+        {/* 🔹 Search */}
+        <div className="relative mt-4 md:mt-0 w-full md:w-72">
+          <Search
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
+          <input
+            type="text"
+            placeholder="Search manager..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border rounded-lg
+                       focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
+        </div>
+      </div>
 
-      {/* Manager List */}
+      {/* 🔹 Manager List */}
       {filteredManagers.length === 0 ? (
-        <p className="text-gray-500">No managers found</p>
+        <div className="text-center py-14 bg-gray-50 rounded-xl border">
+          <p className="text-gray-500">No branch managers found</p>
+        </div>
       ) : (
-        filteredManagers.map((m) => (
-          <div
-            key={m._id}
-            className="border p-4 rounded mb-3 flex justify-between items-center"
-          >
-            <div>
-              <p className="font-semibold">{m.name}</p>
-              <p className="text-sm text-gray-500">{m.email}</p>
-            </div>
+        <div className="grid gap-4">
+          {filteredManagers.map((m) => (
+            <div
+              key={m._id}
+              className="bg-white border rounded-xl p-4 shadow-sm
+                         flex items-center justify-between
+                         hover:shadow-md transition"
+            >
+              <div>
+                <p className="font-semibold text-gray-800">{m.name}</p>
+                <p className="text-sm text-gray-500">{m.email}</p>
+              </div>
 
-            <div className="flex gap-2">
-              {/* Appoint */}
+              {/* 🔹 Remove Button */}
               <button
-                disabled={m.assigned}
-                onClick={() => appointManager(m._id)}
-                className={`px-3 py-1 rounded text-sm ${
-                  m.assigned
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                }`}
+                disabled={removing}
+                onClick={() => removebranchmanager(m._id)}
+                className={`flex items-center gap-2 px-4 py-2 text-sm
+                  rounded-lg transition
+                  ${
+                    removing
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-red-50 text-red-600 hover:bg-red-100"
+                  }`}
               >
-                {m.assigned ? "Assigned" : "Appoint"}
-              </button>
-
-              {/* Delete */}
-              <button
-                onClick={() => deleteManager(m._id)}
-                className="px-3 py-1 rounded text-sm bg-red-600 text-white hover:bg-red-700"
-              >
-                Delete
+                <Trash2 size={16} />
+                {removing ? "Removing..." : "Remove"}
               </button>
             </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   );

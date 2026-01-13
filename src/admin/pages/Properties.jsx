@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+
 import {
   Plus,
   Edit,
@@ -27,6 +28,8 @@ import {
 export default function Properties() {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
+    const [addbranchmanager, { isLoading: addingManager }] =
+      useAddbranchmanagerMutation();
 
   // Branch queries
   const { data: allbranch, refetch: refetchAllBranch, isLoading: loadingAllBranch } =
@@ -40,7 +43,7 @@ export default function Properties() {
 
   // Mutations
   const [addbranch, { isLoading: addingBranch }] = useAddbranchMutation();
-  const [addbranchmanager, { isLoading: addingManager }] = useAddbranchmanagerMutation();
+
   const [deleteProperty] = useDeletePropertyMutation();
 
   // Local states
@@ -48,7 +51,7 @@ export default function Properties() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [addManager, setAddManager] = useState(false);
   const [branchIdForManager, setBranchIdForManager] = useState(null);
-  const [managerData, setManagerData] = useState({ name: "", email: "", phone: "" });
+
   const [deletingPropertyId, setDeletingPropertyId] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -85,35 +88,15 @@ export default function Properties() {
     return "bg-green-100 text-green-600";
   };
   const getOccupancyRate = (occupied, total) => (!total ? 0 : Math.round((occupied / total) * 100));
+const handleAppointManager = async (branchid) => {
+  try {
+    const res = await addbranchmanager({ managerData: {}, branchid }).unwrap();
+    toast.success(res?.message || "Manager appointed successfully.");
+  } catch (err) {
+    toast.error(err?.data?.message || "Failed to appoint manager");
+  }
+};
 
-  // Handlers
-  const handleManagerChange = (e) => {
-    const { name, value } = e.target;
-    setManagerData({ ...managerData, [name]: value });
-  };
-
-  const handleAppointManager = (id) => {
-    setBranchIdForManager(id);
-    setAddManager(true);
-    setManagerData({ name: "", email: "", phone: "" });
-  };
-
-  const handleSaveManager = async (e) => {
-    e.preventDefault();
-    if (!managerData.name || !managerData.email || !managerData.phone) {
-      toast.warn("Please fill all manager fields.");
-      return;
-    }
-    try {
-      const res = await addbranchmanager({ managerData, branchid: branchIdForManager }).unwrap();
-      toast.success(res?.message || "Manager appointed successfully.");
-      setAddManager(false);
-      user?.role === "owner" ? refetchAllBranchOwner?.() : (refetchAllBranch?.(), refetchBranchManagerData?.());
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.data?.message || "Failed to appoint manager.");
-    }
-  };
 
   const handlePropertyChange = (e) => {
     const { name, value } = e.target;
@@ -233,99 +216,174 @@ export default function Properties() {
           const totalOccupancyRate = getOccupancyRate(totalOccupied, totalRooms);
 
           return (
-            <div key={property._id} className="bg-white rounded-3xl shadow-lg border hover:shadow-2xl transition-all duration-300 overflow-hidden group flex flex-col">
+<>
 
-              {/* IMAGE SECTION */}
-              <div className="relative h-60 overflow-hidden rounded-t-3xl">
-                <img
-                  src={property?.Propertyphoto?.[0] || '/fallback-image.png'}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+            <div key={property._id} className="relative">
 
-                {/* Manager Badge / Appoint */}
-                <div className="absolute top-4 left-4">
-                  {!property.branchmanager ? (
-                    <button
-                      onClick={() => navigate(`/admin/addmanager/${property._id}`)}
-                      className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl shadow-md flex items-center gap-2 text-sm hover:scale-105 transition"
-                    >
-                      <UserPlus size={16} />
-                      Appoint Manager
-                    </button>
-                  ) : (
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl shadow-md flex items-center gap-2 text-sm">
-                      <UserPlus size={16} />
-                      {property.branchmanager.name}
-                    </div>
-                  )}
-                </div>
+  {/* CARD */}
+  <div
+    className={`bg-white rounded-3xl shadow-lg border hover:shadow-2xl transition-all duration-300 
+    overflow-hidden group flex flex-col
+    ${!property.branchmanager ? "blur-sm pointer-events-none" : ""}
+  `}
+  >
 
+    {/* IMAGE SECTION */}
+    <div className="relative h-60 overflow-hidden rounded-t-3xl">
+      <img
+        src={property?.Propertyphoto?.[0] || "/fallback-image.png"}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
 
-                {/* Vacant Badge */}
-                <div className={`absolute top-4 right-4 px-4 py-1 rounded-full text-sm font-medium shadow-md ${getStatusColor(totalVacant)}`}>
-                  {totalVacant} Vacant
-                </div>
-              </div>
+      {/* Manager Badge / Appoint */}
+      <div className="absolute top-4 left-4">
+        {property.branchmanager && (
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl shadow-md flex items-center gap-2 text-sm">
+            <UserPlus size={16} />
+            {property.branchmanager.name}
+          </div>
+        )}
+      </div>
 
-              {/* DETAILS SECTION */}
-              <div className="p-6 flex flex-col flex-1 justify-between">
+      {/* Vacant Badge */}
+      <div
+        className={`absolute top-4 right-4 px-4 py-1 rounded-full text-sm font-medium shadow-md ${getStatusColor(
+          totalVacant
+        )}`}
+      >
+        {totalVacant} Vacant
+      </div>
+    </div>
 
-                {/* PROPERTY INFO */}
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-semibold text-[#1e3a5f] truncate">{property.name}</h3>
-                  <div className="flex items-center gap-2 text-gray-600 text-sm truncate">
-                    <MapPin size={18} className="text-gray-500" />
-                    <span className="truncate">{property.address}, {property.city}, {property.state} - {property.pincode}</span>
-                  </div>
-                  <p className="text-sm text-gray-400">Landmark: {property.landmark}</p>
-                </div>
+    {/* DETAILS SECTION */}
+    <div className="p-6 flex flex-col flex-1 justify-between">
 
-                {/* OCCUPANCY METRICS */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                  {[
-                    { name: 'Beds', icon: <BedDouble size={20} />, occupied: occupiedBeds, total: property.totalBeds, rate: bedsOccupancyRate },
-                    { name: 'Rental Rooms', icon: <Users size={20} />, occupied: occupiedRental, total: property.totalrentalRoom, rate: rentalOccupancyRate },
-                    { name: 'Hotel Rooms', icon: <Users size={20} />, occupied: occupiedHotel, total: property.totelhotelroom, rate: hotelOccupancyRate },
-                    { name: 'Total Occupancy', icon: <Users size={20} />, occupied: totalOccupied, total: totalRooms, rate: totalOccupancyRate },
-                  ].map((room, idx) => (
-                    <div key={idx} className="text-center p-4 bg-gray-50 rounded-2xl shadow-inner flex flex-col items-center justify-center">
-                      <div className="text-gray-600 mb-1">{room.icon}</div>
-                      <p className="text-sm text-gray-600">{room.name}</p>
-                      <p className="text-lg font-semibold text-[#1e3a5f]">{room.occupied} / {room.total}</p>
-                      <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-                        <div className="h-2 rounded-full bg-orange-500 transition-all duration-500" style={{ width: `${room.rate}%` }}></div>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">{room.rate}% Occupied</p>
-                    </div>
-                  ))}
-                </div>
+      {/* PROPERTY INFO */}
+      <div className="space-y-2">
+        <h3 className="text-2xl font-semibold text-[#1e3a5f] truncate">
+          {property.name}
+        </h3>
 
-                {/* ACTION BUTTONS */}
-                <div className="flex gap-3 mt-6">
-                  <button className="flex-1 bg-[#1e3a5f] text-white py-3 rounded-2xl flex items-center justify-center gap-2 font-medium hover:bg-[#162f4b] transition-all">
-                    <Eye size={18} /> View Layout
-                  </button>
+        <div className="flex items-center gap-2 text-gray-600 text-sm truncate">
+          <MapPin size={18} className="text-gray-500" />
+          <span className="truncate">
+            {property.address}, {property.city}, {property.state} -{" "}
+            {property.pincode}
+          </span>
+        </div>
 
-                  {user?.role !== "branch-manager" && (
-                    <>
-                      <button className="p-3 border rounded-2xl hover:bg-gray-100 transition flex items-center justify-center">
-                        <Edit size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProperty(occupiedBeds, property._id)}
-                        className="p-3 border border-red-400 rounded-2xl hover:bg-red-50 transition flex items-center justify-center"
-                      >
-                        {deletingPropertyId === property._id ? (
-                          <Loader2 className="w-5 h-5 animate-spin text-red-500" />
-                        ) : (
-                          <Trash2 className="text-red-500" size={18} />
-                        )}
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
+        <p className="text-sm text-gray-400">
+          Landmark: {property.landmark}
+        </p>
+      </div>
+
+      {/* OCCUPANCY METRICS */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        {[
+          { name: "Beds", icon: <BedDouble size={20} />, occupied: occupiedBeds, total: property.totalBeds, rate: bedsOccupancyRate },
+          { name: "Rental Rooms", icon: <Users size={20} />, occupied: occupiedRental, total: property.totalrentalRoom, rate: rentalOccupancyRate },
+          { name: "Hotel Rooms", icon: <Users size={20} />, occupied: occupiedHotel, total: property.totelhotelroom, rate: hotelOccupancyRate },
+          { name: "Total Occupancy", icon: <Users size={20} />, occupied: totalOccupied, total: totalRooms, rate: totalOccupancyRate },
+        ].map((room, idx) => (
+          <div
+            key={idx}
+            className="text-center p-4 bg-gray-50 rounded-2xl shadow-inner flex flex-col items-center justify-center"
+          >
+            <div className="text-gray-600 mb-1">{room.icon}</div>
+            <p className="text-sm text-gray-600">{room.name}</p>
+            <p className="text-lg font-semibold text-[#1e3a5f]">
+              {room.occupied} / {room.total}
+            </p>
+            <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
+              <div
+                className="h-2 rounded-full bg-orange-500 transition-all duration-500"
+                style={{ width: `${room.rate}%` }}
+              />
             </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {room.rate}% Occupied
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* ACTION BUTTONS */}
+      <div className="flex gap-3 mt-6">
+        <button className="flex-1 bg-[#1e3a5f] text-white py-3 rounded-2xl flex items-center justify-center gap-2 font-medium hover:bg-[#162f4b] transition-all">
+          <Eye size={18} /> View Layout
+        </button>
+
+        {user?.role !== "branch-manager" && (
+          <>
+            <button className="p-3 border rounded-2xl hover:bg-gray-100 transition">
+              <Edit size={18} />
+            </button>
+
+            <button
+              onClick={() => handleDeleteProperty(occupiedBeds, property._id)}
+              className="p-3 border border-red-400 rounded-2xl hover:bg-red-50 transition"
+            >
+              {deletingPropertyId === property._id ? (
+                <Loader2 className="w-5 h-5 animate-spin text-red-500" />
+              ) : (
+                <Trash2 className="text-red-500" size={18} />
+              )}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+
+{/* OVERLAY WHEN MANAGER NOT PRESENT */}
+{!property.branchmanager && (
+  <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/30 rounded-3xl">
+    <div className="flex flex-col gap-4">
+      
+      {/* Appoint Manager */}
+      <button
+        onClick={() => navigate(`/admin/addmanager/${property._id}`)}
+        className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-3 rounded-xl shadow-xl
+                   flex items-center justify-center gap-2 hover:scale-105 transition"
+      >
+        <UserPlus size={18} />
+        Appoint Manager
+      </button>
+
+     {/* Appoint Me as Manager */}
+<button
+  onClick={() => handleAppointManager(property._id)}
+  disabled={addingManager}
+  className={`bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-xl shadow-xl
+              flex items-center justify-center gap-2 transition
+              ${addingManager ? "opacity-70 cursor-not-allowed" : "hover:scale-105"}`}
+>
+  {addingManager ? (
+    <>
+      <Loader2 className="w-5 h-5 animate-spin" />
+      Appointing...
+    </>
+  ) : (
+    <>
+      <UserPlus size={18} />
+      Appoint Me as Manager
+    </>
+  )}
+</button>
+
+    </div>
+  </div>
+)}
+
+</div>
+
+
+
+
+
+
+
+            </>
 
           );
         }) : (
@@ -338,35 +396,34 @@ export default function Properties() {
         )}
       </div>
 
-      {/* Add Manager & Add Property Modals */}
-      {addManager && <ManagerModal handleManagerChange={handleManagerChange} handleSaveManager={handleSaveManager} addingManager={addingManager} setAddManager={setAddManager} />}
+
       {showAddModal && <AddPropertyModal formData={formData} setFormData={setFormData} handlePropertyChange={handlePropertyChange} handleSaveProperty={handleSaveProperty} addingBranch={addingBranch} setShowAddModal={setShowAddModal} />}
     </div>
   );
 }
 
-// Manager Modal Component
-const ManagerModal = ({ handleManagerChange, handleSaveManager, addingManager, setAddManager }) => (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-2xl w-full max-w-md shadow-xl border border-gray-200 animate-[fadeIn_0.25s_ease-out]">
-      <div className="p-6 border-b">
-        <h2 className="text-xl font-semibold text-gray-800">Appoint Manager</h2>
-        <p className="text-sm text-gray-500 mt-1">Fill out the details to appoint a new manager.</p>
-      </div>
-      <form onSubmit={handleSaveManager} className="p-6 space-y-5">
-        <input type="text" name="name" placeholder="Name" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
-        <input type="email" name="email" placeholder="Email" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
-        <input type="text" name="phone" placeholder="Phone" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
-        <div className="flex gap-3 pt-2">
-          <button type="button" onClick={() => setAddManager(false)} className="flex-1 border p-3 rounded-xl">Cancel</button>
-          <button type="submit" className="flex-1 bg-blue-600 text-white p-3 rounded-xl">
-            {addingManager ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Save Manager"}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-);
+
+// const ManagerModal = ({ handleManagerChange, handleSaveManager, addingManager, setAddManager }) => (
+//   <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+//     <div className="bg-white rounded-2xl w-full max-w-md shadow-xl border border-gray-200 animate-[fadeIn_0.25s_ease-out]">
+//       <div className="p-6 border-b">
+//         <h2 className="text-xl font-semibold text-gray-800">Appoint Manager</h2>
+//         <p className="text-sm text-gray-500 mt-1">Fill out the details to appoint a new manager.</p>
+//       </div>
+//       <form onSubmit={handleSaveManager} className="p-6 space-y-5">
+//         <input type="text" name="name" placeholder="Name" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
+//         <input type="email" name="email" placeholder="Email" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
+//         <input type="text" name="phone" placeholder="Phone" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
+//         <div className="flex gap-3 pt-2">
+//           <button type="button" onClick={() => setAddManager(false)} className="flex-1 border p-3 rounded-xl">Cancel</button>
+//           <button type="submit" className="flex-1 bg-blue-600 text-white p-3 rounded-xl">
+//             {addingManager ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Save Manager"}
+//           </button>
+//         </div>
+//       </form>
+//     </div>
+//   </div>
+// );
 
 // Add Property Modal Component
 const AddPropertyModal = ({ formData, setFormData, handlePropertyChange, handleSaveProperty, addingBranch, setShowAddModal }) => (
