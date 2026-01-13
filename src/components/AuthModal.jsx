@@ -87,11 +87,13 @@ const handleSubmit = async (e) => {
     toast.success(res.message || "Logged in successfully!");
 
     // Role based redirect
-    if (res?.existingUser?.role !== "user") {
-      navigate("/admin/properties");
-    } else {
-      navigate(-1);
-    }
+  const role = res?.existingUser?.role || [];
+
+if (role.includes("admin")) {
+  navigate("/admin/properties");
+} else {
+  navigate(-1);
+}
 
     // Reset form
     setFormData({

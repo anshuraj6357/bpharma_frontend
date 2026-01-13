@@ -104,7 +104,10 @@ export default function DashboardHeader({
             {user?.username?.charAt(0)?.toUpperCase()}
           </div>
           <span className="hidden sm:inline text-sm font-medium text-gray-700">
-            {user?.role?.toUpperCase()}
+           {Array.isArray(user?.role)
+  ? user.role.join(", ").toUpperCase()
+  : user?.role?.toUpperCase()}
+
           </span>
         </div>
       </div>

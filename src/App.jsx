@@ -77,11 +77,11 @@ function App() {
   }, [dispatch]);
 
   // Admin roles
-  const isAdminRoute =
-    user?.role === "owner" || user?.role === "branch-manager";
-  const UserRoutes =
-    user?.role === "owner" || user?.role === "branch-manager";
+const isAdminRoute = Array.isArray(user?.role)
+  ? user.role.includes("owner") || user.role.includes("branch-manager")
+  : user?.role === "owner" || user?.role === "branch-manager";
 
+  console.log(isAdminRoute)
   return (
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
@@ -142,10 +142,15 @@ function App() {
 
 
           {/* Admin */}
-          <Route path="/admin/*" element={<AdminApp />} />
+ {isAdminRoute && (
+  <Route path="/admin/*" element={<AdminApp />} />
+)}
 
-          {/* Auth */}
-          <Route path="/login" element={<AuthModal />} />
+{/* Auth */}
+ {!isAdminRoute && (
+ <Route path="/login" element={<AuthModal />} />
+
+)}
 
         </Routes>
       </main>
