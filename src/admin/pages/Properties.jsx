@@ -401,59 +401,141 @@ const handleAppointManager = async (branchid) => {
     </div>
   );
 }
+const AddPropertyModal = ({
+  formData,
+  setFormData,
+  handlePropertyChange,
+  handleSaveProperty,
+  addingBranch,
+  setShowAddModal,
+}) => (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-50 p-2">
+    <div className="bg-white/80 backdrop-blur-xl w-full max-w-lg rounded-xl shadow-xl border border-white/40 max-h-[70vh] overflow-y-auto">
 
-
-// const ManagerModal = ({ handleManagerChange, handleSaveManager, addingManager, setAddManager }) => (
-//   <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-//     <div className="bg-white rounded-2xl w-full max-w-md shadow-xl border border-gray-200 animate-[fadeIn_0.25s_ease-out]">
-//       <div className="p-6 border-b">
-//         <h2 className="text-xl font-semibold text-gray-800">Appoint Manager</h2>
-//         <p className="text-sm text-gray-500 mt-1">Fill out the details to appoint a new manager.</p>
-//       </div>
-//       <form onSubmit={handleSaveManager} className="p-6 space-y-5">
-//         <input type="text" name="name" placeholder="Name" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
-//         <input type="email" name="email" placeholder="Email" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
-//         <input type="text" name="phone" placeholder="Phone" onChange={handleManagerChange} className="w-full border p-3 rounded-xl" />
-//         <div className="flex gap-3 pt-2">
-//           <button type="button" onClick={() => setAddManager(false)} className="flex-1 border p-3 rounded-xl">Cancel</button>
-//           <button type="submit" className="flex-1 bg-blue-600 text-white p-3 rounded-xl">
-//             {addingManager ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Save Manager"}
-//           </button>
-//         </div>
-//       </form>
-//     </div>
-//   </div>
-// );
-
-// Add Property Modal Component
-const AddPropertyModal = ({ formData, setFormData, handlePropertyChange, handleSaveProperty, addingBranch, setShowAddModal }) => (
-  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl border border-gray-200 animate-scaleIn max-h-[90vh] overflow-y-auto">
-      <div className="p-6 border-b bg-gradient-to-r from-blue-600 to-blue-500 rounded-t-2xl">
-        <h2 className="text-2xl font-semibold text-white tracking-wide">Add New Property</h2>
+      {/* Header */}
+      <div className="px-3 py-2 border-b bg-gradient-to-r from-blue-600 to-blue-500 rounded-t-xl">
+        <h2 className="text-sm font-semibold text-white tracking-wide">
+          Add New Property
+        </h2>
       </div>
-      <form onSubmit={handleSaveProperty} className="p-6 space-y-6">
-        <input name="name" placeholder="PG Name" value={formData.name} onChange={handlePropertyChange} className="w-full border p-3 rounded-xl" required />
-        <input name="address" placeholder="Address" value={formData.address} onChange={handlePropertyChange} className="w-full border p-3 rounded-xl" required />
-        <div className="grid grid-cols-2 gap-4">
-          <input name="city" placeholder="City" value={formData.city} onChange={handlePropertyChange} className="w-full border p-3 rounded-xl" required />
-          <input name="state" placeholder="State" value={formData.state} onChange={handlePropertyChange} className="w-full border p-3 rounded-xl" required />
+
+      <form onSubmit={handleSaveProperty} className="p-3 space-y-2">
+
+        {/* Inputs */}
+        <input
+          name="name"
+          placeholder="PG Name"
+          value={formData.name}
+          onChange={handlePropertyChange}
+          className="w-full border px-2 py-1.5 rounded-md text-xs focus:ring-1 focus:ring-blue-500 outline-none"
+          required
+        />
+
+        <input
+          name="address"
+          placeholder="Address"
+          value={formData.address}
+          onChange={handlePropertyChange}
+          className="w-full border px-2 py-1.5 rounded-md text-xs focus:ring-1 focus:ring-blue-500 outline-none"
+          required
+        />
+
+        <div className="grid grid-cols-2 gap-1.5">
+          <input
+            name="city"
+            placeholder="City"
+            value={formData.city}
+            onChange={handlePropertyChange}
+            className="w-full border px-2 py-1.5 rounded-md text-xs focus:ring-1 focus:ring-blue-500 outline-none"
+            required
+          />
+          <input
+            name="state"
+            placeholder="State"
+            value={formData.state}
+            onChange={handlePropertyChange}
+            className="w-full border px-2 py-1.5 rounded-md text-xs focus:ring-1 focus:ring-blue-500 outline-none"
+            required
+          />
         </div>
-        <input name="pincode" placeholder="Pincode" value={formData.pincode} onChange={handlePropertyChange} className="w-full border p-3 rounded-xl" required />
-        <input name="streetAdress" placeholder="Street Address" value={formData.streetAdress} onChange={handlePropertyChange} className="w-full border p-3 rounded-xl" required />
-        <input name="landmark" placeholder="Landmark" value={formData.landmark} onChange={handlePropertyChange} className="w-full border p-3 rounded-xl" required />
-        <input type="file" multiple accept="image/*" className="w-full border p-3 rounded-xl" onChange={(e) => {
-          const files = Array.from(e.target.files);
-          const previews = files.map(f => URL.createObjectURL(f));
-          setFormData(prev => ({ ...prev, images: files, previewImages: previews }));
-        }} />
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          {formData.previewImages.map((img, i) => <img key={i} src={img} className="w-full h-28 rounded-xl object-cover shadow-md" />)}
-        </div>
-        <div className="flex gap-4 pt-4">
-          <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 border p-3 rounded-xl font-medium hover:bg-gray-100 transition">Cancel</button>
-          <button type="submit" className="flex-1 bg-blue-600 text-white p-3 rounded-xl font-medium hover:bg-blue-700 transition shadow-md">
-            {addingBranch ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "Save Property"}
+
+        <input
+          name="pincode"
+          placeholder="Pincode"
+          value={formData.pincode}
+          onChange={handlePropertyChange}
+          className="w-full border px-2 py-1.5 rounded-md text-xs focus:ring-1 focus:ring-blue-500 outline-none"
+          required
+        />
+
+        <input
+          name="streetAdress"
+          placeholder="Street Address"
+          value={formData.streetAdress}
+          onChange={handlePropertyChange}
+          className="w-full border px-2 py-1.5 rounded-md text-xs focus:ring-1 focus:ring-blue-500 outline-none"
+          required
+        />
+
+        <input
+          name="landmark"
+          placeholder="Landmark"
+          value={formData.landmark}
+          onChange={handlePropertyChange}
+          className="w-full border px-2 py-1.5 rounded-md text-xs focus:ring-1 focus:ring-blue-500 outline-none"
+          required
+        />
+
+        {/* File input */}
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          className="w-full border px-2 py-1.5 rounded-md text-xs bg-white"
+          onChange={(e) => {
+            const files = Array.from(e.target.files);
+            const previews = files.map((f) => URL.createObjectURL(f));
+            setFormData((prev) => ({
+              ...prev,
+              images: files,
+              previewImages: previews,
+            }));
+          }}
+        />
+
+        {/* Image Preview Grid */}
+        {formData.previewImages.length > 0 && (
+          <div className="grid grid-cols-4 gap-1.5 mt-1">
+            {formData.previewImages.map((img, i) => (
+              <div
+                key={i}
+                className="aspect-square rounded-md overflow-hidden border shadow-sm bg-white"
+              >
+                <img src={img} className="w-full h-full object-cover" />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div className="flex gap-2 pt-2">
+          <button
+            type="button"
+            onClick={() => setShowAddModal(false)}
+            className="flex-1 border px-2 py-1.5 rounded-md text-xs font-medium hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="flex-1 bg-blue-600 text-white px-2 py-1.5 rounded-md text-xs font-medium hover:bg-blue-700 transition shadow"
+          >
+            {addingBranch ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" />
+            ) : (
+              "Save"
+            )}
           </button>
         </div>
       </form>

@@ -142,15 +142,12 @@ const isAdminRoute = Array.isArray(user?.role)
 
 
           {/* Admin */}
- {isAdminRoute && (
-  <Route path="/admin/*" element={<AdminApp />} />
-)}
 
-{/* Auth */}
- {!isAdminRoute && (
+  <Route path="/admin/*" element={<AdminApp />} />
+
+
  <Route path="/login" element={<AuthModal />} />
 
-)}
 
         </Routes>
       </main>

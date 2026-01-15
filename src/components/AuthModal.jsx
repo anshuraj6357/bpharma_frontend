@@ -85,15 +85,15 @@ const handleSubmit = async (e) => {
     localStorage.setItem("user", JSON.stringify(res.existingUser));
 
     toast.success(res.message || "Logged in successfully!");
+const role = res?.existingUser?.role || [];
+console.log("User role:", role);
 
-    // Role based redirect
-  const role = res?.existingUser?.role || [];
-
-if (role.includes("admin")) {
-  navigate("/admin/properties");
+if (role.includes("owner") || role.includes("branch-manager")) {
+  navigate("/admin/properties", { replace: true });
 } else {
-  navigate(-1);
+  navigate("/", { replace: true });
 }
+
 
     // Reset form
     setFormData({

@@ -1470,6 +1470,19 @@ function AddRoomForm() {
                   </select>
                 </div>
               )}
+
+               {(roomData.category !== "Hotel") && (
+        <div className="mt-6">
+          <label className="label-style">Price (Per Month)</label>
+          <input
+            type="number"
+            className="input-style"
+            disabled={roomData.category === "Pg"}
+            value={roomData.price}
+            onChange={e => setRoomData({ ...roomData, price: e.target.value })}
+          />
+        </div>
+      )}
             </div>
           )}
         </>
@@ -1482,6 +1495,7 @@ function AddRoomForm() {
 
           {/* Facilities */}
           <div className="mt-6">
+
             <p className="section-heading">Facilities</p>
             <div className="grid grid-cols-2 gap-3">
               {facilityOptions.map(f => (

@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "http://localhost:5000/api/property/";
+const USER_API = "https://roomgi-backend-project-1.onrender.com/api/property/";
 
 const propertyApi = createApi({
   reducerPath: "propertyapi",
@@ -39,13 +39,14 @@ const propertyApi = createApi({
       query: () => "getbranch/bybranchMnager",
       providesTags: ["Branch"],
     }),
-    getAllBranchbyproperty: builder.query({
-      query: () => "getproperty/all",
+     getAllBranchbyproperty: builder.query({
+      query: () => "/getproperty/all",
       providesTags: ["Branch"],
     }),
+  
     Removebranchmanager: builder.mutation({
-      query: (id) => ({
-        url: `/re/${id}`,
+      query: (managerId) => ({
+        url: `/re/${managerId}`,
         method: "delete",
       }),
       invalidatesTags: ["Branch"],
@@ -61,6 +62,17 @@ const propertyApi = createApi({
       }),
       invalidatesTags: ["Branch"],
     }),
+
+
+      addexistingbranchmanager: builder.mutation({
+      query: ({ managerData, branchid }) => ({
+        url: `createexistingbranchmanager/${branchid}`,
+        method: "POST",
+        body: {managerData},
+      }),
+      invalidatesTags: ["Branch"],
+    }),
+
 
     changemanagerpass: builder.mutation({
       query: (payload) => ({
@@ -151,6 +163,7 @@ const propertyApi = createApi({
 export const {
   useAddbranchMutation,
   useGetAllBranchQuery,
+  useAddexistingbranchmanagerMutation,
   useGetAllBranchByOwnerQuery,
   useGetAllBranchbybranchIdQuery,
    useGetAllBranchbypropertyQuery,
