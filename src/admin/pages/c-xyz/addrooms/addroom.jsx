@@ -1038,7 +1038,7 @@ function AddRoomForm() {
   const { refetch } = useGetAllRoomQuery();
   const [addRoom, { isLoading, isSuccess: addroomsuccess, isError, error }] = useAddRoomMutation();
   const { data: Allbranchdata, isLoading: AllBranchloading } = useGetAllBranchbybranchIdQuery();
-
+console.log(Allbranchdata)
   const facilityOptions = ["AC", "Non-AC", "Bathroom", "WiFi", "Power Backup", "Laundry", "CCTV", "Parking", "Refrigerator", "24x7 Electricity"];
   const notAllowedOptions = ["Smoking", "Alcohol", "Pets", "Visitors", "Loud Music"];
   const rulesOptions = ["Keep room clean", "No loud music", "Maintain hygiene", "No outside guests", "Respect timings"];

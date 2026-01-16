@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const PgApi = createApi({
     reducerPath: "PgApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: "https://roomgi-backend-project-1.onrender.com/api/property/",
+        baseUrl: "http://localhost:5000/api/property/",
         credentials: "include",
     }),
     tagTypes: ["Pg"], // ✅ Added tag for versioning

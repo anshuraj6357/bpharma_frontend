@@ -39,6 +39,7 @@ import PayRentPanel from "./components/payrent";
 import WishlistPage from "./components/wishlistdetails";
 import FounderPage from "./components/founderpage.jsx"
 import Disclaimer from "./components/desclaimer.jsx";
+import InternshipCertificate from "./components/InternshipCertificate";
 
 
 
@@ -138,7 +139,9 @@ const isAdminRoute = Array.isArray(user?.role)
           <Route path="/contact" element={<Contact />} />
           <Route path="/payrent/:id" element={<PayRentPanel />} />
           <Route path="/founder" element={<FounderPage />} />
- <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/internship-certificate"element={<InternshipCertificate />}
+/>
 
 
           {/* Admin */}

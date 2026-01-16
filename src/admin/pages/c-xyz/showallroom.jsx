@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
 import {
-  useGetAllRoomQuery,
+
   useDeleteRoomMutation,
+  useGetAllRoomownerQuery
 } from "../../../Bothfeatures/features2/api/propertyapi";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
-
+import { useSelector }  from "react-redux";
 function ShowRooms() {
   const navigate = useNavigate();
-  const { data, isLoading, error, refetch } = useGetAllRoomQuery();
+  const user = useSelector((state) => state.auth.user);
+
+const ownerRoomsQuery = useGetAllRoomownerQuery();
+
+// Decide which data to use based on user role
+const { data, isLoading, error, refetch } = 
+  ownerRoomsQuery;
+
   const [deleteRoom, { isSuccess }] = useDeleteRoomMutation();
   const [deletingRoomId, setDeletingRoomId] = useState(null);
 

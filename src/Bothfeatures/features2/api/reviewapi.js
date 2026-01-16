@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const reviewApi = createApi({
     reducerPath: "reviewApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: "https://roomgi-backend-project-1.onrender.com/api/review",
+        baseUrl: "http://localhost:5000/api/review",
         credentials: "include", // optional, remove if not needed
     }),
     tagTypes: ["Review"],

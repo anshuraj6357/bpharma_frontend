@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "https://roomgi-backend-project-1.onrender.com/api/property/";
+const USER_API = "http://localhost:5000/api/property/";
 
 const propertyApi = createApi({
   reducerPath: "propertyapi",
@@ -106,6 +106,10 @@ const propertyApi = createApi({
       query: () => "allrooms",
       providesTags: ["Room"],
     }),
+    getAllRoomowner: builder.query({
+      query: () => "allroomsaccordingtoowner",
+      providesTags: ["Room"],
+    }),
 
     getRoomById: builder.query({
       query: (roomId) => `get/${roomId}`,
@@ -171,7 +175,7 @@ export const {
   useChangemanagerpassMutation,
   useDeletePropertyMutation,
   useRemovebranchmanagerMutation,
-
+useGetAllRoomownerQuery,
   useAddRoomMutation,
   useGetAllRoomQuery,
   useGetRoomByIdQuery,

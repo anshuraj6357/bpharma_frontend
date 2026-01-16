@@ -314,3 +314,13 @@
 .animate-scaleIn {
   animation: scaleIn 0.2s ease-out;
 }
+.input-ui {
+  @apply w-full px-4 py-3 rounded-xl border border-gray-300
+         focus:outline-none focus:ring-2 focus:ring-[#1e3a5f]
+         focus:border-transparent transition bg-white;
+}
+
+.file-ui {
+  @apply w-full px-3 py-2 rounded-xl border border-dashed
+         border-gray-400 bg-white cursor-pointer;
+}

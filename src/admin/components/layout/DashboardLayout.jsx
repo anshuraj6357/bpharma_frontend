@@ -18,8 +18,7 @@ export default function DashboardLayout() {
     { id: "rooms", label: "Rooms", path: "/admin/ShowRooms" },
     { id: "complaints", label: "complaints", path: "/admin/complaints" },
     { id: "subscription", label: "subscription", path: "/admin/subscription" },
-     { id: "showbranchmanager", label: "branchmanagers", path: "/admin/showall" },
-  ];
+   ];
 
   const handleNavigation = (path) => {
     navigate(path);
