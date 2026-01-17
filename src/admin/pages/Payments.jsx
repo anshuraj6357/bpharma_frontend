@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Plus, X } from "lucide-react";
+import { TrendingUp, TrendingDown, Plus, X, Calendar, Filter, Search, Wallet, FileText, AlertCircle } from "lucide-react";
 import {
   useCreateExpenseMutation,
   useGetRevenueDetailsQuery,
   useGetAllExpenseQuery
-
 } from "../../Bothfeatures/features2/api/paymentapi.js";
 import {
- useGetAllBranchbybranchIdQuery
+  useGetAllBranchbybranchIdQuery
 } from "../../Bothfeatures/features2/api/propertyapi.js";
 import { useDispatch } from "react-redux";
 import { setAlltenants } from "../../Bothfeatures/notpaidtenantslice";
@@ -16,8 +15,8 @@ import { useNavigate } from "react-router-dom";
 export default function Payments() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {data:branches}=useGetAllBranchbybranchIdQuery()
-  const {data:expensedata}=useGetAllExpenseQuery()
+  const { data: branches } = useGetAllBranchbybranchIdQuery();
+  const { data: expensedata } = useGetAllExpenseQuery();
 
   const currentDate = new Date();
   const [dateAndYear, setDateAndYear] = useState({
@@ -28,7 +27,7 @@ export default function Payments() {
   const [activeTab, setActiveTab] = useState("collection");
   const [payments, setpayments] = useState(null);
 
-  const { data } = useGetRevenueDetailsQuery(dateAndYear);
+  const { data, isLoading } = useGetRevenueDetailsQuery(dateAndYear);
   const [createExpense] = useCreateExpenseMutation();
 
   const [showExpenseModal, setShowExpenseModal] = useState(false);
@@ -41,12 +40,8 @@ export default function Payments() {
   useEffect(() => {
     if (data) {
       setpayments(data?.allPayments);
-      console.log("data", data?.allPayments);
     }
-    if(expensedata){
-      console.log(expensedata)
-    }
-  }, [data,expensedata]);
+  }, [data, expensedata]);
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -57,8 +52,9 @@ export default function Payments() {
     navigate("/all-notpaid-tenant");
   };
 
-  const handleshowtenantlldetails = () => {
-    alert("here all tenant details will have to show");
+  const handleshowtenantlldetails = (payment) => {
+    // Navigate or modal logic here
+    console.log("View details", payment);
   };
 
   const alladv = (tenantpayments = {}) =>
@@ -79,7 +75,6 @@ export default function Payments() {
     try {
       const res = await createExpense(expenseData).unwrap();
       if (res.success) {
-        alert("Expense created successfully!");
         setExpenseData({ category: "", amount: "", branchId: "" });
         setShowExpenseModal(false);
       }
@@ -93,306 +88,397 @@ export default function Payments() {
     navigate("/admin/add-payment");
   };
 
-  const handleRemindTenant = (tenant) => {
-    console.log(`Sending rent reminder → POST /api/reminder to ${tenant}`);
-  };
-
-  const handleViewExpense = (id) => {
-    console.log(`View expense details → GET /api/expenses/${id}`);
-  };
-
-  const handleSaveReminders = () => {
-    console.log("Saving reminder settings → PUT /api/reminders/settings");
+  // Helper for currency formatting
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(amount || 0);
   };
 
   return (
-    <div className="space-y-8">
-      {/* ---------------- HEADER ---------------- */}
-      <div className="animate-fadeIn mb-6">
-        <h1 className="text-[#1e3a5f] text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
-          Payment Management
-        </h1>
-        <p className="text-gray-600 text-sm sm:text-base md:text-lg mt-1">
-          Track rent collection, expenses, and financial performance
-        </p>
-      </div>
-
-      {/* ---------------- FINANCIAL SUMMARY ---------------- */}
-      <div className="overflow-x-auto">
-        <div className="flex md:grid md:grid-cols-3 lg:grid-cols-5 gap-4 min-w-[900px] md:min-w-0">
-          <div className="dashboard-card min-w-[200px]">
-            <div className="flex justify-between items-center mb-2">
-              <p className="card-label">Total Income</p>
-              <TrendingUp className="text-green-500" size={22} />
-            </div>
-            <p className="card-value">₹{data?.income}</p>
-          </div>
-          <div className="dashboard-card min-w-[200px]">
-            <div className="flex justify-between items-center mb-2">
-              <p className="card-label">Total Expenses</p>
-              <TrendingDown className="text-red-500" size={22} />
-            </div>
-            <p className="card-value">₹{data?.expense}</p>
-          </div>
-          <div className="dashboard-card min-w-[200px]">
-            <div className="flex justify-between items-center mb-2">
-              <p className="card-label">Net Profit</p>
-              <TrendingUp className="text-[#ff6b35]" size={22} />
-            </div>
-            <p className="card-value text-[#ff6b35]">
-              ₹{data ? data.income - data.expense : 0}
-            </p>
-            <p className="card-sub">Current month</p>
-          </div>
-          <div
-            onClick={() => handleseerest(data?.notpaid)}
-            className="dashboard-card min-w-[200px] cursor-pointer hover:shadow-lg"
-          >
-            <div className="flex justify-between items-center mb-2">
-              <p className="card-label">Not Paid (Month)</p>
-              <TrendingDown className="text-red-500" size={22} />
-            </div>
-            <p className="card-value">{data?.notpaid?.length}</p>
-          </div>
-          <div className="dashboard-card min-w-[200px]">
-            <div className="flex justify-between items-center mb-2">
-              <p className="card-label">Total Advance</p>
-              <TrendingUp className="text-green-500" size={22} />
-            </div>
-            <p className="card-value">₹{alladv(data?.tenantpayments)}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* ---------------- TITLE + BUTTON + FILTER ---------------- */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-6 p-4 bg-white rounded-2xl shadow-md border border-gray-100">
-        <div className="flex flex-col">
-          <h1 className="text-[#1e3a5f] text-2xl md:text-3xl font-bold tracking-tight">
-            Payment Management
+    <div className="space-y-6 md:space-y-8 min-h-screen bg-gray-50/50 pb-10">
+      
+      {/* ---------------- HEADER SECTION ---------------- */}
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+            Financial Overview
           </h1>
-          <p className="text-gray-500 text-sm md:text-base mt-1">
-            Manage tenant rent, advances, and dues efficiently
+          <p className="text-slate-500 mt-1 text-sm md:text-base">
+            Track your property revenue, expenses, and tenant dues.
           </p>
         </div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-3 w-full sm:w-auto">
-          <button
-            onClick={changepage}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-[#ff6b35] to-[#ff8c4a] text-white font-medium rounded-xl shadow-md hover:scale-[1.03] transition-transform duration-200 w-full sm:w-auto"
-          >
-            <Plus size={18} /> Add Payment
-          </button>
-
-          <select
-            value={dateAndYear.month}
-            onChange={(e) => setDateAndYear((prev) => ({ ...prev, month: Number(e.target.value) }))}
-            className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            {[
-              "January", "February", "March", "April", "May", "June",
-              "July", "August", "September", "October", "November", "December",
-            ].map((m, i) => (
-              <option key={i} value={i + 1}>
-                {m}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={dateAndYear.year}
-            onChange={(e) => setDateAndYear((prev) => ({ ...prev, year: Number(e.target.value) }))}
-            className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            {Array.from({ length: 5 }, (_, i) => currentDate.getFullYear() - 2 + i).map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* ---------------- TABS ---------------- */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
-        <div className="flex border-b border-gray-200">
-          {["collection", "expenses", "reminders"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => handleTabChange(tab)}
-              className={`px-4 py-2 font-medium ${activeTab === tab ? "border-b-2 border-orange-500 text-orange-500" : "text-gray-500"}`}
+        
+        {/* Date Filter Controls */}
+        <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl shadow-sm border border-gray-200">
+            <div className="px-2 text-gray-400">
+                <Calendar size={18} />
+            </div>
+            <select
+                value={dateAndYear.month}
+                onChange={(e) => setDateAndYear((prev) => ({ ...prev, month: Number(e.target.value) }))}
+                className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none cursor-pointer hover:text-orange-600 transition"
             >
-              {tab === "collection" ? "Rent Collection" : tab === "expenses" ? "Expenses" : "Reminders"}
-            </button>
-          ))}
+                {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((m, i) => (
+                <option key={i} value={i + 1}>{m}</option>
+                ))}
+            </select>
+            <div className="h-4 w-[1px] bg-gray-300"></div>
+            <select
+                value={dateAndYear.year}
+                onChange={(e) => setDateAndYear((prev) => ({ ...prev, year: Number(e.target.value) }))}
+                className="bg-transparent text-sm font-medium text-slate-700 focus:outline-none cursor-pointer hover:text-orange-600 transition pr-2"
+            >
+                {Array.from({ length: 5 }, (_, i) => currentDate.getFullYear() - 2 + i).map((year) => (
+                <option key={year} value={year}>{year}</option>
+                ))}
+            </select>
+        </div>
+      </div>
+
+      {/* ---------------- STATS CARDS (Responsive Grid) ---------------- */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Income */}
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-all duration-300">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Wallet className="text-emerald-500" size={48} />
+            </div>
+            <p className="text-sm font-medium text-slate-500 mb-1">Total Income</p>
+            <h3 className="text-2xl font-bold text-slate-800">{formatCurrency(data?.income)}</h3>
+            <div className="flex items-center mt-2 text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2 py-1 rounded-full">
+                <TrendingUp size={14} className="mr-1" /> +Collected
+            </div>
         </div>
 
-        {/* ---------------- RENT COLLECTION ---------------- */}
-        {activeTab === "collection" && (
-          <div className="p-4 sm:p-6">
-            {/* Desktop Table */}
-            <div className="hidden md:block overflow-x-auto rounded-xl shadow-sm border border-gray-100">
-              <table className="w-full min-w-[900px]">
-                <thead className="bg-gray-50 text-xs uppercase text-gray-500">
-                  <tr>
-                    <th className="px-4 py-3 text-left">Tenant</th>
-                    <th className="px-4 py-3 text-left">Property / Room</th>
-                    <th className="px-4 py-3 text-left">Amount</th>
-                    <th className="px-4 py-3 text-left">Status</th>
-                    <th className="px-4 py-3 text-left">Date</th>
-                    <th className="px-4 py-3 text-left">Advance</th>
-                    <th className="px-4 py-3 text-left">Dues</th>
-                    <th className="px-4 py-3 text-left">Mode</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {payments?.map((payment) => (
-                    <tr
-                      key={payment._id}
-                      onClick={() => handleshowtenantlldetails(payment)}
-                      className="cursor-pointer hover:bg-gray-50 transition"
-                    >
-                      <td className="px-4 py-4 flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold">
-                          {payment?.tenantId?.name?.charAt(0)}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-[#1e3a5f]">{payment?.tenantId?.name}</p>
-                          <p className="text-xs text-gray-500">Room {payment?.tenantId?.roomNumber}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <p className="font-medium">{payment?.branch?.name || "—"}</p>
-                        <p className="text-xs text-gray-400">PG / Hostel</p>
-                      </td>
-                      <td className="px-4 py-4 font-bold text-[#1e3a5f]">₹{payment?.amountpaid}</td>
-                      <td className="px-4 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${payment?.tilldatestatus === "paid"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-600"
-                            }`}
-                        >
-                          {payment?.tilldatestatus}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-sm">{new Date(payment.createdAt).toLocaleDateString("en-IN")}</td>
-                      <td className="px-4 py-4 text-green-600 font-semibold">₹{payment?.tilldateAdvance}</td>
-                      <td className="px-4 py-4 text-red-600 font-semibold">₹{Math.abs(payment?.tilldatedues)}</td>
-                      <td className="px-4 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-lg text-xs font-medium ${payment?.mode === "Online" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-700"}`}
-                        >
-                          {payment?.mode}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Expenses */}
+        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-all duration-300">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <FileText className="text-rose-500" size={48} />
             </div>
-          </div>
-        )}
-
-        {/* ---------------- EXPENSES TAB ---------------- */}
-        {activeTab === "expenses" && (
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-gray-600">
-                Showing expenses for {new Date().toLocaleDateString("en-IN")}
-              </p>
-              <button onClick={handleAddExpense} className="btn-orange flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
-                <Plus size={16} /> Add Expense
-              </button>
+            <p className="text-sm font-medium text-slate-500 mb-1">Total Expenses</p>
+            <h3 className="text-2xl font-bold text-slate-800">{formatCurrency(data?.expense)}</h3>
+            <div className="flex items-center mt-2 text-xs font-medium text-rose-600 bg-rose-50 w-fit px-2 py-1 rounded-full">
+                <TrendingDown size={14} className="mr-1" /> Outflow
             </div>
+        </div>
 
-            {/* ---------------- ADD EXPENSE MODAL ---------------- */}
-            {showExpenseModal && (
-              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg relative">
-                  <button
-                    onClick={() => setShowExpenseModal(false)}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
-                  >
-                    <X size={20} />
-                  </button>
-                  <h2 className="text-xl font-semibold mb-4">Add New Expense</h2>
-                  <form className="space-y-4" onSubmit={handleExpenseSubmit}>
-                    {/* Category Dropdown */}
-                    <select
-                      value={expenseData.category}
-                      onChange={(e) => setExpenseData({ ...expenseData, category: e.target.value })}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                    >
-                      <option value="">Select Category</option>
-                      {["Electricity", "Water Bill", "WiFi", "Maintenance", "Other"].map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
+        {/* Net Profit */}
+        <div className="bg-gradient-to-br from-indigo-600 to-blue-700 p-5 rounded-2xl shadow-md text-white relative overflow-hidden">
+            <div className="absolute -bottom-4 -right-4 bg-white/10 w-24 h-24 rounded-full blur-xl"></div>
+            <p className="text-indigo-100 text-sm font-medium mb-1">Net Profit</p>
+            <h3 className="text-2xl font-bold text-white">
+                {formatCurrency(data ? data.income - data.expense : 0)}
+            </h3>
+            <p className="text-xs text-indigo-200 mt-2 opacity-80">Income - Expense</p>
+        </div>
 
-                    {/* Amount Input */}
-                    <input
-                      type="number"
-                      placeholder="Amount"
-                      value={expenseData.amount}
-                      onChange={(e) => setExpenseData({ ...expenseData, amount: e.target.value })}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                    />
-
-                    {/* Branch Dropdown */}
-                    <select
-                      value={expenseData.branchId}
-                      onChange={(e) => setExpenseData({ ...expenseData, branchId: e.target.value })}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
-                    >
-                      <option value="">Select Branch</option>
-                      {branches.allbranch.length>0 && branches?.allbranch?.map((branch) => (
-                        <option key={branch._id} value={branch._id}>
-                          {branch.name} - {branch.address}
-                        </option>
-                      ))}
-                    </select>
-
-                    {/* Submit Button */}
-                    <button
-                      type="submit"
-                      className="w-full px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition"
-                    >
-                      Save Expense
-                    </button>
-                  </form>
-
-                </div>
-              </div>
-            )}
-
-            {/* ---------------- EXPENSES TABLE ---------------- */}
-            <div className="overflow-x-auto rounded-xl shadow-sm border border-gray-100 mt-4">
-              <table className="w-full">
-                <thead className="table-head bg-gray-50 text-xs uppercase text-gray-500">
-                  <tr>
-                    <th className="px-4 py-3 text-left">Category</th>
-                    <th className="px-4 py-3 text-left">Amount</th>
-                    <th className="px-4 py-3 text-left">Created</th>
-                    <th className="px-4 py-3 text-left">Property</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {data?.allExpense?.map((exp) => (
-                    <tr key={exp._id} className="hover:bg-gray-50 transition">
-                      <td className="px-4 py-3 text-[#1e3a5f] font-medium">{exp.category}</td>
-                      <td className="px-4 py-3 text-red-500 font-semibold">₹{exp.amount}</td>
-                      <td className="px-4 py-3">{new Date(exp.createdAt).toLocaleDateString("en-IN")}</td>
-                      <td className="px-4 py-3 text-gray-700">{exp.branchId?.address || "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Dues / Not Paid */}
+        <div 
+            onClick={() => handleseerest(data?.notpaid)}
+            className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group cursor-pointer hover:border-orange-200 hover:shadow-md transition-all duration-300"
+        >
+             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <AlertCircle className="text-orange-500" size={48} />
             </div>
-          </div>
-        )}
+            <p className="text-sm font-medium text-slate-500 mb-1">Pending Collections</p>
+            <h3 className="text-2xl font-bold text-orange-600">{data?.notpaid?.length || 0}</h3>
+            <div className="flex items-center justify-between mt-2">
+                <span className="text-xs text-slate-400">Tenants pending</span>
+                <span className="text-xs text-orange-600 font-semibold flex items-center">
+                    View list <span className="ml-1">→</span>
+                </span>
+            </div>
+        </div>
       </div>
+
+      {/* ---------------- ACTION BAR ---------------- */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+        
+        {/* Tabs */}
+        <div className="flex p-1 bg-gray-100/80 rounded-xl w-full sm:w-auto overflow-x-auto">
+            {[
+                { id: "collection", label: "Rent Collection" },
+                { id: "expenses", label: "Expenses" },
+                { id: "reminders", label: "Reminders" }
+            ].map((tab) => (
+            <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`
+                    px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 whitespace-nowrap
+                    ${activeTab === tab.id 
+                        ? "bg-white text-slate-800 shadow-sm" 
+                        : "text-slate-500 hover:text-slate-700 hover:bg-gray-200/50"}
+                `}
+            >
+                {tab.label}
+            </button>
+            ))}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 w-full sm:w-auto px-2 pb-2 sm:pb-0">
+             {activeTab === "expenses" ? (
+                <button
+                    onClick={handleAddExpense}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-sm shadow-orange-200"
+                >
+                    <Plus size={18} /> <span className="hidden sm:inline">Add Expense</span> <span className="sm:hidden">Expense</span>
+                </button>
+             ) : (
+                <button
+                    onClick={changepage}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#1e3a5f] hover:bg-[#2a4d7a] text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-sm shadow-blue-200"
+                >
+                    <Plus size={18} /> <span className="hidden sm:inline">Record Payment</span> <span className="sm:hidden">Payment</span>
+                </button>
+             )}
+        </div>
+      </div>
+
+      {/* ---------------- CONTENT AREA ---------------- */}
+      
+      {/* RENT COLLECTION VIEW */}
+      {activeTab === "collection" && (
+        <div className="animate-fadeIn">
+            {/* Desktop Table */}
+            <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <table className="w-full text-sm text-left">
+                    <thead className="bg-gray-50/50 text-slate-500 border-b border-gray-100">
+                        <tr>
+                            <th className="px-6 py-4 font-medium">Tenant</th>
+                            <th className="px-6 py-4 font-medium">Property</th>
+                            <th className="px-6 py-4 font-medium">Amount</th>
+                            <th className="px-6 py-4 font-medium">Status</th>
+                            <th className="px-6 py-4 font-medium">Date</th>
+                            <th className="px-6 py-4 font-medium">Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                        {payments?.map((payment) => (
+                            <tr 
+                                key={payment._id} 
+                                onClick={() => handleshowtenantlldetails(payment)}
+                                className="hover:bg-gray-50/80 transition-colors cursor-pointer group"
+                            >
+                                <td className="px-6 py-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm">
+                                            {payment?.tenantId?.name?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-slate-700">{payment?.tenantId?.name}</p>
+                                            <p className="text-xs text-slate-400">Room {payment?.tenantId?.roomNumber}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 text-slate-600">{payment?.branch?.name}</td>
+                                <td className="px-6 py-4 font-bold text-slate-800">{formatCurrency(payment?.amountpaid)}</td>
+                                <td className="px-6 py-4">
+                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        ${payment?.tilldatestatus === "paid" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
+                                        {payment?.tilldatestatus === "paid" ? "Paid" : "Partial/Due"}
+                                     </span>
+                                </td>
+                                <td className="px-6 py-4 text-slate-500">{new Date(payment.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' })}</td>
+                                <td className="px-6 py-4">
+                                    <div className="flex flex-col text-xs">
+                                        <span className="text-emerald-600 font-medium">Adv: ₹{payment?.tenantId?.advanced}</span>
+                                        <span className="text-rose-500 font-medium">Due: ₹{Math.abs(payment?.tenantId?.duesamount)}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                         {(!payments || payments.length === 0) && (
+                            <tr>
+                                <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
+                                    No payment records found for this month.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Mobile Cards (Visible only on small screens) */}
+            <div className="md:hidden space-y-3">
+                {payments?.map((payment) => (
+                    <div 
+                        key={payment._id} 
+                        onClick={() => handleshowtenantlldetails(payment)}
+                        className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 active:scale-[0.98] transition-transform"
+                    >
+                        <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold">
+                                    {payment?.tenantId?.name?.charAt(0)}
+                                </div>
+                                <div>
+                                    <h4 className="font-semibold text-slate-800">{payment?.tenantId?.name}</h4>
+                                    <p className="text-xs text-slate-500">{payment?.branch?.name} • Room {payment?.tenantId?.roomNumber}</p>
+                                </div>
+                            </div>
+                            <span className="font-bold text-lg text-slate-800">{formatCurrency(payment?.amountpaid)}</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                             <div className="bg-gray-50 p-2 rounded-lg">
+                                <p className="text-gray-400">Status</p>
+                                <p className={`font-medium ${payment?.tilldatestatus === "paid" ? "text-emerald-600" : "text-rose-600"}`}>
+                                    {payment?.status}
+                                </p>
+                             </div>
+                             <div className="bg-gray-50 p-2 rounded-lg">
+                                <p className="text-gray-400">Date</p>
+                                <p className="font-medium text-slate-700">
+                                    {new Date(payment.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' })}
+                                </p>
+                             </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                             <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded-md">
+                                {payment?.mode || "Cash"}
+                             </span>
+                             <span className="text-xs text-rose-500 font-medium">
+                                Due: ₹{Math.abs(payment?.tenantId?.duesamount)}
+                             </span>
+                        </div>
+                    </div>
+                ))}
+                 {(!payments || payments.length === 0) && (
+                    <div className="text-center py-10 bg-white rounded-xl text-gray-400">
+                        No payments found.
+                    </div>
+                )}
+            </div>
+        </div>
+      )}
+
+      {/* EXPENSE VIEW */}
+      {activeTab === "expenses" && (
+        <div className="animate-fadeIn">
+            {/* Desktop Expense Table */}
+            <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <table className="w-full text-sm text-left">
+                     <thead className="bg-gray-50/50 text-slate-500 border-b border-gray-100">
+                        <tr>
+                            <th className="px-6 py-4 font-medium">Category</th>
+                            <th className="px-6 py-4 font-medium">Property</th>
+                            <th className="px-6 py-4 font-medium">Date</th>
+                            <th className="px-6 py-4 font-medium text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                        {data?.allExpense?.map((exp) => (
+                             <tr key={exp._id} className="hover:bg-gray-50/80 transition-colors">
+                                <td className="px-6 py-4 font-medium text-slate-700">{exp.category}</td>
+                                <td className="px-6 py-4 text-slate-500">{exp.branchId?.address || "General"}</td>
+                                <td className="px-6 py-4 text-slate-500">{new Date(exp.createdAt).toLocaleDateString("en-IN")}</td>
+                                <td className="px-6 py-4 text-right font-bold text-rose-600">-{formatCurrency(exp.amount)}</td>
+                             </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
+             {/* Mobile Expense Cards */}
+            <div className="md:hidden space-y-3">
+                {data?.allExpense?.map((exp) => (
+                    <div key={exp._id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
+                                <TrendingDown size={18} />
+                            </div>
+                            <div>
+                                <h4 className="font-medium text-slate-800">{exp.category}</h4>
+                                <p className="text-xs text-slate-400">{new Date(exp.createdAt).toLocaleDateString("en-IN", {day:'numeric', month:'short'})}</p>
+                            </div>
+                        </div>
+                        <span className="font-bold text-rose-600">-{formatCurrency(exp.amount)}</span>
+                    </div>
+                ))}
+            </div>
+        </div>
+      )}
+
+      {/* ---------------- MODALS ---------------- */}
+      
+      {/* ADD EXPENSE MODAL */}
+      {showExpenseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            {/* Backdrop */}
+            <div 
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+                onClick={() => setShowExpenseModal(false)}
+            ></div>
+            
+            {/* Modal Content */}
+            <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl transform transition-all relative overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                    <h2 className="text-lg font-bold text-slate-800">Add New Expense</h2>
+                    <button onClick={() => setShowExpenseModal(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition">
+                        <X size={20} />
+                    </button>
+                </div>
+                
+                <form onSubmit={handleExpenseSubmit} className="p-6 space-y-4">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Category</label>
+                        <select
+                            value={expenseData.category}
+                            onChange={(e) => setExpenseData({ ...expenseData, category: e.target.value })}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm"
+                        >
+                            <option value="">Select Category</option>
+                            {["Electricity", "Water Bill", "WiFi", "Maintenance", "Cleaning", "Other"].map((cat) => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Amount (₹)</label>
+                        <div className="relative">
+                            <span className="absolute left-4 top-3.5 text-gray-400 text-sm">₹</span>
+                            <input
+                                type="number"
+                                placeholder="0.00"
+                                value={expenseData.amount}
+                                onChange={(e) => setExpenseData({ ...expenseData, amount: e.target.value })}
+                                className="w-full pl-8 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm font-medium"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Property Branch</label>
+                        <select
+                            value={expenseData.branchId}
+                            onChange={(e) => setExpenseData({ ...expenseData, branchId: e.target.value })}
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm"
+                        >
+                            <option value="">Select Branch</option>
+                            {branches?.allbranch?.map((branch) => (
+                                <option key={branch._id} value={branch._id}>
+                                    {branch.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full py-3.5 bg-orange-500 text-white font-semibold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-600 hover:shadow-orange-300 hover:-translate-y-0.5 transition-all duration-200 mt-2"
+                    >
+                        Save Expense
+                    </button>
+                </form>
+            </div>
+        </div>
+      )}
     </div>
   );
 }

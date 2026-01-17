@@ -10,10 +10,9 @@ const ComplainApi = createApi({
     credentials: "include",
   }),
 
-  tagTypes: ["Complaint"], // 🔥 IMPORTANT
+  tagTypes: ["Complaint"],
 
   endpoints: (builder) => ({
-
     /* ---------------- CREATE ---------------- */
     createComplain: builder.mutation({
       query: (formData) => ({
@@ -31,17 +30,7 @@ const ComplainApi = createApi({
         method: "PATCH",
         body: { status: newStatus },
       }),
-      invalidatesTags: ["Complaint"], // 🔥 AUTO REFETCH
-    }),
-
-    /* ---------------- UPDATE ---------------- */
-    updateComplain: builder.mutation({
-      query: ({ complaintId, updatedData }) => ({
-        url: `${complaintId}`,
-        method: "PUT",
-        body: updatedData,
-      }),
-      invalidatesTags: ["Complaint"],
+      invalidatesTags: ["Complaint"], 
     }),
 
     /* ---------------- DELETE ---------------- */
@@ -53,55 +42,65 @@ const ComplainApi = createApi({
       invalidatesTags: ["Complaint"],
     }),
 
-    /* ---------------- GET (TENANT) ---------------- */
-    getAllComplainByTenant: builder.query({
-      query: () => `tenant`,
-      providesTags: ["Complaint"],
-    }),
-
-    getComplainByTenant: builder.query({
-      query: (tenantId) => `tenant/${tenantId}`,
-      providesTags: ["Complaint"],
-    }),
-
-    /* ---------------- GET (MANAGER / ADMIN) ---------------- */
+    /* ---------------- GET (MANAGER / ALL) ---------------- */
+    // Stats ke liye hum usually cursor nahi bhejte, sirf summary chahiye hoti hai
     getAllComplain: builder.query({
       query: () => ``,
       providesTags: ["Complaint"],
     }),
 
-    getComplainByBranch: builder.query({
-      query: (branchId) => `branch/${branchId}`,
-      providesTags: ["Complaint"],
-    }),
+    /* ---------------- PAGINATED QUERIES (Lazy Loading Support) ---------------- */
 
+    // Status based fetch with cursor
     getComplainByStatus: builder.query({
-      query: (status) => `status/${status}`,
-      providesTags: ["Complaint"],
+      query: ({ status, cursor, limit = 10 }) => ({
+        url: `status/${status}`,
+        params: { cursor, limit }, // Query params: ?cursor=abc&limit=10
+      }),
+      providesTags: (result) => 
+        result 
+          ? [...result.data.map(({ _id }) => ({ type: "Complaint", id: _id })), "Complaint"]
+          : ["Complaint"],
     }),
-     getComplainByCategory: builder.query({
-      query: (category) => `category/${category}`,
+
+    // Branch based fetch with cursor
+    getComplainByBranch: builder.query({
+      query: ({ branchId, cursor, limit = 10 }) => ({
+        url: `branch/${branchId}`,
+        params: { cursor, limit },
+      }),
       providesTags: ["Complaint"],
     }),
 
- 
+    // Category based fetch with cursor
+    getComplainByCategory: builder.query({
+      query: ({ category, cursor, limit = 10 }) => ({
+        url: `category/${category}`,
+        params: { cursor, limit },
+      }),
+      providesTags: ["Complaint"],
+    }),
+
+    // Tenant personal complaints with cursor
+    getAllComplainByTenant: builder.query({
+      query: ({ cursor, limit = 10 } = {}) => ({
+        url: `tenant`,
+        params: { cursor, limit },
+      }),
+      providesTags: ["Complaint"],
+    }),
   }),
 });
 
 export const {
   useCreateComplainMutation,
   useChangeComplainStatusMutation,
-  useUpdateComplainMutation,
   useDeleteComplainMutation,
-  useGetComplainByCategoryQuery,
-
-  useGetAllComplainByTenantQuery,
-  useGetComplainByTenantQuery,
   useGetAllComplainQuery,
-  useGetComplainByBranchQuery,
   useGetComplainByStatusQuery,
-
-  
+  useGetComplainByBranchQuery,
+  useGetComplainByCategoryQuery,
+  useGetAllComplainByTenantQuery,
 } = ComplainApi;
 
 export default ComplainApi;
