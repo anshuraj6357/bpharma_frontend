@@ -5,7 +5,9 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Phone, Loader2, Navigation, Share2, Star, BadgeCheck } from "lucide-react";
+
+import { Phone, Loader2,MapPin ,Check , X,Zap ,ReceiptText, ShieldCheck, ArrowRight,LayoutGrid,Layers,Calendar,CheckCircle2,Construction,CheckCircle,
+  Sparkles, Home,Bed,Maximize ,Armchair,Users, Navigation, Share2, Star, BadgeCheck } from "lucide-react";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import SkeletonLoader from "./loader/skeletondetails.jsx";
@@ -18,9 +20,7 @@ import {
   useRazorpayPaymentMutation,
 } from "../Bothfeatures/adminfeatures/api/paymentapi.js";
 
-/* ============================
-   RAZORPAY SCRIPT LOADER
-============================ */
+
 /* ============================
    RAZORPAY SCRIPT LOADER
 ============================ */
@@ -266,6 +266,7 @@ export default function PGDetailsPage() {
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const pg = data?.room;
+  console.log(pg)
 
   const allImages = useMemo(() => {
     if (!pg) return [];
@@ -393,161 +394,108 @@ export default function PGDetailsPage() {
       )}
 
       {/* IMAGE SLIDER */}
-      <div className="max-w-6xl mx-auto mt-6 relative h-auto">
+   <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 relative group/gallery">
 
-        {/* ------- MOBILE LAYOUT (hidden on md+) ------- */}
-        <div className="md:hidden w-full h-[400px] relative overflow-hidden rounded-2xl">
+  {/* ------- MOBILE LAYOUT (Compact & Modern) ------- */}
+  <div className="md:hidden w-full h-[380px] relative overflow-hidden rounded-[2rem] shadow-2xl">
+    {allImages.length === 1 && (
+      <img src={allImages[0]} className="w-full h-full object-cover" alt="Main" />
+    )}
 
-          {/* ===== SINGLE IMAGE ===== */}
-          {allImages.length === 1 && (
-            <img
-              src={allImages[0]}
-              className="w-full h-full object-cover"
-            />
-          )}
-
-          {/* ===== TWO IMAGES ===== */}
-          {allImages.length === 2 && (
-            <div className="grid grid-cols-2 h-full gap-1">
-              {allImages.map((img, i) => (
-                <img
-                  key={i}
-                  src={img}
-                  className="w-full h-full object-cover"
-                />
-              ))}
-            </div>
-          )}
-
-          {/* ===== THREE OR MORE IMAGES ===== */}
-          {allImages.length >= 3 && (
-            <div className="grid grid-cols-2 grid-rows-3 gap-1 h-full">
-
-              {/* Big top image */}
-              <div className="col-span-2 row-span-2 overflow-hidden">
-                <img
-                  src={allImages[0]}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Bottom left */}
-              <div className="overflow-hidden">
-                <img
-                  src={allImages[1]}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Bottom right */}
-              <div className="overflow-hidden relative">
-                <img
-                  src={allImages[2]}
-                  className="w-full h-full object-cover"
-                />
-
-                {/* Overlay */}
-                {allImages.length > 3 && (
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <span className="text-white font-semibold text-lg">
-                      +{allImages.length - 3} more
-                    </span>
-                  </div>
-                )}
-              </div>
-
-            </div>
-          )}
-
-          {/* ===== SHOW ALL BUTTON (ALWAYS VISIBLE) ===== */}
-          {allImages.length > 1 && (
-            <button
-              onClick={() => navigate(`/allpotos/${id}`)}
-              className="absolute bottom-3 right-3
-        bg-white/90 backdrop-blur
-        px-4 py-2 rounded-xl
-        text-sm font-semibold shadow-lg"
-            >
-              Show all photos
-            </button>
-          )}
-        </div>
-
-
-
-
-        {/* ------- DESKTOP LAYOUT (hidden on mobile) ------- */}
-        {/* ================= IMAGE GRID ================= */}
-        <div className="hidden md:block h-[500px]">
-
-          {/* ===== 1 IMAGE ===== */}
-          {allImages.length === 1 && (
-            <div className="relative h-full rounded-2xl overflow-hidden">
-              <img src={allImages[0]} className="w-full h-full object-cover" />
-
-              <ShowAllButton />
-            </div>
-          )}
-
-          {/* ===== 2 IMAGES ===== */}
-          {allImages.length === 2 && (
-            <div className="grid grid-cols-2 gap-2 h-full">
-              {allImages.map((img, i) => (
-                <div key={i} className="relative rounded-2xl overflow-hidden">
-                  <img src={img} className="w-full h-full object-cover" />
-                </div>
-              ))}
-
-              <ShowAllButton />
-            </div>
-          )}
-
-          {/* ===== 3 IMAGES (PERFECT LAYOUT) ===== */}
-          {allImages.length === 3 && (
-            <div className="grid grid-cols-3 grid-rows-2 gap-2 h-full relative">
-
-              <div className="col-span-2 row-span-2 rounded-l-2xl overflow-hidden">
-                <img src={allImages[0]} className="w-full h-full object-cover" />
-              </div>
-
-              <div className="rounded-tr-2xl overflow-hidden">
-                <img src={allImages[1]} className="w-full h-full object-cover" />
-              </div>
-
-              <div className="rounded-br-2xl overflow-hidden">
-                <img src={allImages[2]} className="w-full h-full object-cover" />
-              </div>
-
-              <ShowAllButton />
-            </div>
-          )}
-
-          {/* ===== 4 OR MORE IMAGES ===== */}
-          {allImages.length >= 4 && (
-            <div className="grid grid-cols-4 grid-rows-2 gap-2 h-full relative">
-
-              <div className="col-span-2 row-span-2 rounded-l-2xl overflow-hidden">
-                <img src={allImages[0]} className="w-full h-full object-cover" />
-              </div>
-
-              {allImages.slice(1, 5).map((img, i) => (
-                <div
-                  key={i}
-                  className={`overflow-hidden ${i === 1 ? "rounded-tr-2xl" : ""
-                    } ${i === 3 ? "rounded-br-2xl" : ""}`}
-                >
-                  <img src={img} className="w-full h-full object-cover" />
-                </div>
-              ))}
-
-              <ShowAllButton />
-            </div>
-          )}
-        </div>
-
-
-
+    {allImages.length === 2 && (
+      <div className="grid grid-cols-2 h-full gap-1.5">
+        {allImages.map((img, i) => (
+          <img key={i} src={img} className="w-full h-full object-cover" alt={`view-${i}`} />
+        ))}
       </div>
+    )}
+
+    {allImages.length >= 3 && (
+      <div className="grid grid-cols-2 grid-rows-3 gap-1.5 h-full">
+        <div className="col-span-2 row-span-2 overflow-hidden">
+          <img src={allImages[0]} className="w-full h-full object-cover" alt="Focus" />
+        </div>
+        <div className="overflow-hidden">
+          <img src={allImages[1]} className="w-full h-full object-cover" alt="Detail 1" />
+        </div>
+        <div className="overflow-hidden relative group">
+          <img src={allImages[2]} className="w-full h-full object-cover" alt="Detail 2" />
+          {allImages.length > 3 && (
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center border-l border-white/20">
+              <span className="text-white font-black text-xl tracking-tighter">+{allImages.length - 3}</span>
+              <span className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Photos</span>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+
+    {/* MOBILE FLOATING BUTTON */}
+    <button 
+      onClick={() => navigate(`/allpotos/${id}`)}
+      className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-xl px-5 py-2.5 rounded-2xl text-xs font-black text-slate-900 shadow-xl border border-white/50 flex items-center gap-2 active:scale-90 transition-all"
+    >
+      <LayoutGrid size={14} />
+      Show Gallery
+    </button>
+  </div>
+
+
+  {/* ------- DESKTOP LAYOUT (MNC Bento Style) ------- */}
+  <div className="hidden md:block h-[550px] relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-100">
+    
+    {/* Layout Logic */}
+    <div className="h-full">
+      {allImages.length === 1 ? (
+        <div className="relative h-full overflow-hidden group">
+          <img src={allImages[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+        </div>
+      ) : (
+        <div className={`grid h-full gap-3 ${
+          allImages.length === 2 ? 'grid-cols-2' : 
+          allImages.length === 3 ? 'grid-cols-3 grid-rows-2' : 
+          'grid-cols-4 grid-rows-2'
+        }`}>
+          
+          {/* Main Hero Image */}
+          <div className={`${
+            allImages.length === 2 ? 'col-span-1' : 
+            allImages.length === 3 ? 'col-span-2 row-span-2' : 
+            'col-span-2 row-span-2'
+          } overflow-hidden group relative`}>
+            <img src={allImages[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 cursor-pointer" />
+            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+          </div>
+
+          {/* Secondary Images */}
+          {allImages.slice(1, 5).map((img, i) => (
+            <div 
+              key={i} 
+              className={`overflow-hidden group relative bg-white ${
+                allImages.length === 3 ? 'col-span-1 row-span-1' : ''
+              }`}
+            >
+              <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 cursor-pointer" />
+              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+
+    {/* DESKTOP SHOW ALL BUTTON (Floating Glass Style) */}
+    <button
+      onClick={() => navigate(`/allpotos/${id}`)}
+      className="absolute bottom-6 right-6 bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl text-white px-6 py-3 rounded-2xl font-black text-sm shadow-2xl border border-white/10 flex items-center gap-3 transition-all hover:px-8 group/btn"
+    >
+      <LayoutGrid size={18} className="group-hover/btn:rotate-90 transition-transform duration-500" />
+      <span>View All Photos</span>
+    </button>
+  </div>
+
+</div>
+
+
 
 
       {/* MAIN CONTENT */}
@@ -556,392 +504,500 @@ export default function PGDetailsPage() {
         {/* LEFT SIDE — INFORMATION */}
         <div className="lg:col-span-2 space-y-8">
 
-          {/* BASIC INFORMATION */}
-          <InfoBlock title="Basic Information">
-            <div className="space-y-8">
-
-              {/* ================= TITLE + VERIFIED ================= */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h2 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
-                  {pg.branch.name}
-
-                  {pg.verified && (
-                    <span className="flex items-center gap-1 px-3 py-1
-          bg-green-100 text-green-700 rounded-full text-sm font-semibold">
-                      <BadgeCheck className="w-4 h-4" /> Verified
-                    </span>
-                  )}
-                </h2>
-
-                {/* ================= RATING CARD ================= */}
-                <div className="flex items-center gap-3 bg-yellow-50
-        border border-yellow-200 px-4 py-2 rounded-xl shadow-sm">
-
-                  <div className="flex items-center justify-center w-9 h-9 rounded-full bg-yellow-100">
-                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                  </div>
-
-                  <div className="flex flex-col leading-tight">
-                    <span className="text-lg font-bold text-gray-900">
-                      {pg.personalreview?.length > 0
-                        ? (pg.totalrating / pg.personalreview.length).toFixed(1)
-                        : "0.0"}
-                      <span className="text-sm text-gray-600"> / 5</span>
-                    </span>
-
-                    <span className="text-sm text-gray-600">
-                      {pg.personalreview?.length || 0} Reviews
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ================= PROPERTY DETAILS CARD ================= */}
-              <div className="bg-gradient-to-br from-white to-gray-50
-      rounded-3xl border border-gray-200 shadow-xl p-8 space-y-8">
-
-                <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                  🏠 Property & Room Details
-                </h3>
-
-                {/* ================= INFO GRID ================= */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                  <InfoItem label="Address" value={data?.roomz} />
-                  <InfoItem label="City" value={pg.city} />
-                  <InfoItem label="Room Number" value={pg.roomNumber} />
-
-                  <InfoItem
-                    label="Room Type"
-                    value={
-                      pg.category === "Hotel"
-                        ? pg.hoteltype
-                        : pg.category === "Pg"
-                          ? pg.type
-                          : pg.category === "Rented-Room"
-                            ? pg.renttype === "Flat-Rent"
-                              ? pg.flattype
-                              : pg.roomtype
-                            : ""
-                    }
-                  />
-
-                  <InfoItem label="Furnished" value={pg.furnishedType} />
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm text-gray-500 font-medium">Advance</span>
-
-                    {pg.advancedmonth > 0 ? (
-                      <p className="text-xl font-bold text-indigo-700">
-                        {pg.advancedmonth} month{pg.advancedmonth > 1 ? "s" : ""}
-                      </p>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm px-3 py-1 rounded-full
-        bg-green-100 text-green-700 font-semibold">
-                          No Advance Required
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-
-                  <div className="flex flex-col">
-                    <span className="text-sm text-gray-500 font-medium">Availability</span>
-                    <p
-                      className={`text-xl font-bold ${pg.availabilityStatus === "Available"
-                        ? "text-green-600"
-                        : "text-red-600"
-                        }`}
-                    >
-                      {pg.availabilityStatus}
-                    </p>
-                  </div>
-                </div>
-
-                {/* ================= OCCUPANCY STATS ================= */}
-                <div className="flex flex-wrap gap-6 pt-6 border-t border-gray-200">
-
-                  <StatCard
-                    label="Occupied"
-                    value={pg.occupied || "0"}
-                    color="red"
-                  />
-
-                  <StatCard
-                    label="Vacant"
-                    value={
-                      pg.category === "Pg"
-                        ? pg.vacant
-                        : Math.max(0, pg.vacant - pg.occupied)
-                    }
-                    color="green"
-                  />
-                </div>
-              </div>
+         {/* BASIC INFORMATION SECTION */}
+<InfoBlock title="Property Overview">
+  <div className="space-y-10">
+    {/* ================= HEADER SECTION (MNC STYLE) ================= */}
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-4xl font-black text-gray-900 tracking-tight">
+            {pg.branch.name}
+          </h2>
+          {pg.verified && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-full shadow-lg shadow-indigo-200">
+              <BadgeCheck className="w-4 h-4 fill-white text-indigo-600" />
+              <span className="text-[10px] font-black uppercase tracking-wider">Verified Stay</span>
             </div>
-          </InfoBlock>
-
-
-          {/* DESCRIPTION */}
-          {pg.description && (
-            <InfoBlock title="Description">
-              <p className="text-gray-700 leading-relaxed text-[15px]">{pg.description}</p>
-            </InfoBlock>
           )}
-
-          {/* ALLOWED FOR */}
-          {pg.allowedFor && (
-            <InfoBlock title="Allowed For">
-              <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <span className="text-blue-600 font-bold text-xl">✔</span>
-                <span className="text-gray-800 font-semibold text-lg">{pg.allowedFor}</span>
-              </div>
-            </InfoBlock>
-          )}
-
-          {/* RULES */}
-          {pg.rules?.length > 0 && (
-            <InfoBlock title="Rules">
-              <ul className="list-disc list-inside space-y-2 text-[15px] text-gray-700">
-                {pg.rules.map((rule, i) => <li key={i}>{rule}</li>)}
-              </ul>
-            </InfoBlock>
-          )}
-
-          {/* NOT ALLOWED */}
-          {pg.notAllowed?.length > 0 && (
-            <InfoBlock title="Not Allowed">
-              <ul className="list-disc list-inside space-y-2 text-[15px] text-gray-700">
-                {pg.notAllowed.map((item, i) => <li key={i}>{item}</li>)}
-              </ul>
-            </InfoBlock>
-          )}
-
-          {/* FACILITIES */}
-          {pg.facilities?.length > 0 && (
-            <InfoBlock title="Facilities">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {pg.facilities.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 bg-gray-100 shadow-sm border border-gray-200 p-3 rounded-lg">
-                    <span className="text-green-600 text-xl font-bold">✔</span>
-                    <span className="font-medium text-gray-800">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </InfoBlock>
-          )}
-
-          {/* PUBLISH STATUS */}
-          {pg.toPublish?.status && (
-            <InfoBlock title="Publish Status">
-              <p className="text-gray-600 font-semibold">Published on: {new Date(pg.toPublish.date).toLocaleDateString()}</p>
-            </InfoBlock>
-          )}
-
         </div>
-
-        {/* RIGHT SIDE — RENT & ACTIONS */}
-        <div className="space-y-8">
-
-          {/* ================== RENT CARD ================== */}
-          <InfoBlock title="Rent & Services Breakdown">
-            <div className="w-full max-w-md mx-auto bg-white shadow-lg rounded-2xl p-6 space-y-6">
-
-              {/* ================= BASE RENT / SERVICES ================= */}
-              <div>
-                <h4 className="text-gray-700 font-semibold text-lg mb-2">
-                  Base Rent Breakdown
-                </h4>
-
-                <div className="pl-4 space-y-2">
-                  {pg.services?.length > 0 ? (
-                    pg.services.map((s) => (
-                      <div
-                        key={s._id}
-                        className="flex justify-between text-gray-800 text-sm"
-                      >
-                        <span>{s.name}</span>
-                        <span>₹{s.price}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex justify-between text-gray-800 text-sm">
-                      <span>Room / House Rent</span>
-                      <span>₹{pg.price}</span>
-                    </div>
-                  )}
-
-                  <div className="flex justify-between border-t pt-2 font-semibold">
-                    <span>Total Rent / month</span>
-                    <span>₹{pg.price}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* ================= ADVANCE ================= */}
-              {pg.advancedmonth > 0 && (
-                <div>
-                  <h4 className="text-gray-700 font-semibold text-lg mb-2">
-                    Advance Payment
-                  </h4>
-
-                  <div className="flex justify-between bg-gray-50 px-3 py-2 rounded-lg">
-                    <span>
-                      {pg.advancedmonth} Month
-                      {pg.advancedmonth > 1 ? "s" : ""} Advance
-                    </span>
-                    <span>₹{pg.price * pg.advancedmonth}</span>
-                  </div>
-                </div>
-              )}
-
-             {/* ================= TOTAL ================= */}
-{(() => {
-  const totalRent =
-    pg.price + (pg.advancedmonth ? pg.price * Math.max(0,pg.advancedmonth) : 0);
-
-  const maxWalletAllowed = totalRent * 0.1; // 10% cap
-  const walletDiscount = Math.min(
-    user?.walletBalance || 0,
-    maxWalletAllowed
-  );
-
-  const finalAfterWallet = totalRent - walletDiscount;
-  const isWalletApplicable = finalAfterWallet > 1;
-
-  const finalPayable =
-    totalRent -
-    (useWallet && isWalletApplicable ? walletDiscount : 0);
-
-  return (
-    <>
-      <div className="border-t pt-3 flex justify-between text-base font-semibold">
-        <span>Total Payable</span>
-        <span>₹{totalRent}</span>
+        <div className="flex items-center text-gray-500 gap-2">
+          <MapPin size={18} className="text-indigo-500" />
+          <span className="text-lg font-medium">{pg.city}, India</span>
+        </div>
       </div>
 
-      {/* ================= WALLET CASES ================= */}
-      {isAuthenticated && pg.availabilityStatus === "Available" && (
-        <>
-          {user?.walletBalance > 0 && (
-            <div
-              className={`mt-3 flex items-center gap-3 px-4 py-3 rounded-xl border transition
-              ${
-                isWalletApplicable
-                  ? "bg-green-50 border-green-200"
-                  : "bg-gray-50 border-gray-300 opacity-70"
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={useWallet}
-                disabled={!isWalletApplicable}
-                onChange={() => setUseWallet(!useWallet)}
-                className="h-5 w-5 accent-green-600 disabled:opacity-50"
-              />
+      {/* RATING PILL - Floating Design */}
+      <div className="flex items-center gap-4 bg-white border border-gray-100 p-2 pr-6 rounded-2xl shadow-xl shadow-gray-100/50">
+        <div className="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center shadow-lg shadow-amber-200">
+          <Star className="w-6 h-6 text-white fill-white" />
+        </div>
+        <div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-black text-gray-900">
+              {pg.personalreview?.length > 0
+                ? (pg.totalrating / pg.personalreview.length).toFixed(1)
+                : "New"}
+            </span>
+            <span className="text-xs font-bold text-gray-400">/ 5.0</span>
+          </div>
+          <p className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter">
+            {pg.personalreview?.length || 0} Guest Reviews
+          </p>
+        </div>
+      </div>
+    </div>
 
-              <div className="flex flex-col">
-                <span className="text-sm font-semibold">
-                  Use Wallet Balance
-                </span>
-                <span className="text-xs text-gray-500">
-                  Available: ₹{user.walletBalance}
-                </span>
-              </div>
+    {/* ================= BENTO GRID DETAILS ================= */}
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      
+      {/* Main Info Card (Large) */}
+      <div className="md:col-span-8 bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all duration-500">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+            <Sparkles size={20} />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 tracking-tight">Essential Details</h3>
+        </div>
 
-              <span className="ml-auto text-sm font-semibold">
-                {isWalletApplicable ? (
-                  useWallet ? (
-                    <span className="text-green-700">
-                      −₹{walletDiscount}
-                    </span>
-                  ) : (
-                    <span className="text-gray-500">Optional</span>
-                  )
-                ) : (
-                  <span className="text-red-500">Not Applicable</span>
-                )}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-10 gap-x-6">
+          <InfoItem icon={<Home size={16}/>} label="Category" value={pg.category} />
+          <InfoItem icon={<Bed size={16}/>} label="Room Number" value={`Room #${pg.roomNumber}`} />
+          <InfoItem icon={<Maximize size={16}/>} label="Layout" value={
+            pg.category === "Hotel" ? pg.hoteltype : 
+            pg.category === "Pg" ? pg.type : 
+            pg.renttype === "Flat-Rent" ? pg.flattype : pg.roomtype
+          } />
+          <InfoItem icon={<Armchair size={16}/>} label="Furnishing" value={pg.furnishedType} />
+          
+          {/* Advance Month Logic */}
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Security Deposit</span>
+            {pg.advancedmonth > 0 ? (
+              <p className="text-lg font-bold text-gray-900 flex items-center gap-1">
+                {pg.advancedmonth} <span className="text-sm text-gray-500 font-medium">Months</span>
+              </p>
+            ) : (
+              <span className="w-fit text-[10px] px-2 py-1 bg-emerald-50 text-emerald-600 rounded-md font-bold uppercase tracking-tighter">No Advance</span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Availability</span>
+            <div className="flex items-center gap-2">
+               <div className={`w-2 h-2 rounded-full animate-pulse ${pg.availabilityStatus === "Available" ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+               <span className={`text-lg font-bold ${pg.availabilityStatus === "Available" ? "text-emerald-600" : "text-red-600"}`}>
+                {pg.availabilityStatus}
               </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Occupancy Stats Card (Sidebar Style) */}
+      <div className="md:col-span-4 bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group">
+        {/* Abstract Background Decoration */}
+        <div className="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 blur-[80px] group-hover:bg-indigo-500/40 transition-all duration-700"></div>
+        
+        <h3 className="text-lg font-bold mb-8 relative z-10 flex items-center gap-2">
+          <Users size={18} className="text-indigo-400" />
+          Live Status
+        </h3>
+
+        <div className="space-y-8 relative z-10">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Currently Occupied</p>
+              <p className="text-4xl font-black">{pg.occupied || "0"}</p>
+            </div>
+            <div className="w-12 h-1 bg-red-500 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)]"></div>
+          </div>
+
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Vacant Units</p>
+              <p className="text-4xl font-black text-emerald-400">
+                {pg.category === "Pg" ? pg.vacant : Math.max(0, pg.vacant - pg.occupied)}
+              </p>
+            </div>
+            <div className="w-12 h-1 bg-emerald-400 rounded-full shadow-[0_0_15px_rgba(52,211,153,0.5)]"></div>
+          </div>
+        </div>
+
+        <button className="w-full mt-10 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all border border-white/10">
+          Instant Booking
+        </button>
+      </div>
+    </div>
+  </div>
+</InfoBlock>
+
+
+         {/* DESCRIPTION SECTION - PRODUCTION GRADE */}
+{pg.description && (
+  <InfoBlock title="About this space">
+    <div className="relative group/desc">
+      {/* 1. Iconic Lead-in: MNCs use subtle accents to break text monotony */}
+      <div className="flex gap-4">
+        <div className="hidden md:flex flex-col items-center">
+          <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mb-2 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
+          <div className="w-[2px] flex-1 bg-gradient-to-b from-indigo-100 to-transparent rounded-full" />
+        </div>
+
+        <div className="space-y-6">
+          {/* 2. Optimized Typography: Leading-relaxed and Gray-600 for eye comfort */}
+          <div className="relative">
+            <p className="text-gray-600 leading-[1.8] text-base md:text-lg font-medium selection:bg-indigo-100 selection:text-indigo-900">
+              {pg.description}
+            </p>
+          </div>
+
+          {/* 3. Feature Highlights: Automated extraction from text (Mental Mapping) */}
+          <div className="flex flex-wrap gap-3 pt-4">
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-2xl border border-gray-100 group-hover/desc:border-indigo-100 transition-colors">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] font-black text-gray-500 uppercase tracking-wider">Recently Renovated</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-2xl border border-gray-100 group-hover/desc:border-indigo-100 transition-colors">
+              <Sparkles size={14} className="text-amber-500" />
+              <span className="text-[11px] font-black text-gray-500 uppercase tracking-wider">Top Rated Host</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Subtle Border Decoration for Desktop */}
+      <div className="absolute -left-10 top-0 bottom-0 w-[1px] bg-gray-100 hidden md:block" />
+    </div>
+  </InfoBlock>
+)}
+
+          {/* ALLOWED FOR */}
+        {/* ALLOWED FOR SECTION - PRODUCTION LEVEL */}
+{pg.allowedFor && (
+  <InfoBlock title="Preferred Guests">
+    <div className="relative overflow-hidden group/allowed">
+      <div className={`flex items-center justify-between p-6 rounded-[2rem] transition-all duration-500 ${
+        pg.allowedFor.toLowerCase().includes('girls') 
+          ? 'bg-rose-50/50 border border-rose-100' 
+          : 'bg-indigo-50/50 border border-indigo-100'
+      }`}>
+        
+        <div className="flex items-center gap-5">
+          {/* Icon Container with Dark Contrast */}
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-500 group-hover/allowed:rotate-[-10deg] ${
+            pg.allowedFor.toLowerCase().includes('girls')
+              ? 'bg-rose-600 shadow-rose-200'
+              : 'bg-indigo-900 shadow-indigo-200'
+          }`}>
+            <Users className="text-white w-7 h-7" />
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Exclusively For</span>
+            <h4 className="text-2xl font-black text-gray-900 tracking-tight">
+              {pg.allowedFor}
+            </h4>
+          </div>
+        </div>
+
+        {/* Status Indicator */}
+        <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm border border-gray-50">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-black text-gray-700 uppercase tracking-tighter">Admission Open</span>
+        </div>
+
+        {/* Background Abstract Pattern (MNC Style Decor) */}
+        <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
+           <Users size={120} />
+        </div>
+      </div>
+
+      {/* Trust Note */}
+      <p className="mt-4 px-2 text-xs font-bold text-gray-500 flex items-center gap-2">
+        <BadgeCheck size={14} className="text-indigo-500" />
+        Strict adherence to house rules is required for all {pg.allowedFor}.
+      </p>
+    </div>
+  </InfoBlock>
+)}
+
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  {/* RULES SECTION */}
+  {pg.rules?.length > 0 && (
+    <InfoBlock title="House Guidelines">
+      <div className="space-y-4">
+        {pg.rules.map((rule, i) => (
+          <div key={i} className="flex items-start gap-4 group/rule">
+            <div className="mt-1 w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 group-hover/rule:bg-emerald-500 transition-colors">
+              <Check size={12} className="text-emerald-600 group-hover/rule:text-white" />
+            </div>
+            <p className="text-gray-900 font-bold text-[15px] leading-snug">{rule}</p>
+          </div>
+        ))}
+      </div>
+    </InfoBlock>
+  )}
+
+  {/* NOT ALLOWED SECTION */}
+  {pg.notAllowed?.length > 0 && (
+    <InfoBlock title="Restricted">
+      <div className="space-y-4">
+        {pg.notAllowed.map((item, i) => (
+          <div key={i} className="flex items-start gap-4 group/not">
+            <div className="mt-1 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0 group-hover/not:bg-rose-500 transition-colors">
+              <X size={12} className="text-rose-600 group-hover/not:text-white" />
+            </div>
+            <p className="text-gray-900 font-bold text-[15px] leading-snug">{item}</p>
+          </div>
+        ))}
+      </div>
+    </InfoBlock>
+  )}
+</div>
+
+
+     
+
+{/* FACILITIES SECTION */}
+{pg.facilities?.length > 0 && (
+  <InfoBlock title="Premium Amenities">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {pg.facilities.map((item, i) => (
+        <div 
+          key={i} 
+          className="relative overflow-hidden flex flex-col items-center justify-center gap-3 p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group/item"
+        >
+          {/* Subtle Background Pattern */}
+          <div className="absolute top-0 right-0 p-2 opacity-[0.03] group-hover/item:opacity-10 transition-opacity">
+            <Sparkles size={40} />
+          </div>
+
+          <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover/item:bg-indigo-600 group-hover/item:text-white transition-all duration-300">
+            {/* Yahan aap category-based icon logic bhi laga sakte hain, 
+                filhal hum modern Check use kar rahe hain */}
+            <Zap size={20} className="fill-current" />
+          </div>
+
+          <span className="font-black text-gray-900 text-sm text-center tracking-tight leading-tight">
+            {item}
+          </span>
+          
+          {/* Bottom Dot Decor */}
+          <div className="w-1 h-1 rounded-full bg-indigo-200 group-hover/item:w-4 transition-all" />
+        </div>
+      ))}
+    </div>
+  </InfoBlock>
+)}
+
+
+          {/* PUBLISH STATUS */}
+ 
+
+  {/* 1. PUBLISH STATUS BLOCK (MNC Upgrade) */}
+  {pg.toPublish?.status && (
+    <div className="relative overflow-hidden bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm group hover:shadow-md transition-all duration-300">
+      {/* Subtle Background Icon */}
+      <CheckCircle2 className="absolute -right-4 -bottom-4 w-32 h-32 text-emerald-50 opacity-[0.05] group-hover:scale-110 transition-transform" />
+      
+      <div className="flex items-center gap-4 mb-4">
+        <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
+          <Calendar size={20} strokeWidth={2.5} />
+        </div>
+        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Visibility Status</h3>
+      </div>
+
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+        <div>
+          <p className="text-2xl font-black text-slate-900 tracking-tight">
+            Live on Platform
+          </p>
+          <p className="text-slate-500 font-bold text-sm">
+            Launched on {new Date(pg.toPublish.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest border border-emerald-100">
+          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+          Active
+        </div>
+      </div>
+    </div>
+  )}
+
+  {/* 2. BRANCH ROOMS SECTION (The Upgrade) */}
+
+
+<InfoBlock className="mt-16 p-1 bg-white">
+  {/* --- HEADER WITH ACTIONS --- */}
+  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <div className="h-6 w-1 bg-indigo-600 rounded-full"></div> {/* Accent line */}
+        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Inventory Intelligence</span>
+      </div>
+      <h2 className="text-4xl font-black text-slate-900 tracking-tighter">
+        Branch Units <span className="text-slate-300 font-light">/ Overview</span>
+      </h2>
+      <p className="text-slate-500 font-medium text-sm max-w-md">
+        Real-time availability and occupancy metrics for <span className="text-slate-900 font-bold">Branch ID: {pg.branchId}</span>.
+      </p>
+    </div>
+
+    <button 
+      onClick={() => navigate(`/branch-rooms/${pg.branch}`)}
+      className="relative overflow-hidden group flex items-center gap-3 bg-slate-950 text-white px-10 py-5 rounded-[2rem] font-black text-sm transition-all hover:bg-indigo-600 hover:shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] active:scale-95"
+    >
+      <span className="relative z-10">Manage All Inventory</span>
+      <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform duration-300" size={18} />
+      {/* Subtle shine effect on hover */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+    </button>
+  </div>
+
+  {/* --- HIGH-END STATS GRID --- */}
+ 
+
+        {/* Action Link for each card */}
+        <div className="mt-4 pt-4 border-t border-slate-100/50 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">View Details</span>
+          <ArrowRight size={14} className="text-slate-400" />
+        
+      
+    
+  </div>
+</InfoBlock>
+
+</div>
+
+     {/* RIGHT SIDE — RENT & ACTIONS */}
+<div className="space-y-6 lg:sticky lg:top-24">
+  
+  {/* ================== PREMIUM RENT CARD ================== */}
+  <InfoBlock title="Payment Summary">
+    <div className="w-full bg-slate-50/50 rounded-3xl p-2 space-y-4">
+      
+      {/* RENT BREAKDOWN BOX */}
+      <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
+        <div className="flex items-center gap-2 mb-4">
+          <ReceiptText size={18} className="text-indigo-600" />
+          <h4 className="text-slate-900 font-black text-sm uppercase tracking-wider">
+            Billing Details
+          </h4>
+        </div>
+
+        <div className="space-y-3">
+          {pg.services?.length > 0 ? (
+            pg.services.map((s) => (
+              <div key={s._id} className="flex justify-between items-center group">
+                <span className="text-slate-500 font-medium group-hover:text-slate-900 transition-colors">{s.name}</span>
+                <span className="text-slate-900 font-bold">₹{s.price}</span>
+              </div>
+            ))
+          ) : (
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-medium">Standard Room Rent</span>
+              <span className="text-slate-900 font-bold">₹{pg.price}</span>
             </div>
           )}
 
-          {/* ================= FINAL PAYABLE ================= */}
-          <div className="flex justify-between font-bold text-lg mt-3">
-            <span>Final Payable</span>
-            <span>₹{finalPayable}</span>
-          </div>
-
-          {/* ================= CONFIRM ================= */}
-          <button
-            onClick={() =>
-              handleBook({
-                totalAmount: totalRent,
-                walletUsed:
-                  useWallet && isWalletApplicable
-                    ? walletDiscount
-                    : 0,
-                payableAmount: finalPayable,
-              })
-            }
-            className="w-full mt-4 py-3 rounded-xl font-semibold
-            text-white bg-blue-600 hover:bg-blue-700 transition active:scale-95"
-          >
-            Confirm Booking
-          </button>
-        </>
-      )}
-
-      {!isAuthenticated && (
-        <button
-          disabled
-          className="w-full mt-4 py-3 rounded-xl font-semibold
-          bg-gray-300 text-white cursor-not-allowed"
-        >
-          Login to Book
-        </button>
-      )}
-    </>
-  );
-})()}
-
+          {pg.advancedmonth > 0 && (
+            <div className="flex justify-between items-center py-2 px-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
+              <div className="flex flex-col">
+                <span className="text-indigo-700 font-bold text-xs uppercase">Security Deposit</span>
+                <span className="text-[10px] text-indigo-400 font-medium">{pg.advancedmonth} Month Refundable</span>
+              </div>
+              <span className="text-indigo-700 font-black text-sm">₹{pg.price * pg.advancedmonth}</span>
             </div>
-          </InfoBlock>
-
-
-
-
-
-
-
-          {/* ================== ACTION BUTTONS ================== */}
-          <InfoBlock title="Actions">
-            <div className="flex flex-col mt-5 space-y-4">
-              <Action
-                icon={<Phone />}
-                label="Contact Owner"
-                whatsappNumber="+919693915693"
-                isAuthenticated={isAuthenticated}
-                onAuthOpen={() => setIsAuthModalOpen(true)}
-              />
-              <Action
-                icon={<Navigation />}
-                label="Get Directions"
-                onClick={handleGetDirections}
-                isAuthenticated={isAuthenticated}
-                onAuthOpen={() => setIsAuthModalOpen(true)}
-              />
-              <Action
-                icon={<Share2 />}
-                label="Share PG"
-                onClick={sharePG}
-                isAuthenticated={isAuthenticated}
-                onAuthOpen={() => setIsAuthModalOpen(true)}
-              />
-            </div>
-          </InfoBlock>
-
+          )}
         </div>
+
+        <div className="mt-4 pt-4 border-t border-dashed border-slate-200 flex justify-between items-baseline">
+          <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">Total Value</span>
+          <span className="text-xl font-black text-slate-900">₹{pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0)}</span>
+        </div>
+      </div>
+
+      {/* WALLET & FINAL CHECKOUT */}
+      {(() => {
+        const totalRent = pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0);
+        const maxWalletAllowed = totalRent * 0.1;
+        const walletDiscount = Math.min(user?.walletBalance || 0, maxWalletAllowed);
+        const isWalletApplicable = totalRent > 1 && user?.walletBalance > 0;
+        const finalPayable = totalRent - (useWallet && isWalletApplicable ? walletDiscount : 0);
+
+        return (
+          <div className="p-4 space-y-4">
+            {isAuthenticated && pg.availabilityStatus === "Available" && isWalletApplicable && (
+              <div 
+                onClick={() => setUseWallet(!useWallet)}
+                className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+                  useWallet ? "bg-emerald-50 border-emerald-500 shadow-md" : "bg-white border-slate-100"
+                }`}
+              >
+                <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                  useWallet ? "bg-emerald-500 border-emerald-500" : "bg-white border-slate-200"
+                }`}>
+                  {useWallet && <Check size={14} className="text-white stroke-[4px]" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-slate-900 font-black text-xs uppercase tracking-tight">Redeem Wallet</p>
+                  <p className="text-[10px] text-slate-500 font-medium">Balance: ₹{user.walletBalance}</p>
+                </div>
+                {useWallet && <span className="text-emerald-600 font-black text-sm">-₹{walletDiscount}</span>}
+              </div>
+            )}
+
+            <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-2xl shadow-indigo-200/50 relative overflow-hidden group">
+              <div className="absolute right-[-10%] top-[-10%] opacity-10 group-hover:rotate-12 transition-transform duration-700">
+                <Sparkles size={100} />
+              </div>
+              
+              <div className="relative z-10 flex justify-between items-end mb-6">
+                <div>
+                  <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Final Amount</p>
+                  <p className="text-3xl font-black tracking-tighter">₹{finalPayable}</p>
+                </div>
+                <div className="text-right">
+                   <p className="text-[10px] font-bold text-emerald-400">Secure Payment</p>
+                   <ShieldCheck className="ml-auto text-emerald-400" size={20} />
+                </div>
+              </div>
+
+              {isAuthenticated ? (
+                <button 
+                  onClick={() => handleBook({ totalAmount: totalRent, walletUsed: useWallet ? walletDiscount : 0, payableAmount: finalPayable })}
+                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black text-lg transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2"
+                >
+                  Confirm Booking
+                  <ArrowRight size={20} />
+                </button>
+              ) : (
+                <button disabled className="w-full py-4 bg-slate-800 text-slate-500 rounded-2xl font-black text-lg cursor-not-allowed border border-slate-700">
+                  Login to Book
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+    </div>
+  </InfoBlock>
+
+  {/* ================== PREMIUM ACTIONS ================== */}
+  <div className="grid grid-cols-1 gap-3">
+    <ActionBtn 
+      icon={<Phone size={20} />} 
+      label="Contact Owner" 
+      primary 
+      onClick={() => window.open(`https://wa.me/919693915693`, '_blank')} 
+    />
+    <div className="grid grid-cols-2 gap-3">
+      <ActionBtn icon={<Navigation size={18} />} label="Directions" onClick={handleGetDirections} />
+      <ActionBtn icon={<Share2 size={18} />} label="Share Link" onClick={sharePG} />
+    </div>
+  </div>
+</div>
 
       </div>
 
@@ -956,39 +1012,52 @@ export default function PGDetailsPage() {
 // REUSABLE INFO BLOCK COMPONENT
 function InfoBlock({ title, children }) {
   return (
-    <div className="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
-      <h3 className="text-xl font-bold text-gray-800 mb-3">{title}</h3>
-      {children}
+    <div className="bg-white rounded-[2.5rem] border border-gray-100/80 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_70px_-20px_rgba(0,0,0,0.08)] transition-all duration-500 overflow-hidden group mb-8">
+      
+      {/* MNC Branding: Dynamic Gradient Line */}
+      <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-400 to-transparent opacity-10 group-hover:opacity-100 transition-opacity duration-700" />
+      
+      <div className="p-8 md:p-10">
+        {/* Modern Section Header */}
+        <div className="relative mb-10 flex items-center justify-between">
+          <div className="relative inline-block">
+            <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight relative z-10">
+              {title}
+            </h3>
+            {/* Minimalist Title Decoration */}
+            <div className="absolute -bottom-1 left-0 w-1/4 h-1.5 bg-indigo-500/20 rounded-full group-hover:w-full transition-all duration-700 ease-out" />
+          </div>
+
+          {/* Interactive Icon: MNC apps use these to show section status */}
+          <div className="hidden sm:flex w-10 h-10 rounded-2xl bg-gray-50 items-center justify-center text-gray-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all duration-500">
+            <Sparkles size={18} />
+          </div>
+        </div>
+
+        {/* Content Area: Staggered Fade-in Animation */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out fill-mode-forwards">
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
-
-// PRICE COMPONENT
-function Price({ label, value }) {
-  return (
-    <div className="flex justify-between py-2 border-b">
-      <span className="text-gray-600">{label}</span>
-      <span className="font-semibold">₹{value}</span>
-    </div>
-  );
-}
-
 // ACTION BUTTON COMPONENT
-function Action({ icon, label, onClick, whatsappNumber, isAuthenticated, onAuthOpen }) {
-  const handleClick = () => {
-    if (!isAuthenticated) return onAuthOpen();
-    if (whatsappNumber) {
-      const msg = encodeURIComponent("Hello, I'm interested in your PG");
-      window.open(`https://wa.me/${whatsappNumber}?text=${msg}`, "_blank");
-      return;
-    }
-    if (onClick) onClick();
-  };
-
+// 1. Pehle ye reusable component define karein
+function ActionBtn({ icon, label, primary, onClick }) {
   return (
-    <button onClick={handleClick} className="flex items-center gap-3 p-3 border rounded-xl shadow-sm transition hover:bg-gray-100">
-      {icon}
-      <span className="font-medium">{label}</span>
+    <button 
+      onClick={onClick}
+      className={`flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] font-black transition-all duration-300 active:scale-95 w-full ${
+        primary 
+          ? "bg-slate-900 text-white shadow-xl shadow-slate-200 hover:bg-indigo-600" 
+          : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+      }`}
+    >
+      <span className={primary ? "text-indigo-400" : "text-slate-400"}>
+        {icon}
+      </span>
+      <span className="text-sm uppercase tracking-tighter">{label}</span>
     </button>
   );
 }
@@ -1002,17 +1071,4 @@ const InfoItem = ({ label, value }) => (
   </div>
 );
 
-const StatCard = ({ label, value, color }) => (
-  <div className="flex flex-col items-center
-    bg-white/70 backdrop-blur-xl
-    px-6 py-4 rounded-2xl shadow-lg border border-white/30">
-    <span className="text-sm font-medium text-gray-600">{label}</span>
-    <p
-      className={`text-3xl font-extrabold ${color === "green" ? "text-green-600" : "text-red-600"
-        }`}
-    >
-      {value}
-    </p>
-  </div>
-);
 

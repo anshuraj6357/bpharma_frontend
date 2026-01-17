@@ -1,6 +1,6 @@
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, Mail, Lock, User, Phone, Briefcase, ChevronRight, Stars } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -10,12 +10,10 @@ import {
 import { userLoggedin } from "../Bothfeatures/features/authSlice";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function AuthModal({ isOpen, onClose }) {
+export default function AuthModal() {
   const [isSignUp, setIsSignUp] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -28,9 +26,6 @@ export default function AuthModal({ isOpen, onClose }) {
   const [registerUser, { isLoading: registerLoading }] = useRegisterUserMutation();
   const [loginUser, { isLoading: loginLoading }] = useLoginUserMutation();
 
-  // Automatically close modal if user is already authenticated
-
-
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) dispatch(userLoggedin({ user: JSON.parse(storedUser) }));
@@ -41,232 +36,208 @@ export default function AuthModal({ isOpen, onClose }) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      let res;
+      if (isSignUp) {
+        if (!formData.username || !formData.email || !formData.password || !formData.phone || !formData.role) {
+          toast.error("All fields are required");
+          return;
+        }
+        res = await registerUser(formData).unwrap();
+        dispatch(userLoggedin({ user: res.existingUser }));
+        localStorage.setItem("user", JSON.stringify(res.existingUser));
+        toast.success("Welcome to RoomGi!");
+        navigate("/signup-success");
+      } else {
+        // Login: Only Email & Password
+        if (!formData.email || !formData.password) {
+          toast.error("Email and Password are required");
+          return;
+        }
+        res = await loginUser({ email: formData.email, password: formData.password }).unwrap();
+        dispatch(userLoggedin({ user: res.existingUser }));
+        localStorage.setItem("user", JSON.stringify(res.existingUser));
+        toast.success("Logged in successfully");
 
-  try {
-    let res;
-
-    /* ---------------- SIGNUP ---------------- */
-    if (isSignUp) {
-      if (
-        !formData.username ||
-        !formData.email ||
-        !formData.password ||
-        !formData.phone ||
-        !formData.role
-      ) {
-        toast.error("Please fill all fields");
-        return;
+        const role = res?.existingUser?.role || "";
+        if (role.includes("owner") || role.includes("branch-manager")) {
+          navigate("/admin/properties", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
       }
-
-      res = await registerUser(formData).unwrap();
-
-      // Save user
-      dispatch(userLoggedin({ user: res.existingUser }));
-      localStorage.setItem("user", JSON.stringify(res.existingUser));
-
-      toast.success("🎉 Registration successful!");
-
-      // 🔥 IMPORTANT: Directly go to success screen
-      navigate("/signup-success");
-      return; // ⛔ STOP further execution
+    } catch (err) {
+      toast.error(err?.data?.message || "Authentication failed");
     }
-
-    /* ---------------- LOGIN ---------------- */
-    if (!formData.email || !formData.password) {
-      toast.error("Please fill all fields");
-      return;
-    }
-
-    res = await loginUser(formData).unwrap();
-
-    dispatch(userLoggedin({ user: res.existingUser }));
-    localStorage.setItem("user", JSON.stringify(res.existingUser));
-
-    toast.success(res.message || "Logged in successfully!");
-const role = res?.existingUser?.role || [];
-console.log("User role:", role);
-
-if (role.includes("owner") || role.includes("branch-manager")) {
-  navigate("/admin/properties", { replace: true });
-} else {
-  navigate("/", { replace: true });
-}
-
-
-    // Reset form
-    setFormData({
-      username: "",
-      email: "",
-      password: "",
-      phone: "",
-      role: "",
-    });
-
-  } catch (err) {
-    toast.error(err?.data?.message || "Something went wrong!");
-  }
-};
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 relative shadow-2xl border border-gray-200 animate-slideUp">
-        {/* Close Button */}
-        <button
-          onClick={() => {
-            // properly call the function
-            navigate(-1); // navigate after closing
-          }}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition"
-        >
-          <X className="w-6 h-6" />
-        </button>
-        {/* Heading */}
-
-
-        <div className="flex justify-center items-center gap-8 mb-4">
-
-
-          <button
-            onClick={() => setIsSignUp(false)}
-            className={`text-lg font-semibold transition ${!isSignUp
-                ? "text-indigo-700 border-b-4 border-indigo-700 pb-1"
-                : "text-gray-500 hover:text-gray-700"
-              }`}
-          >
-            Login
-          </button>
-
-          <button
-            onClick={() => setIsSignUp(true)}
-            className={`text-lg font-semibold transition ${isSignUp
-                ? "text-indigo-700 border-b-4 border-indigo-700 pb-1"
-                : "text-gray-500 hover:text-gray-700"
-              }`}
-          >
-            Sign Up
-          </button>
-
-
+    <div className="min-h-screen w-full bg-slate-200/40 backdrop-blur-xl flex items-center justify-center p-4 py-10 animate-in fade-in duration-500">
+      
+      {/* --- Main Card --- */}
+      <div className="bg-white rounded-[2.5rem] max-w-4xl w-full flex flex-col md:flex-row overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-white animate-in zoom-in-95 duration-500">
+        
+        {/* --- LEFT SIDE: PICHLA WALA IMAGE --- */}
+        <div className="md:w-[42%] relative min-h-[300px] md:min-h-full overflow-hidden">
+          <img 
+            src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=2070&auto=format&fit=crop" 
+            alt="Luxury Interior"
+            className="absolute inset-0 w-full h-full object-cover transform hover:scale-110 transition-transform duration-[3000ms]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
+          
+          <div className="relative z-10 p-10 h-full flex flex-col justify-end text-white">
+            <div className="flex items-center gap-2 mb-4">
+              <Stars className="text-yellow-400 fill-yellow-400" size={20} />
+              <span className="text-xs font-bold tracking-[0.2em] uppercase text-slate-200">Premium Living</span>
+            </div>
+            <h1 className="text-3xl font-black leading-tight tracking-tight mb-2">
+              Find Your <br /> Cozy Corner.
+            </h1>
+            <p className="text-slate-300 text-sm font-medium leading-relaxed opacity-90">
+              Discover verified shared spaces that feel like home, managed with care.
+            </p>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center tracking-wide">
-          {isSignUp ? "Create Account" : "Login Now"}
-        </h2>
 
-
-        {/* Form */}
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          {isSignUp && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-              <input
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                type="text"
-                placeholder="John Doe"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm hover:shadow-md"
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              type="email"
-              placeholder="example@email.com"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm hover:shadow-md"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              type="password"
-              placeholder="********"
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm hover:shadow-md"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm hover:shadow-md"
-            >
-              <option value="">Select Role</option>
-              <option value="user">User</option>
-              <option value="owner">PG Owner</option>
-              <option value="branch-manager">Branch Manager</option>
-            </select>
-          </div>
-
-          {isSignUp && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-              <input
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                type="tel"
-                placeholder="+91 9876543210"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none transition shadow-sm hover:shadow-md"
-              />
-            </div>
-          )}
-
+        {/* --- RIGHT SIDE: PICHLA WALA PREMIUM UI (#fdfdfd) --- */}
+        <div className="flex-1 bg-[#fdfdfd] p-8 md:p-14 relative">
+          
           <button
-            type="submit"
-            disabled={registerLoading || loginLoading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-blue-500 text-white py-3 rounded-full hover:scale-105 hover:shadow-lg transition transform font-semibold flex justify-center items-center gap-2"
+            onClick={() => navigate(-1)}
+            className="absolute top-8 right-8 text-slate-400 hover:text-slate-900 bg-slate-100/50 hover:bg-slate-100 p-2 rounded-full transition-all"
           >
-            {(registerLoading || loginLoading) && <Loader2 className="w-5 h-5 animate-spin" />}
-            {isSignUp ? "Sign Up" : "Login"}
+            <X size={20} />
           </button>
-        </form>
 
-        {/* Toggle SignUp/Login */}
-        <div className="mt-5 text-center text-sm flex flex-col gap-2">
-          {isSignUp ? (
-            <span>
-              Already have an account?{" "}
+          <div className="max-w-sm mx-auto">
+            <div className="mb-10 text-center md:text-left">
+              <h2 className="text-2xl font-black text-slate-900 mb-2">
+                {isSignUp ? "Join the Community" : "Welcome Back"}
+              </h2>
+              <p className="text-slate-500 text-sm font-medium">
+                {isSignUp ? "Enter your details to get started." : "Good to see you again!"}
+              </p>
+            </div>
+
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              {/* FULL NAME (Signup Only) */}
+              {isSignUp && (
+                <div className="space-y-1 group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                    <input
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      placeholder="Jane Doe"
+                      className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm font-semibold text-slate-800 shadow-sm"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* EMAIL (Always) */}
+              <div className="space-y-1 group">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                  <input
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    type="email"
+                    placeholder="email@example.com"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm font-semibold text-slate-800 shadow-sm"
+                  />
+                </div>
+              </div>
+
+              {/* PASSWORD (Always) */}
+              <div className="space-y-1 group">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                  <input
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    type="password"
+                    placeholder="••••••••"
+                    className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm font-semibold text-slate-800 shadow-sm"
+                  />
+                </div>
+              </div>
+
+              {/* ROLE (Signup Only) - Yahi se problem aa rahi thi, ab login mein nahi dikhega */}
+              {isSignUp && (
+                <div className="space-y-1 group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Your Role</label>
+                  <div className="relative">
+                    <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                    <select
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      className="w-full pl-12 pr-10 py-3.5 bg-white border border-slate-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm font-semibold text-slate-800 appearance-none cursor-pointer shadow-sm"
+                    >
+                      <option value="">Select Role</option>
+                      <option value="user">Looking for Room</option>
+                      <option value="owner">Property Owner</option>
+                      <option value="branch-manager">Manager</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {/* PHONE (Signup Only) */}
+              {isSignUp && (
+                <div className="space-y-1 group">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone</label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                    <input
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      type="tel"
+                      placeholder="+91..."
+                      className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-sm font-semibold text-slate-800 shadow-sm"
+                    />
+                  </div>
+                </div>
+              )}
+
               <button
-                onClick={() => setIsSignUp(false)}
-                className="text-indigo-600 hover:text-indigo-700 font-medium"
+                type="submit"
+                disabled={registerLoading || loginLoading}
+                className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-600 shadow-xl shadow-slate-200 hover:shadow-indigo-200 transition-all flex justify-center items-center gap-2 active:scale-95 disabled:opacity-70 mt-4"
               >
-                Login
+                {registerLoading || loginLoading ? <Loader2 className="animate-spin" size={18} /> : (
+                  <>
+                    {isSignUp ? "Register Now" : "Sign In"}
+                    <ChevronRight size={16} />
+                  </>
+                )}
               </button>
-            </span>
-          ) : (
-            <>
-              <span>
-                Don't have an account?{" "}
+            </form>
+
+            <div className="mt-8 text-center">
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-tighter">
+                {isSignUp ? "Already a member?" : "New to the platform?"}
                 <button
-                  onClick={() => setIsSignUp(true)}
-                  className="text-indigo-600 hover:text-indigo-700 font-medium"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="ml-2 text-indigo-600 hover:text-indigo-800 transition-colors underline underline-offset-4"
                 >
-                  Sign Up
+                  {isSignUp ? "Login" : "Sign Up"}
                 </button>
-              </span>
-              <button
-                onClick={() => toast.info("Forgot password clicked")}
-                className="text-red-500 hover:underline mt-1"
-              >
-                Forgot Password?
-              </button>
-            </>
-          )}
+              </p>
+            </div>
+          </div>
         </div>
-
       </div>
     </div>
   );

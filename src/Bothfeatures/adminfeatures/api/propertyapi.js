@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "https://roomgi-backend-project-1.onrender.com/api/property/";
+const USER_API = "http://localhost:5000/api/property/";
 
 const propertyApi = createApi({
   reducerPath: "propertyapi",
@@ -52,6 +52,32 @@ const propertyApi = createApi({
       invalidatesTags: ["Branch"],
     }),
 
+    /* ===================== BRANCH ROOMS (CURSOR PAGINATION) ===================== */
+getRoomsByBranch: builder.query({
+  query: ({ branchId, cursor, limit = 10 }) => ({
+    url: `branch-rooms/${branchId}`,
+    params: { limit, cursor }, // Query params object format mein dena zyada saaf hai
+  }),
+
+  // Sirf branchId ke basis par cache maintain karega (Pagination ke liye zaroori)
+  serializeQueryArgs: ({ queryArgs }) => queryArgs.branchId,
+
+  // Naye data ko purane mein merge karna
+  merge: (currentCache, newData) => {
+    if (!currentCache) return newData; // Agar pehla load hai toh direct return karo
+    
+    return {
+      ...newData,
+      rooms: [...currentCache.rooms, ...newData.rooms], // Purane rooms + naye rooms
+      nextCursor: newData.nextCursor, // Update cursor
+    };
+  },
+
+  // Jab branch change ho tabhi refetch karega (Not on cursor change)
+  forceRefetch: ({ currentArg, previousArg }) => currentArg?.branchId !== previousArg?.branchId,
+
+  providesTags: (result, error, arg) => [{ type: "Room", id: arg.branchId }],
+}),
   
 
     addbranchmanager: builder.mutation({
@@ -167,6 +193,7 @@ const propertyApi = createApi({
 export const {
   useAddbranchMutation,
   useGetAllBranchQuery,
+  useGetRoomsByBranchQuery,
   useAddexistingbranchmanagerMutation,
   useGetAllBranchByOwnerQuery,
   useGetAllBranchbybranchIdQuery,
@@ -188,3 +215,7 @@ useGetAllRoomownerQuery,
 } = propertyApi;
 
 export default propertyApi;
+
+
+
+

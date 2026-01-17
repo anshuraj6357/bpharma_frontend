@@ -12,8 +12,6 @@ import {
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
-// Assume you have an API hook like this:
-// import { useCreateComplaintMutation } from "../../../Bothfeatures/features2/api/complaintApi";
 
 export default function AddComplaint({ onClose }) {
   const { branchId } = useParams(); // Destructure properly from params

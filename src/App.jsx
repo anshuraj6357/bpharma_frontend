@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-
+import BranchRoomsPage from "./components/branch-rooms.jsx"
 import LandingPage from './components/LandingPage';
 import TenantDashboard from "./components/trackrentdashboard";
 import PGDetailsPage from './components/PGDetailsPage';
@@ -140,8 +140,9 @@ const isAdminRoute = Array.isArray(user?.role)
           <Route path="/payrent/:id" element={<PayRentPanel />} />
           <Route path="/founder" element={<FounderPage />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
-          <Route path="/internship-certificate"element={<InternshipCertificate />}
-/>
+          <Route path="/internship-certificate"element={<InternshipCertificate />}/>
+          <Route path="/branch-rooms/:id" element={<BranchRoomsPage/>}/>
+
 
 
           {/* Admin */}

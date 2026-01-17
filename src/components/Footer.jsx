@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Youtube, Linkedin, Twitter } from "lucide-react";
+import { Facebook, Instagram, Youtube, Linkedin, Twitter, Mail, Send, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Footer() {
@@ -11,92 +11,104 @@ export default function Footer() {
   };
 
   const linkClass =
-    "block text-sm text-gray-300 hover:text-white transition-all duration-200 cursor-pointer";
+    "text-sm text-gray-400 hover:text-indigo-400 hover:translate-x-1 transition-all duration-300 flex items-center gap-1";
 
   return (
-    <footer className="bg-gray-900 text-white pt-16 pb-10 px-6 sm:px-12 lg:px-24">
+    <footer className="bg-slate-950 text-white pt-24 pb-12 px-6 sm:px-12 lg:px-24 relative overflow-hidden">
+      
+      {/* BACKGROUND DECORATION (Subtle glow) */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-600/10 blur-[120px] pointer-events-none" />
 
-      {/* MAIN GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+    
 
-        {/* COMPANY */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 text-gray-200">Company</h2>
-          <ul className="space-y-2">
-            <li><a href="/aboutus" onClick={(e)=>handleNav(e,"/aboutus")} className={linkClass}>About Us</a></li>
-            <li><a href="/founder" onClick={(e)=>handleNav(e,"/founder")} className={linkClass}>Founder</a></li>
-            <li><a href="/careers" onClick={(e)=>handleNav(e,"/careers")} className={linkClass}>Careers</a></li>
-            <li><a href="/media" onClick={(e)=>handleNav(e,"/media")} className={linkClass}>Media / Press</a></li>
-            <li><a href="/blog" onClick={(e)=>handleNav(e,"/blog")} className={linkClass}>Blog</a></li>
-          </ul>
+      {/* 2. MAIN CONTENT GRID */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
+        
+        {/* BRAND INFO (3 Cols) */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="text-3xl font-black tracking-tighter text-white flex items-center gap-2">
+            <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">R</div>
+            RoomGi<span className="text-indigo-500">.</span>
+          </div>
+          <p className="text-gray-400 font-medium leading-relaxed max-w-sm">
+            India's most trusted broker-free house hunting platform. We help you find rooms that feel like home, minus the brokerage.
+          </p>
+          <div className="space-y-3">
+             <div className="flex items-center gap-3 text-gray-400">
+                <MapPin size={18} className="text-indigo-500" />
+                <span className="text-sm font-semibold">Noida, Uttar Pradesh, India</span>
+             </div>
+             <div className="flex items-center gap-3 text-gray-400">
+                <Mail size={18} className="text-indigo-500" />
+                <span className="text-sm font-semibold">support@roomgi.com</span>
+             </div>
+          </div>
         </div>
 
-        {/* SUPPORT */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 text-gray-200">Support</h2>
-          <ul className="space-y-2">
-            <li><a href="/helpcenter" onClick={(e)=>handleNav(e,"/helpcenter")} className={linkClass}>Help Center</a></li>
-            <li><a href="/faqs" onClick={(e)=>handleNav(e,"/faqs")} className={linkClass}>FAQs</a></li>
-            <li><a href="/customersupport" onClick={(e)=>handleNav(e,"/customersupport")} className={linkClass}>Customer Support</a></li>
-            <li><a href="/contactus" onClick={(e)=>handleNav(e,"/contactus")} className={linkClass}>Contact Us</a></li>
-            <li><a href="/reportissue" onClick={(e)=>handleNav(e,"/reportissue")} className={linkClass}>Report an Issue</a></li>
-          </ul>
+        {/* LINKS (6 Cols Total) */}
+        <div className="lg:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-8">
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white mb-6">Company</h3>
+            <ul className="space-y-4">
+              <li><a href="/aboutus" onClick={(e)=>handleNav(e,"/aboutus")} className={linkClass}>About Us</a></li>
+              <li><a href="/careers" onClick={(e)=>handleNav(e,"/careers")} className={linkClass}>Careers</a></li>
+              <li><a href="/blog" onClick={(e)=>handleNav(e,"/blog")} className={linkClass}>Our Blog</a></li>
+              <li><a href="/media" onClick={(e)=>handleNav(e,"/media")} className={linkClass}>Press Kit</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white mb-6">Support</h3>
+            <ul className="space-y-4">
+              <li><a href="/faqs" onClick={(e)=>handleNav(e,"/faqs")} className={linkClass}>FAQs</a></li>
+              <li><a href="/helpcenter" onClick={(e)=>handleNav(e,"/helpcenter")} className={linkClass}>Help Center</a></li>
+              <li><a href="/contactus" onClick={(e)=>handleNav(e,"/contactus")} className={linkClass}>Contact</a></li>
+              <li><a href="/reportissue" onClick={(e)=>handleNav(e,"/reportissue")} className={linkClass}>Report Issue</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white mb-6">Legal</h3>
+            <ul className="space-y-4">
+              <li><a href="/privacypolicy" onClick={(e)=>handleNav(e,"/privacypolicy")} className={linkClass}>Privacy</a></li>
+              <li><a href="/termsandcondition" onClick={(e)=>handleNav(e,"/termsandcondition")} className={linkClass}>Terms</a></li>
+              <li><a href="/CancellationPolicy" onClick={(e)=>handleNav(e,"/CancellationPolicy")} className={linkClass}>Refunds</a></li>
+            </ul>
+          </div>
         </div>
 
-        {/* SERVICES */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 text-gray-200">Services</h2>
-          <ul className="space-y-2">
-            <li><a href="/partnerwithroomgi" onClick={(e)=>handleNav(e,"/partnerwithroomgi")} className={linkClass}>Partner with Roomgi</a></li>
-            <li><a href="/listproperty" onClick={(e)=>handleNav(e,"/listproperty")} className={linkClass}>List Your Property</a></li>
-          </ul>
-        </div>
-
-        {/* LEGAL */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 text-gray-200">Legal</h2>
-          <ul className="space-y-2">
-            <li><a href="/privacypolicy" onClick={(e)=>handleNav(e,"/privacypolicy")} className={linkClass}>Privacy Policy</a></li>
-            <li><a href="/termsandcondition" onClick={(e)=>handleNav(e,"/termsandcondition")} className={linkClass}>Terms & Conditions</a></li>
-            <li><a href="/shippingpolicy" onClick={(e)=>handleNav(e,"/shippingpolicy")} className={linkClass}>Shipping Policy</a></li>
-            <li><a href="/CancellationPolicy" onClick={(e)=>handleNav(e,"/CancellationPolicy")} className={linkClass}>Cancellation & Refund</a></li>
-            <li><a href="/disclaimer" onClick={(e)=>handleNav(e,"/disclaimer")} className={linkClass}>Disclaimer</a></li>
-          </ul>
-        </div>
-
-        {/* CONNECT */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 text-gray-200">Connect With Us</h2>
-          <div className="flex gap-4 mt-2">
-            <a href="https://www.facebook.com/share/17Pg2nzg3s/" target="_blank" rel="noreferrer"
-              className="p-3 rounded-full bg-blue-600 hover:brightness-125 transition">
-              <Facebook className="w-5 h-5"/>
-            </a>
-            <a href="https://www.instagram.com/roomgi_officials" target="_blank" rel="noreferrer"
-              className="p-3 rounded-full bg-gradient-to-tr from-pink-500 via-purple-500 to-yellow-400 hover:scale-110 transition">
-              <Instagram className="w-5 h-5"/>
-            </a>
-            <a href="https://youtube.com/@goroomgi" target="_blank" rel="noreferrer"
-              className="p-3 rounded-full bg-red-600 hover:brightness-125 transition">
-              <Youtube className="w-5 h-5"/>
-            </a>
-            <a href="https://www.linkedin.com/company/roomgi" target="_blank" rel="noreferrer"
-              className="p-3 rounded-full bg-blue-700 hover:brightness-125 transition">
-              <Linkedin className="w-5 h-5"/>
-            </a>
-            <a href="https://x.com/teamroomgi" target="_blank" rel="noreferrer"
-              className="p-3 rounded-full bg-sky-400 hover:brightness-125 transition">
-              <Twitter className="w-5 h-5"/>
-            </a>
+        {/* CONNECT (2 Cols) */}
+        <div className="lg:col-span-2">
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white mb-6">Socials</h3>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { Icon: Facebook, link: "https://facebook.com...", color: "hover:bg-blue-600" },
+              { Icon: Instagram, link: "https://instagram.com...", color: "hover:bg-gradient-to-tr from-pink-500 to-yellow-500" },
+              { Icon: Twitter, link: "https://x.com...", color: "hover:bg-black" },
+              { Icon: Linkedin, link: "https://linkedin.com...", color: "hover:bg-blue-700" },
+            ].map((social, i) => (
+              <a 
+                key={i} 
+                href={social.link} 
+                target="_blank" 
+                rel="noreferrer"
+                className={`w-10 h-10 flex items-center justify-center rounded-xl bg-gray-800 transition-all duration-300 ${social.color} hover:scale-110`}
+              >
+                <social.Icon size={18} />
+              </a>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* COPYRIGHT */}
-      <div className="mt-14 border-t border-gray-700 pt-5 text-center text-sm text-gray-400">
-        © 2026 Roomgi Private Limited | CIN: U68100UP2026PTC240368  
-        <br />
-        <a href="/sitemap.xml" className="hover:text-white">Sitemap</a>
+      {/* 3. COPYRIGHT BAR */}
+      <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-gray-800/50 flex flex-col md:flex-row justify-between items-center gap-6 text-gray-500">
+        <p className="text-xs font-medium">
+          © 2026 RoomGi Private Limited. CIN: U68100UP2026PTC240368
+        </p>
+        <div className="flex gap-6 text-xs font-bold uppercase tracking-widest">
+           <a href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</a>
+           <span className="text-gray-800">|</span>
+           <span className="text-indigo-500">Made with ❤️ in India</span>
+        </div>
       </div>
     </footer>
   );
