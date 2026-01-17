@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useGetAllBranchQuery } from "../../../Bothfeatures/features2/api/propertyapi";
+import { useGetAllBranchQuery } from "../../../Bothfeatures/adminfeatures/api/propertyapi";
 import {
     useAddStaffMutation,
     useGetAllStaffQuery,
-} from "../../../Bothfeatures/features2/api/staffapi";
+} from "../../../Bothfeatures/adminfeatures/api/staffapi";
 
 
 export default function AddStaff() {

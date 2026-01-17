@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useCreateComplainMutation } from "../Bothfeatures/features2/api/complainapi";
+import { useCreateComplainMutation } from "../Bothfeatures/adminfeatures/api/complainapi";
 import { useParams } from "react-router-dom"
 
 export default function CreateComplaint() {

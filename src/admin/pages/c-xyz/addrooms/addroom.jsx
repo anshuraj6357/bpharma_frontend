@@ -10,7 +10,7 @@ import {
   useAddRoomMutation,
   useGetAllBranchbybranchIdQuery,
   useGetAllRoomQuery
-} from "../../../../Bothfeatures/features2/api/propertyapi";
+} from "../../../../Bothfeatures/adminfeatures/api/propertyapi";
 import { useNavigate } from "react-router-dom";
 
 function AddRoomForm() {

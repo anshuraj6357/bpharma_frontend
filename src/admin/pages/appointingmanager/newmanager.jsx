@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 import {
   useAddbranchmanagerMutation,
-} from "../../../Bothfeatures/features2/api/propertyapi";
+} from "../../../Bothfeatures/adminfeatures/api/propertyapi";
 
 export default function AppointNewManager() {
   const { id } = useParams(); // branch / property id

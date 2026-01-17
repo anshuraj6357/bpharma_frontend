@@ -11,9 +11,9 @@ import {
   CreditCard
 } from "lucide-react";
 
-import { useCreatePaymentMutation } from "../../../Bothfeatures/features2/api/paymentapi.js";
-import { useGetAllBranchbybranchIdQuery } from "../../../Bothfeatures/features2/api/propertyapi";
-import { useGetallactivetenantQuery } from "../../../Bothfeatures/features2/api/tenant";
+import { useCreatePaymentMutation } from "../../../Bothfeatures/adminfeatures/api/paymentapi.js";
+import { useGetAllBranchbybranchIdQuery } from "../../../Bothfeatures/adminfeatures/api/propertyapi.js";
+import { useGetallactivetenantQuery } from "../../../Bothfeatures/adminfeatures/api/tenant.js";
 
 export default function AddPayment({ onClose }) {
   const navigate = useNavigate();

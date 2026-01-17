@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import {
   useDeleteRoomMutation,
   useGetAllRoomownerQuery
-} from "../../../Bothfeatures/features2/api/propertyapi";
+} from "../../../Bothfeatures/adminfeatures/api/propertyapi";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { 

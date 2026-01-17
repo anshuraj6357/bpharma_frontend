@@ -16,7 +16,7 @@ import { useGetPgByIdQuery } from "../Bothfeatures/features/api/allpg.js";
 import {
   useRazorpayPaymentVerifyMutation,
   useRazorpayPaymentMutation,
-} from "../Bothfeatures/features2/api/paymentapi";
+} from "../Bothfeatures/adminfeatures/api/paymentapi.js";
 
 /* ============================
    RAZORPAY SCRIPT LOADER

@@ -6,7 +6,7 @@ import {
   useGetAllStaffQuery,
   useUpdateStaffMutation,
   useDeleteStaffMutation,
-} from "../../Bothfeatures/features2/api/staffapi";
+} from "../../Bothfeatures/adminfeatures/api/staffapi";
 
 
 

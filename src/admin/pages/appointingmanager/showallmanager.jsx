@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import {
   useGetAllBranchbypropertyQuery,
   useRemovebranchmanagerMutation,
-} from "../../../Bothfeatures/features2/api/propertyapi";
+} from "../../../Bothfeatures/adminfeatures/api/propertyapi";
 import { Trash2, Search } from "lucide-react";
 
 export default function ShowAllManager() {

@@ -9,7 +9,7 @@ import {
   useGetAllComplainQuery,
   useGetComplainByStatusQuery,
   useChangeComplainStatusMutation,
-} from "../../Bothfeatures/features2/api/complainapi";
+} from "../../Bothfeatures/adminfeatures/api/complainapi";
 
 export default function Complaints() {
   const [filterStatus, setFilterStatus] = useState("all");

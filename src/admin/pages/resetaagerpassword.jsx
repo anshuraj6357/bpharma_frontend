@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import Footer from "../../components/Footer";
-import { useChangemanagerpassMutation } from "../../Bothfeatures/features2/api/propertyapi";
+import { useChangemanagerpassMutation } from "../../Bothfeatures/adminfeatures/api/propertyapi";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 

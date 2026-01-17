@@ -23,7 +23,7 @@ import {
   useGetAllBranchByOwnerQuery,
 
   useGetAllBranchbybranchIdQuery,
-} from "../../Bothfeatures/features2/api/propertyapi";
+} from "../../Bothfeatures/adminfeatures/api/propertyapi";
 
 export default function Properties() {
   

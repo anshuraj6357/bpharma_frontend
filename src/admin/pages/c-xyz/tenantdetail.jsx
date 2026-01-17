@@ -2,7 +2,7 @@
 
 import { react, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetTenantByIdQuery } from "../../../Bothfeatures/features2/api/tenant"
+import { useGetTenantByIdQuery } from "../../../Bothfeatures/adminfeatures/api/tenant"
 
 
 

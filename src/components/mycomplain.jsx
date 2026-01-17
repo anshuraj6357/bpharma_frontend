@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   useGetAllComplainByTenantQuery,
   useDeleteComplainMutation,
-} from "../Bothfeatures/features2/api/complainapi";
+} from "../Bothfeatures/adminfeatures/api/complainapi";
 
 // --- Professional Toast Notification ---
 const Toaster = ({ message }) => {

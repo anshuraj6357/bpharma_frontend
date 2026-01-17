@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useGetbookingQuery } from "../Bothfeatures/features2/api/tenant";
-import { useCreateReviewMutation } from "../Bothfeatures/features2/api/reviewapi";
+import { useGetbookingQuery } from "../Bothfeatures/adminfeatures/api/tenant";
+import { useCreateReviewMutation } from "../Bothfeatures/adminfeatures/api/reviewapi";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {

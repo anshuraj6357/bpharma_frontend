@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { useAddHotelRoomMutation, useGetAllBranchbybranchIdQuery } from "../../../Bothfeatures/features2/api/propertyapi";
+import { useAddHotelRoomMutation, useGetAllBranchbybranchIdQuery } from "../../../Bothfeatures/adminfeatures/api/propertyapi";
 
 export function AddHotelRoom() {
   const { data, isLoading, isError, error } = useGetAllBranchbybranchIdQuery();

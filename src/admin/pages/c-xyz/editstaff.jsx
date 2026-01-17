@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetStaffByIdQuery, useUpdateStaffMutation } from "../../../Bothfeatures/features2/api/staffapi";
-import { useGetAllBranchQuery } from "../../../Bothfeatures/features2/api/propertyapi";
+import { useGetStaffByIdQuery, useUpdateStaffMutation } from "../../../Bothfeatures/adminfeatures/api/staffapi";
+import { useGetAllBranchQuery } from "../../../Bothfeatures/adminfeatures/api/propertyapi";
 export default function EditStaff() {
   const { data: AllStaffdata } = useGetAllBranchQuery();
   console.log("id")

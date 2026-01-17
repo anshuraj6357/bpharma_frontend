@@ -1,5 +1,5 @@
 import { useState,useEffect } from "react";
-import {useRegisterUserMutation} from "../../../Bothfeatures/features2/api/authapi"
+import {useRegisterUserMutation} from "../../../Bothfeatures/adminfeatures/api/authapi"
 import { useNavigate } from "react-router-dom";
 
 export default function Signup() {

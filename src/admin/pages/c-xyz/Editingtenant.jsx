@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useGetTenantByIdQuery, useUpdateTenantMutation } from "../../../Bothfeatures/features2/api/tenant";
+import { useGetTenantByIdQuery, useUpdateTenantMutation } from "../../../Bothfeatures/adminfeatures/api/tenant";
 
 export default function EditTenant() {
   const navigate = useNavigate();

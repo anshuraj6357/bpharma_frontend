@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   useGetAllBranchbypropertyQuery,
   useAddexistingbranchmanagerMutation
-} from "../../../Bothfeatures/features2/api/propertyapi";
+} from "../../../Bothfeatures/adminfeatures/api/propertyapi";
 import { CheckCircle, AlertTriangle, UserPlus } from "lucide-react";
 
 export default function AppointExistingManager() {

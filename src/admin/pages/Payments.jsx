@@ -4,10 +4,10 @@ import {
   useCreateExpenseMutation,
   useGetRevenueDetailsQuery,
   useGetAllExpenseQuery
-} from "../../Bothfeatures/features2/api/paymentapi.js";
+} from "../../Bothfeatures/adminfeatures/api/paymentapi.js";
 import {
   useGetAllBranchbybranchIdQuery
-} from "../../Bothfeatures/features2/api/propertyapi.js";
+} from "../../Bothfeatures/adminfeatures/api/propertyapi.js";
 import { useDispatch } from "react-redux";
 import { setAlltenants } from "../../Bothfeatures/notpaidtenantslice";
 import { useNavigate } from "react-router-dom";

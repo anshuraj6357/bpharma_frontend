@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import { useGetTenantByIdQuery } from "../Bothfeatures/features2/api/tenant";
+import { useGetTenantByIdQuery } from "../Bothfeatures/adminfeatures/api/tenant";
 import {
   useRazorpayrentPaymentVerifyMutation,
   useRazorpayPaymentMutation,
-} from "../Bothfeatures/features2/api/paymentapi";
+} from "../Bothfeatures/adminfeatures/api/paymentapi";
 import { toast } from "react-toastify";
 import PaymentSuccessUI from "../components/rentpaymentsuccessui";
 

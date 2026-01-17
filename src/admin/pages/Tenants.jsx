@@ -12,10 +12,10 @@ import {
   useAddTenantMutation,
   useChangeStatusMutation,
   useGetStatusQuery,
-} from "../../Bothfeatures/features2/api/tenant";
+} from "../../Bothfeatures/adminfeatures/api/tenant";
 
 import { useGetAllBranchbybranchIdQuery } from
-  "../../Bothfeatures/features2/api/propertyapi";
+  "../../Bothfeatures/adminfeatures/api/propertyapi";
 
 import { TenantCardSkeleton } from "./skeleton/tenantdetailsskeleton";
 

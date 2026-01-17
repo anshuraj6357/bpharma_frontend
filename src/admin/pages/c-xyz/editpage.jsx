@@ -5,7 +5,7 @@ import {
   useUpdateRoomMutation,
   useDeleteRoomImageMutation,
   useAddRoomImagesMutation,
-} from "../../../Bothfeatures/features2/api/propertyapi";
+} from "../../../Bothfeatures/adminfeatures/api/propertyapi";
 import { Toaster, toast } from "react-hot-toast";
 import { 
   Trash2, Upload, ArrowLeft, X, Plus, 
