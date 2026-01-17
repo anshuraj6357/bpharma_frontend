@@ -50,6 +50,7 @@ export function AddHotelRoom() {
     updatedImages[index] = file;
     setFormData({ ...formData, images: updatedImages });
   };
+  console.log("done")
 
   // Add more image inputs
   const addMoreImageInput = () => {
