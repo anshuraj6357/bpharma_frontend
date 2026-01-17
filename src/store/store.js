@@ -7,13 +7,13 @@ import tenantReducer from "../Bothfeatures/notpaidtenantslice";
 // RTK QUERY APIs
 import { PgApi } from "../Bothfeatures/features/api/allpg";
 import authApi from "../Bothfeatures/features/api/authapi";
-import paymentApi from "../Bothfeatures/features2/api/paymentapi";
-import reviewApi from "../Bothfeatures/features2/api/reviewapi";
-import propertyApi from "../Bothfeatures/features2/api/propertyapi";
-import TenantApi from "../Bothfeatures/features2/api/tenant";
-import AnalysisApi from "../Bothfeatures/features2/api/analysisapi";
-import staffApi from "../Bothfeatures/features2/api/staffapi";
-import ComplainApi from "../Bothfeatures/features2/api/complainapi";
+import paymentApi from "../Bothfeatures/adminfeatures/api/paymentapi";
+import reviewApi from "../Bothfeatures/adminfeatures/api/reviewapi";
+import propertyApi from "../Bothfeatures/adminfeatures/api/propertyapi";
+import TenantApi from "../Bothfeatures/adminfeatures/api/tenant";
+import AnalysisApi from "../Bothfeatures/adminfeatures/api/analysisapi";
+import staffApi from "../Bothfeatures/adminfeatures/api/staffapi";
+import ComplainApi from "../Bothfeatures/adminfeatures/api/complainapi";
 
 // -------------------------------
 // COMBINED REDUCER
