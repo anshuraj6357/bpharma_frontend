@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { userLoggedin, userLoggedout } from '../../features/authSlice';
 
 // const USER_API = import.meta.env.VITE_REACT_APP_AUTHAPI;
-const USER_API = "https://roomgi-backend-project-1.onrender.com/api/v1/user/";
+const USER_API = "https://roomgi-backend-project-2.onrender.com/api/v1/user/";
 
 const authApi = createApi({
   reducerPath: "authApi",
