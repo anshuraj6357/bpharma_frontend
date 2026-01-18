@@ -1,160 +1,95 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, MapPin, Bed, Zap, ShieldCheck } from "lucide-react";
+import { Star, MapPin } from "lucide-react";
 import WishlistButton from "../components/wishlist.jsx";
 
-const RoomCard = memo(function RoomCard({
-  pgData = [],
-  setIsAuthModalOpen,
-}) {
+const RoomCard = memo(function RoomCard({ pgData, setIsAuthModalOpen }) {
   const navigate = useNavigate();
 
-  if (!pgData.length) {
+  if (!pgData || pgData.length === 0) {
     return (
       <div className="col-span-full py-24 text-center">
-        <p className="text-gray-400 text-sm">
-          No premium rooms available
-        </p>
+        <p className="text-slate-400 text-sm">No listings available</p>
       </div>
     );
   }
 
   return (
     <section
-      aria-label="Available rooms"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 w-full"
+      aria-label="Room listings"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
     >
       {pgData.map((room) => {
-        const reviews = room?.personalreview || [];
-        const avgRating =
-          reviews.length > 0
-            ? (
-                reviews.reduce((sum, r) => sum + r.rating, 0) /
-                reviews.length
-              ).toFixed(1)
-            : null;
+        const reviews = room.personalreview || [];
 
-        const price =
-          room?.category === "Hotel"
-            ? room?.rentperNight
-            : room?.price;
-
-        const priceSuffix =
-          room?.category === "Hotel" ? "night" : "month";
+        const avgRating = useMemo(() => {
+          return reviews.length
+            ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+            : 0;
+        }, [reviews]);
 
         return (
           <article
-            key={room?._id}
-            onClick={() => navigate(`/pg/${room?._id}`)}
-            itemScope
-            itemType="https://schema.org/Hotel"
-            className="group cursor-pointer bg-white rounded-3xl overflow-hidden
-            border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500"
+            key={room._id}
+            onClick={() => navigate(`/pg/${room._id}`)}
+            className="group bg-white rounded-xl border border-slate-200 
+            hover:shadow-lg transition-all duration-300 
+            cursor-pointer overflow-hidden"
           >
             {/* Image */}
-            <div className="relative aspect-[4/5] overflow-hidden">
+            <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
               <img
                 src={room?.roomImages?.[0] || "/room-placeholder.jpg"}
-                alt={`${room?.branch?.name || "Room"} in ${room?.branch?.address || "city"}`}
+                alt={`${room?.branch?.name} accommodation in ${room?.branch?.address}`}
                 loading="lazy"
-                itemProp="image"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover 
+                transition-transform duration-700 group-hover:scale-105"
               />
-
-              {/* Verified */}
-              <div className="absolute top-4 left-4">
-                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
-                bg-black/70 backdrop-blur text-white text-[11px] font-medium">
-                  <ShieldCheck size={12} className="text-emerald-400" />
-                  Verified
-                </span>
-              </div>
 
               {/* Wishlist */}
               <div
-                className="absolute top-4 right-4"
+                className="absolute top-3 right-3 z-10"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="bg-white/90 backdrop-blur p-2 rounded-full shadow-md">
+                <div className="bg-white/90 backdrop-blur p-2 rounded-lg shadow-sm border border-slate-200">
                   <WishlistButton
                     pg={room}
                     onAuthOpen={() => setIsAuthModalOpen(true)}
                   />
                 </div>
               </div>
-
-              {/* Price */}
-              <div className="absolute bottom-4 left-4 right-4">
-                <div className="bg-white/95 backdrop-blur px-4 py-3 rounded-2xl
-                flex items-center justify-between shadow-md">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wide text-gray-500">
-                      Starting from
-                    </p>
-                    <p
-                      className="text-gray-900 text-lg font-semibold"
-                      itemProp="priceRange"
-                    >
-                      ₹{price}
-                      <span className="text-sm text-gray-400">
-                        /{priceSuffix}
-                      </span>
-                    </p>
-                  </div>
-                  <div className="h-9 w-9 rounded-full bg-gray-900 text-white
-                  flex items-center justify-center">
-                    <Zap size={14} />
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Content */}
-            <div className="px-5 pt-4 pb-5 flex flex-col h-full">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-1.5 text-sm">
-                  <Star size={14} className="text-amber-400" />
-                  <span className="font-medium text-gray-900">
-                    {avgRating || "New"}
-                  </span>
-                </div>
-                <span className="text-[11px] uppercase tracking-wide text-gray-400">
-                  {room?.category || "Standard"}
-                </span>
-              </div>
-
-              <h3
-                itemProp="name"
-                className="text-gray-900 font-semibold text-base leading-tight mb-1 line-clamp-1"
-              >
+            <div className="p-4 space-y-2">
+              {/* Title */}
+              <h3 className="text-sm font-semibold text-slate-900 line-clamp-1">
                 {room?.branch?.name}
               </h3>
 
-              <div
-                itemProp="address"
-                className="flex items-center gap-1.5 text-gray-500 text-sm mb-4"
-              >
-                <MapPin size={14} />
-                <span className="truncate">
-                  {room?.branch?.address}
-                </span>
+              {/* Location */}
+              <div className="flex items-center gap-1 text-slate-500 text-xs">
+                <MapPin size={12} />
+                <span className="truncate">{room?.branch?.address}</span>
               </div>
 
-              <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                <div className="flex items-center gap-4 text-gray-500 text-xs">
-                  <div className="flex items-center gap-1">
-                    <Bed size={14} />
-                    AC
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Zap size={14} />
-                    WiFi
-                  </div>
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center gap-1 text-xs text-slate-600">
+                  <Star size={12} className="text-amber-400" fill="#fbbf24" />
+                  <span className="font-medium">
+                    {avgRating ? avgRating.toFixed(1) : "New"}
+                  </span>
                 </div>
 
-                <span className="text-xs font-medium text-gray-900">
-                  View details →
-                </span>
+                <div className="text-right">
+                  <p className="text-slate-900 font-semibold text-sm">
+                    ₹{room?.category === "Hotel" ? room?.rentperNight : room?.price}
+                    <span className="text-[10px] text-slate-400">
+                      /{room?.category === "Hotel" ? "night" : "month"}
+                    </span>
+                  </p>
+                </div>
               </div>
             </div>
           </article>
