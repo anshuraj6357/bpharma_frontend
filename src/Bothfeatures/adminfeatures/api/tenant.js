@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const USER_API = "https://roomgi-backend-project-1.onrender.com/api/tenant/";
+const USER_API = "https://roomgi-backend-project-2.onrender.com/api/tenant/";
 
 
 const TenantApi = createApi({
