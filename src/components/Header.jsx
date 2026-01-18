@@ -7,7 +7,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
-import logo from "../assets/logo.png";
+import logo from "../assets/roomgilogo.png";
 import { useLogoutUserMutation } from "../Bothfeatures/features/api/authapi";
 import { userLoggedout } from "../Bothfeatures/features/authSlice";
 
