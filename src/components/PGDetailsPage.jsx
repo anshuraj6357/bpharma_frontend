@@ -1,8 +1,3 @@
-
-
-
-
-
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -397,101 +392,182 @@ export default function PGDetailsPage() {
    <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 relative group/gallery">
 
   {/* ------- MOBILE LAYOUT (Compact & Modern) ------- */}
-  <div className="md:hidden w-full h-[380px] relative overflow-hidden rounded-[2rem] shadow-2xl">
-    {allImages.length === 1 && (
-      <img src={allImages[0]} className="w-full h-full object-cover" alt="Main" />
-    )}
+  <div
+  className="md:hidden w-full max-w-screen-sm mx-auto h-[320px] sm:h-[360px] relative overflow-hidden rounded-[2rem] shadow-2xl"
+  role="region"
+  aria-label="Property image gallery"
+>
+  {/* SINGLE IMAGE */}
+  {allImages.length === 1 && (
+    <img
+      src={allImages[0]}
+      className="w-full h-full object-cover"
+      alt={`${pg?.branch?.name || "Property"} main image`}
+      loading="eager"
+      fetchpriority="high"
+    />
+  )}
 
-    {allImages.length === 2 && (
-      <div className="grid grid-cols-2 h-full gap-1.5">
-        {allImages.map((img, i) => (
-          <img key={i} src={img} className="w-full h-full object-cover" alt={`view-${i}`} />
-        ))}
+  {/* TWO IMAGES */}
+  {allImages.length === 2 && (
+    <div className="grid grid-cols-2 h-full gap-1.5">
+      {allImages.map((img, i) => (
+        <img
+          key={i}
+          src={img}
+          className="w-full h-full object-cover"
+          alt={`${pg?.branch?.name || "Property"} view ${i + 1}`}
+          loading={i === 0 ? "eager" : "lazy"}
+          decoding="async"
+        />
+      ))}
+    </div>
+  )}
+
+  {/* THREE OR MORE */}
+  {allImages.length >= 3 && (
+    <div className="grid grid-cols-2 grid-rows-3 gap-1.5 h-full">
+      {/* HERO */}
+      <div className="col-span-2 row-span-2 overflow-hidden">
+        <img
+          src={allImages[0]}
+          className="w-full h-full object-cover"
+          alt={`${pg?.branch?.name || "Property"} featured image`}
+          loading="eager"
+          fetchpriority="high"
+        />
       </div>
-    )}
 
-    {allImages.length >= 3 && (
-      <div className="grid grid-cols-2 grid-rows-3 gap-1.5 h-full">
-        <div className="col-span-2 row-span-2 overflow-hidden">
-          <img src={allImages[0]} className="w-full h-full object-cover" alt="Focus" />
-        </div>
-        <div className="overflow-hidden">
-          <img src={allImages[1]} className="w-full h-full object-cover" alt="Detail 1" />
-        </div>
-        <div className="overflow-hidden relative group">
-          <img src={allImages[2]} className="w-full h-full object-cover" alt="Detail 2" />
-          {allImages.length > 3 && (
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center border-l border-white/20">
-              <span className="text-white font-black text-xl tracking-tighter">+{allImages.length - 3}</span>
-              <span className="text-white/80 text-[10px] font-bold uppercase tracking-widest">Photos</span>
-            </div>
-          )}
-        </div>
+      {/* SECOND */}
+      <div className="overflow-hidden">
+        <img
+          src={allImages[1]}
+          className="w-full h-full object-cover"
+          alt={`${pg?.branch?.name || "Property"} gallery image 2`}
+          loading="lazy"
+          decoding="async"
+        />
       </div>
-    )}
 
-    {/* MOBILE FLOATING BUTTON */}
-    <button 
-      onClick={() => navigate(`/allpotos/${id}`)}
-      className="absolute bottom-4 right-4 bg-white/80 backdrop-blur-xl px-5 py-2.5 rounded-2xl text-xs font-black text-slate-900 shadow-xl border border-white/50 flex items-center gap-2 active:scale-90 transition-all"
-    >
-      <LayoutGrid size={14} />
-      Show Gallery
-    </button>
-  </div>
+      {/* THIRD */}
+      <div className="overflow-hidden relative">
+        <img
+          src={allImages[2]}
+          className="w-full h-full object-cover"
+          alt={`${pg?.branch?.name || "Property"} gallery image 3`}
+          loading="lazy"
+          decoding="async"
+        />
+
+        {allImages.length > 3 && (
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center border-l border-white/20">
+            <span className="text-white font-black text-xl tracking-tight">
+              +{allImages.length - 3}
+            </span>
+            <span className="text-white/80 text-[10px] font-bold uppercase tracking-widest">
+              Photos
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  )}
+
+  {/* MOBILE FLOATING CTA */}
+  <button 
+    onClick={() => navigate(`/allpotos/${id}`)}
+    aria-label="View all property photos"
+    title="View all photos"
+    className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-xl px-4 py-2 rounded-xl text-[11px] font-black text-slate-900 shadow-xl border border-white/50 flex items-center gap-2 active:scale-90 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500"
+  >
+    <LayoutGrid size={14} />
+    Show Gallery
+  </button>
+</div>
+
 
 
   {/* ------- DESKTOP LAYOUT (MNC Bento Style) ------- */}
-  <div className="hidden md:block h-[550px] relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-100">
-    
-    {/* Layout Logic */}
-    <div className="h-full">
-      {allImages.length === 1 ? (
-        <div className="relative h-full overflow-hidden group">
-          <img src={allImages[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000" />
+  <div
+  className="hidden md:block w-full max-w-screen-2xl mx-auto relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-100"
+  role="region"
+  aria-label="Property image gallery"
+>
+  <div className="h-[420px] lg:h-[550px] xl:h-[600px]">
+    {allImages.length === 1 ? (
+      <div className="relative h-full overflow-hidden group">
+        <img
+          src={allImages[0]}
+          alt={`${pg?.branch?.name || "Property"} main image`}
+          loading="eager"
+          fetchpriority="high"
+          className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+        />
+      </div>
+    ) : (
+      <div
+        className={`grid h-full gap-2 lg:gap-3 ${
+          allImages.length === 2
+            ? "grid-cols-2"
+            : allImages.length === 3
+            ? "grid-cols-3 grid-rows-2"
+            : "grid-cols-4 grid-rows-2"
+        }`}
+      >
+        {/* HERO IMAGE */}
+        <div
+          className={`${
+            allImages.length === 2
+              ? "col-span-1"
+              : "col-span-2 row-span-2"
+          } relative overflow-hidden group`}
+        >
+          <img
+            src={allImages[0]}
+            alt={`${pg?.branch?.name || "Property"} featured image`}
+            loading="eager"
+            fetchpriority="high"
+            className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105 cursor-pointer"
+          />
+          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
         </div>
-      ) : (
-        <div className={`grid h-full gap-3 ${
-          allImages.length === 2 ? 'grid-cols-2' : 
-          allImages.length === 3 ? 'grid-cols-3 grid-rows-2' : 
-          'grid-cols-4 grid-rows-2'
-        }`}>
-          
-          {/* Main Hero Image */}
-          <div className={`${
-            allImages.length === 2 ? 'col-span-1' : 
-            allImages.length === 3 ? 'col-span-2 row-span-2' : 
-            'col-span-2 row-span-2'
-          } overflow-hidden group relative`}>
-            <img src={allImages[0]} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 cursor-pointer" />
-            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+        {/* SECONDARY IMAGES */}
+        {allImages.slice(1, 5).map((img, i) => (
+          <div
+            key={i}
+            className="relative overflow-hidden group bg-white"
+          >
+            <img
+              src={img}
+              alt={`${pg?.branch?.name || "Property"} gallery image ${i + 2}`}
+              loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 cursor-pointer"
+            />
+            <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
           </div>
-
-          {/* Secondary Images */}
-          {allImages.slice(1, 5).map((img, i) => (
-            <div 
-              key={i} 
-              className={`overflow-hidden group relative bg-white ${
-                allImages.length === 3 ? 'col-span-1 row-span-1' : ''
-              }`}
-            >
-              <img src={img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 cursor-pointer" />
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-
-    {/* DESKTOP SHOW ALL BUTTON (Floating Glass Style) */}
-    <button
-      onClick={() => navigate(`/allpotos/${id}`)}
-      className="absolute bottom-6 right-6 bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl text-white px-6 py-3 rounded-2xl font-black text-sm shadow-2xl border border-white/10 flex items-center gap-3 transition-all hover:px-8 group/btn"
-    >
-      <LayoutGrid size={18} className="group-hover/btn:rotate-90 transition-transform duration-500" />
-      <span>View All Photos</span>
-    </button>
+        ))}
+      </div>
+    )}
   </div>
+
+  {/* FLOATING CTA */}
+  <button
+    onClick={() => navigate(`/allpotos/${id}`)}
+    aria-label="View all property photos"
+    title="View all photos"
+    className="absolute bottom-4 right-4 lg:bottom-6 lg:right-6 bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl text-white px-4 py-2 lg:px-6 lg:py-3 rounded-2xl font-bold text-xs lg:text-sm shadow-2xl border border-white/10 flex items-center gap-2 lg:gap-3 transition-all hover:px-6 lg:hover:px-8 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 group"
+  >
+    <LayoutGrid
+      size={18}
+      className="transition-transform duration-500 group-hover:rotate-90"
+    />
+    <span>View All Photos</span>
+  </button>
+</div>
+
+
 
 </div>
 
@@ -828,45 +904,73 @@ export default function PGDetailsPage() {
   {/* 2. BRANCH ROOMS SECTION (The Upgrade) */}
 
 
-<InfoBlock className="mt-16 p-1 bg-white">
+<InfoBlock
+  className="mt-12 md:mt-16 p-4 md:p-6 bg-white"
+  role="region"
+  aria-labelledby="branch-units-heading"
+>
   {/* --- HEADER WITH ACTIONS --- */}
-  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-6">
+  <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 md:mb-10 gap-6">
+    
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <div className="h-6 w-1 bg-indigo-600 rounded-full"></div> {/* Accent line */}
-        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Inventory Intelligence</span>
+        <div className="h-6 w-1 bg-indigo-600 rounded-full" aria-hidden="true"></div>
+        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">
+          Inventory Intelligence
+        </span>
       </div>
-      <h2 className="text-4xl font-black text-slate-900 tracking-tighter">
-        Branch Units <span className="text-slate-300 font-light">/ Overview</span>
+
+      <h2
+        id="branch-units-heading"
+        className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight"
+      >
+        Branch Units{" "}
+        <span className="text-slate-300 font-light">/ Overview</span>
       </h2>
+
       <p className="text-slate-500 font-medium text-sm max-w-md">
-        Real-time availability and occupancy metrics for <span className="text-slate-900 font-bold">Branch ID: {pg.branchId}</span>.
+        Real-time availability and occupancy metrics for{" "}
+        <span className="text-slate-900 font-bold">
+          Branch ID: {pg.branchId}
+        </span>.
       </p>
     </div>
 
-    <button 
+    <button
       onClick={() => navigate(`/branch-rooms/${pg.branch}`)}
-      className="relative overflow-hidden group flex items-center gap-3 bg-slate-950 text-white px-10 py-5 rounded-[2rem] font-black text-sm transition-all hover:bg-indigo-600 hover:shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] active:scale-95"
+      aria-label="Manage all branch inventory"
+      title="Manage all inventory"
+      className="relative overflow-hidden group flex items-center gap-3 bg-slate-950 text-white px-6 md:px-10 py-3 md:py-5 rounded-[1.5rem] md:rounded-[2rem] font-black text-xs md:text-sm transition-all hover:bg-indigo-600 hover:shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500"
     >
       <span className="relative z-10">Manage All Inventory</span>
-      <ArrowRight className="relative z-10 group-hover:translate-x-2 transition-transform duration-300" size={18} />
-      {/* Subtle shine effect on hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+      <ArrowRight
+        className="relative z-10 group-hover:translate-x-2 transition-transform duration-300"
+        size={18}
+        aria-hidden="true"
+      />
+
+      {/* Subtle shine */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
     </button>
-  </div>
+  </header>
 
-  {/* --- HIGH-END STATS GRID --- */}
- 
+  {/* --- STATS GRID SLOT (Scalable Area) --- */}
+  <section
+    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+    aria-label="Branch statistics"
+  >
+    {/* Your stat cards go here */}
+  </section>
 
-        {/* Action Link for each card */}
-        <div className="mt-4 pt-4 border-t border-slate-100/50 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">View Details</span>
-          <ArrowRight size={14} className="text-slate-400" />
-        
-      
-    
+  {/* --- CARD ACTION FOOTER (Reusable) --- */}
+  <div className="mt-4 pt-4 border-t border-slate-100/50 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+    <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
+      View Details
+    </span>
+    <ArrowRight size={14} className="text-slate-400" aria-hidden="true" />
   </div>
 </InfoBlock>
+
 
 </div>
 
@@ -1012,55 +1116,98 @@ export default function PGDetailsPage() {
 // REUSABLE INFO BLOCK COMPONENT
 function InfoBlock({ title, children }) {
   return (
-    <div className="bg-white rounded-[2.5rem] border border-gray-100/80 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_70px_-20px_rgba(0,0,0,0.08)] transition-all duration-500 overflow-hidden group mb-8">
-      
-      {/* MNC Branding: Dynamic Gradient Line */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-400 to-transparent opacity-10 group-hover:opacity-100 transition-opacity duration-700" />
-      
-      <div className="p-8 md:p-10">
-        {/* Modern Section Header */}
-        <div className="relative mb-10 flex items-center justify-between">
-          <div className="relative inline-block">
-            <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight relative z-10">
-              {title}
-            </h3>
-            {/* Minimalist Title Decoration */}
-            <div className="absolute -bottom-1 left-0 w-1/4 h-1.5 bg-indigo-500/20 rounded-full group-hover:w-full transition-all duration-700 ease-out" />
-          </div>
+   <section
+  className="bg-white rounded-[2.5rem] border border-gray-100/80 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_70px_-20px_rgba(0,0,0,0.08)] transition-all duration-500 overflow-hidden group mb-8"
+  aria-labelledby={`section-${title?.toLowerCase()?.replace(/\s+/g, "-")}`}
+>
+  {/* Dynamic Gradient Accent */}
+  <div
+    className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-400 to-transparent opacity-10 group-hover:opacity-100 transition-opacity duration-700"
+    aria-hidden="true"
+  />
 
-          {/* Interactive Icon: MNC apps use these to show section status */}
-          <div className="hidden sm:flex w-10 h-10 rounded-2xl bg-gray-50 items-center justify-center text-gray-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all duration-500">
-            <Sparkles size={18} />
-          </div>
-        </div>
+  <div className="p-8 md:p-10">
+    
+    {/* Section Header */}
+    <header className="relative mb-10 flex items-center justify-between">
+      <div className="relative inline-block">
+        <h3
+          id={`section-${title?.toLowerCase()?.replace(/\s+/g, "-")}`}
+          className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight relative z-10"
+        >
+          {title}
+        </h3>
 
-        {/* Content Area: Staggered Fade-in Animation */}
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out fill-mode-forwards">
-          {children}
-        </div>
+        {/* Title Decoration */}
+        <div
+          className="absolute -bottom-1 left-0 w-1/4 h-1.5 bg-indigo-500/20 rounded-full group-hover:w-full transition-all duration-700 ease-out"
+          aria-hidden="true"
+        />
       </div>
+
+      {/* Status / Decorative Icon */}
+      <div
+        className="hidden sm:flex w-10 h-10 rounded-2xl bg-gray-50 items-center justify-center text-gray-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all duration-500"
+        aria-hidden="true"
+      >
+        <Sparkles size={18} />
+      </div>
+    </header>
+
+    {/* Content */}
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out fill-mode-forwards">
+      {children}
     </div>
+  </div>
+</section>
+
   );
 }
 // ACTION BUTTON COMPONENT
 // 1. Pehle ye reusable component define karein
-function ActionBtn({ icon, label, primary, onClick }) {
+function ActionBtn({
+  icon,
+  label,
+  primary = false,
+  onClick,
+  disabled = false,
+  loading = false,
+  type = "button",
+}) {
   return (
-    <button 
+    <button
+      type={type}
       onClick={onClick}
-      className={`flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] font-black transition-all duration-300 active:scale-95 w-full ${
-        primary 
-          ? "bg-slate-900 text-white shadow-xl shadow-slate-200 hover:bg-indigo-600" 
-          : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
-      }`}
+      disabled={disabled || loading}
+      aria-label={label}
+      className={`flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] font-black transition-all duration-300 w-full 
+        active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
+        ${disabled || loading ? "opacity-60 cursor-not-allowed" : ""}
+        ${
+          primary
+            ? "bg-slate-900 text-white shadow-xl shadow-slate-200 hover:bg-indigo-600"
+            : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+        }
+      `}
     >
-      <span className={primary ? "text-indigo-400" : "text-slate-400"}>
+      {/* Icon */}
+      <span
+        className={`flex items-center justify-center ${
+          primary ? "text-indigo-400" : "text-slate-400"
+        }`}
+        aria-hidden="true"
+      >
         {icon}
       </span>
-      <span className="text-sm uppercase tracking-tighter">{label}</span>
+
+      {/* Label */}
+      <span className="text-sm uppercase tracking-tighter">
+        {loading ? "Please wait..." : label}
+      </span>
     </button>
   );
 }
+
 
 const InfoItem = ({ label, value }) => (
   <div className="flex flex-col">

@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Search, MapPin, Shield,ShieldCheck, CreditCard, Zap, Sparkles } from "lucide-react";
-
+import { 
+  Search, MapPin, Shield, ShieldCheck, CreditCard, Zap, Sparkles,
+  ArrowRight, Star, Users, Clock, Filter, ChevronDown 
+} from "lucide-react";
 import AuthModal from "../components/AuthModal";
 import ROOMCARD from "../components/roomcard";
 import LandingPageSkeleton from "./loader/landingpageskeleton";
@@ -14,34 +16,60 @@ export default function LandingPage() {
   const inputRef = useRef(null);
   const typingTimer = useRef(null);
 
-  const { data: pgApiData, isLoading: pgLoading } = useGetAllListedPgQuery();
-  const { data: wishlistData } = useGetWishlistQuery();
+  const { data: pgApiData, isLoading: pgLoading, error: pgError } = useGetAllListedPgQuery();
+  const { data: wishlistData, isLoading: wishlistLoading } = useGetWishlistQuery();
 
+  // Optimized state management
   const [pgData, setPgData] = useState([]);
   const [supportedCities, setSupportedCities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchError, setSearchError] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  /* ---------------- LOAD PG DATA ---------------- */
+  // Memoized PG data processing
+  const processedPgData = useMemo(() => {
+    if (!pgData.length) return [];
+    
+    const filtered = pgData.filter(pg => {
+      switch(activeFilter) {
+        case "Popular": return pg.rating >= 4.2;
+        case "Newest": return pg.createdAt > Date.now() - 30 * 24 * 60 * 60 * 1000;
+        case "Budget": return pg.price < 15000;
+        default: return true;
+      }
+    });
+
+    return filtered.sort((a, b) => {
+      if (activeFilter === "Popular") return (b.rating || 0) - (a.rating || 0);
+      if (activeFilter === "Newest") return new Date(b.createdAt) - new Date(a.createdAt);
+      return 0;
+    });
+  }, [pgData, activeFilter]);
+
+  /* ---------------- PERFORMANCE OPTIMIZED EFFECTS ---------------- */
   useEffect(() => {
-    if (pgApiData?.allrooms) setPgData(pgApiData.allrooms);
+    if (pgApiData?.allrooms) {
+      setPgData(pgApiData.allrooms);
+    }
   }, [pgApiData]);
 
-  /* ---------------- LOAD SUPPORTED CITIES ---------------- */
   useEffect(() => {
-    fetch("/api/service-cities")
+    fetch("/api/service-cities", { 
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache" }
+    })
       .then(res => res.json())
       .then(data => setSupportedCities(data.filter(c => c.isActive)))
       .catch(() => toast.error("Failed to load cities"));
   }, []);
 
-  /* ---------------- GOOGLE AUTOCOMPLETE ---------------- */
+  // Fixed Google Autocomplete with proper cleanup
   useEffect(() => {
-    if (!window.google ) return;
+    if (!window.google || !inputRef.current) return;
 
     const token = new window.google.maps.places.AutocompleteSessionToken();
-
     const autocomplete = new window.google.maps.places.Autocomplete(
       inputRef.current,
       {
@@ -51,39 +79,38 @@ export default function LandingPage() {
       }
     );
 
-    autocomplete.addListener("place_changed", () => {
+    const handlePlaceChanged = () => {
       const place = autocomplete.getPlace();
       if (!place?.address_components) return;
 
-      let city = "";
-      let area = "";
-
+      let city = "", area = "";
       place.address_components.forEach(c => {
         if (c.types.includes("locality")) city = c.long_name;
-        if (
-          c.types.includes("sublocality") ||
-          c.types.includes("sublocality_level_1")
-        ) area = c.long_name;
+        if (c.types.includes("sublocality") || c.types.includes("sublocality_level_1"))
+          area = c.long_name;
       });
 
       const allowed = supportedCities.find(c => c.city === city);
-
       if (!allowed) {
         toast.info(`RoomGi is not available in ${city} yet`);
         return;
       }
 
       navigate(`/search/${city}/${area || "all"}`);
-    });
-  }, [ navigate]);
+    };
 
-  /* ---------------- FREE TEXT (GEMINI READY) ---------------- */
-  const handleFreeTextSearch = (value) => {
+    autocomplete.addListener("place_changed", handlePlaceChanged);
+
+    return () => {
+      window.google.maps.event.clearInstanceListeners(autocomplete);
+    };
+  }, [supportedCities, navigate]);
+
+  // Optimized debounced search
+  const handleFreeTextSearch = useCallback((value) => {
     clearTimeout(typingTimer.current);
-
     typingTimer.current = setTimeout(() => {
       if (!value.trim()) return;
-
       fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,298 +123,445 @@ export default function LandingPage() {
           }
         });
     }, 600);
-  };
+  }, []);
 
-  /* ---------------- MANUAL SEARCH BUTTON ---------------- */
-  const handleFindPG = () => {
+  const handleFindPG = useCallback(() => {
     setSearchError("");
     if (!searchQuery.trim()) {
       setSearchError("Please enter a location to begin your search");
       return;
     }
     navigate(`/search/${searchQuery}`);
-  };
+  }, [searchQuery, navigate]);
 
- return (
-  <div className="min-h-screen bg-[#FBFCFE] font-sans selection:bg-indigo-100">
+  const filterOptions = [
+    { key: "All", label: "All Stays", count: pgData.length },
+    { key: "Popular", label: "Popular", count: pgData.filter(p => p.rating >= 4.2).length },
+    { key: "Newest", label: "Newest", count: pgData.filter(p => p.createdAt > Date.now() - 30 * 24 * 60 * 60 * 1000).length },
+    { key: "Budget", label: "Budget", count: pgData.filter(p => p.price < 15000).length }
+  ];
+
+  // SEO Optimized Meta Tags
+  useEffect(() => {
+    const title = "RoomGi - Premium PG & Rooms Without Brokerage | Verified Stays";
+    const description = "Discover verified PGs, rooms & shared accommodations with zero brokerage. High-speed WiFi, modern amenities, instant booking. Live better, pay less.";
     
-    {/* ---------------- HERO SECTION ---------------- */}
-  {/* ---------------- HERO SECTION ---------------- */}
-<section className="relative w-full h-[90vh] flex items-center justify-center overflow-hidden bg-[#FBFCFE]">
-  {/* --- Background Section with Zoom Effect --- */}
-  <div className="absolute inset-0 scale-105 animate-subtle-zoom">
+    document.title = title;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', description);
+
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', title);
+
+    return () => {
+      document.title = "RoomGi - Find Your Perfect Stay";
+    };
+  }, []);
+
+  if (pgLoading || wishlistLoading) return <LandingPageSkeleton />;
+  if (pgError) {
+    toast.error("Failed to load properties. Please refresh.");
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 font-inter selection:bg-indigo-100/60">
+      {/* Structured Data for SEO */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "RoomGi",
+          "url": "https://roomgi.com",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://roomgi.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        })
+      }} />
+
+      {/* Hero Section - Optimized for Core Web Vitals */}
+     <section
+  aria-labelledby="hero-heading"
+  className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900"
+>
+  {/* Background */}
+  <div className="absolute inset-0">
     <img
-      src="https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg"
-      className="w-full h-full object-cover"
-      alt="Luxury Living"
+      src="https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop"
+      loading="eager"
+      fetchPriority="high"
+      decoding="async"
+      className="w-full h-full object-cover brightness-50"
+      alt="Modern luxury living spaces for rent"
     />
-    {/* Dual Gradient Overlay for Text Readability */}
-    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[#FBFCFE]"></div>
-    <div className="absolute inset-0 bg-black/20"></div>
+    <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent" />
   </div>
 
-  {/* --- Visual Decorations --- */}
-  <div className="absolute top-1/4 left-10 hidden lg:block animate-bounce-slow">
-     <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-2xl">
-        <ShieldCheck className="text-emerald-400 mb-1" size={24} />
-        <p className="text-white text-[10px] font-black uppercase tracking-tighter">100% Verified</p>
-     </div>
-  </div>
-  <div className="absolute bottom-1/3 right-12 hidden lg:block animate-pulse">
-     <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-2xl">
-        <Zap className="text-amber-400 mb-1" size={24} />
-        <p className="text-white text-[10px] font-black uppercase tracking-tighter">Instant Booking</p>
-     </div>
+  {/* Floating Trust Badges */}
+  <div className="absolute top-8 left-6 lg:left-12 space-y-4 hidden xl:block">
+    {[
+      { icon: ShieldCheck, text: "100% Verified", color: "emerald" },
+      { icon: CreditCard, text: "Zero Brokerage", color: "indigo" },
+      { icon: Zap, text: "Instant Booking", color: "amber" }
+    ].map((badge, i) => (
+      <div
+        key={i}
+        className="bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-2xl"
+      >
+        <badge.icon className={`text-${badge.color}-400 mb-2`} size={20} />
+        <p className="text-xs font-black text-white uppercase tracking-wider">
+          {badge.text}
+        </p>
+      </div>
+    ))}
   </div>
 
-  {/* --- Content Container --- */}
-  <div className="relative z-10 max-w-5xl px-6 text-center">
-    <div className="inline-flex items-center gap-2 px-5 py-2 mb-8 bg-indigo-600/20 backdrop-blur-xl border border-indigo-500/30 rounded-full shadow-2xl animate-fade-in-up">
-      <span className="relative flex h-2 w-2">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-        <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-      </span>
-      <span className="text-[10px] font-black tracking-[0.2em] text-indigo-100 uppercase">
-        Premium Broker-Free Living
+  {/* Main Content */}
+  <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    
+    {/* Premium Badge */}
+    <div className="inline-flex items-center gap-2 px-5 py-2.5 mb-10 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 backdrop-blur-xl border border-indigo-400/30 rounded-full shadow-xl">
+      <span className="h-2 w-2 bg-indigo-400 rounded-full animate-pulse" />
+      <span className="text-xs font-black tracking-[0.3em] uppercase text-indigo-100">
+        Premium Direct Rentals
       </span>
     </div>
 
-    <h1 className="text-6xl md:text-8xl font-black text-white mb-8 tracking-tighter leading-none drop-shadow-2xl">
-      Live <span className="relative">
-        <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">Better.</span>
-        <svg className="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 200 12" fill="none"><path d="M2 10C60 2 140 2 198 10" stroke="#818cf8" strokeWidth="4" strokeLinecap="round"/></svg>
+    {/* H1 for SEO */}
+    <h1
+      id="hero-heading"
+      className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white mb-6 leading-tight"
+    >
+      Find Your{" "}
+      <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+        Perfect Stay
       </span>
     </h1>
 
-    <p className="text-lg md:text-2xl text-gray-200 mb-14 max-w-2xl mx-auto font-medium leading-relaxed">
-      Ditch the brokerage. Discover curated, high-end rooms designed for the modern achiever.
+    {/* SEO subheading */}
+    <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-indigo-100/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+      Zero brokerage • 100% verified • Modern amenities • Instant booking
     </p>
 
-    {/* --- ADVANCED SEARCH BAR --- */}
-    <div className="relative max-w-4xl mx-auto group">
-      <div className={`relative flex flex-col md:flex-row items-center bg-white rounded-[2.8rem] p-2.5 shadow-[0_30px_100px_-15px_rgba(0,0,0,0.4)] transition-all duration-500 hover:shadow-[0_40px_120px_-15px_rgba(99,102,241,0.3)] ${searchError ? "ring-4 ring-red-500/20" : ""}`}>
-        
-        {/* Location Icon & Input */}
-        <div className="flex items-center flex-1 w-full px-6 py-2 border-r-0 md:border-r border-slate-100">
-          <div className="bg-indigo-50 p-3 rounded-2xl mr-4 group-focus-within:bg-indigo-600 group-focus-within:text-white transition-colors">
-            <MapPin size={22} />
-          </div>
-          <div className="flex flex-col items-start w-full">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Location</label>
+    {/* Search Box */}
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white/95 backdrop-blur-3xl rounded-2xl p-3 sm:p-4 shadow-2xl border border-white/50">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          
+          <div className="flex items-center flex-1 px-4 py-3 border border-slate-100 rounded-xl">
+            <MapPin size={22} className="text-indigo-500 mr-3 shrink-0" />
             <input
               ref={inputRef}
               type="text"
               value={searchQuery}
-              placeholder="Ex: Gurgaon, Sector 45"
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleFindPG()}
-              className="w-full bg-transparent outline-none text-slate-900 placeholder:text-slate-300 font-bold text-lg"
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                handleFreeTextSearch(e.target.value);
+              }}
+              placeholder="Enter city or area (Delhi, Mumbai, Bangalore...)"
+              className="w-full bg-transparent outline-none text-slate-900 placeholder-slate-400 text-base sm:text-lg font-semibold"
+              aria-label="Search PG rooms and rental properties"
+              autoComplete="off"
             />
           </div>
+
+          <button
+            onClick={handleFindPG}
+            className="bg-gradient-to-r from-slate-900 to-slate-800 hover:from-indigo-600 hover:to-purple-600 text-white px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl font-black shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+            aria-label="Search properties"
+          >
+            <Search size={20} />
+            <span>Find Rooms</span>
+          </button>
         </div>
 
-        {/* Explore Button */}
-        <button
-          onClick={handleFindPG}
-          className="w-full md:w-auto mt-4 md:mt-0 bg-slate-950 hover:bg-indigo-600 text-white px-14 py-5 rounded-[2.3rem] font-black text-lg transition-all duration-500 flex items-center justify-center gap-3 shadow-xl hover:translate-x-1"
-        >
-          <Search size={22} strokeWidth={3} />
-          <span>Find My Space</span>
-        </button>
+        {searchError && (
+          <p className="mt-3 text-sm text-red-500 font-semibold">
+            {searchError}
+          </p>
+        )}
       </div>
-
-      {/* Error Message Tooltip */}
-      {searchError && (
-        <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 bg-red-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-lg animate-bounce">
-          {searchError}
-        </div>
-      )}
     </div>
+
+    {/* Live Count */}
+    {processedPgData.length > 0 && (
+      <p className="text-indigo-200 mt-8 text-base sm:text-lg font-medium">
+        ✨ {processedPgData.length} premium stays available
+      </p>
+    )}
   </div>
 
-  {/* --- BOTTOM BLUR GRADIENT (Smooth transition to next section) --- */}
-  <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#FBFCFE] to-transparent z-[5]"></div>
+  {/* Scroll Indicator */}
+  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:block">
+    <div className="w-6 h-10 border-2 border-white/50 rounded-3xl flex justify-center">
+      <div className="w-1 h-3 bg-white/80 rounded-full mt-2 animate-bounce" />
+    </div>
+  </div>
 </section>
 
-    {/* ---------------- FLOATING FEATURES ---------------- */}
- <section className="max-w-7xl mx-auto px-6 -mt-20 relative z-30">
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      {/* Trust Signals Section */}
+     <section
+  aria-labelledby="trust-section-title"
+  className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28"
+>
+  <h2 id="trust-section-title" className="sr-only">
+    Why Choose RoomGi
+  </h2>
+
+  {/* Feature Cards */}
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 mb-20">
     {[
-      { 
-        icon: <Shield />, 
-        title: "Verified Stays", 
-        desc: "Every property undergoes a 20-point physical inspection check.",
-        color: "from-blue-500 to-cyan-400" 
+      {
+        icon: ShieldCheck,
+        title: "100% Verified",
+        desc: "Every property undergoes a 25-point physical inspection",
+        stat: "10K+",
+        gradient: "from-indigo-500 to-indigo-600",
+        text: "text-indigo-500",
       },
-      { 
-        icon: <CreditCard />, 
-        title: "Zero Brokerage", 
-        desc: "Deal directly with owners and save up to a month's rent instantly.",
-        color: "from-indigo-600 to-purple-500" 
+      {
+        icon: CreditCard,
+        title: "Zero Brokerage",
+        desc: "Direct owner deals, save ₹15K–30K instantly",
+        stat: "100%",
+        gradient: "from-emerald-500 to-emerald-600",
+        text: "text-emerald-500",
       },
-      { 
-        icon: <Sparkles />, 
-        title: "Premium Lifestyle", 
-        desc: "Access curated spaces with high-speed WiFi and modern cooling.",
-        color: "from-amber-400 to-orange-500" 
+      {
+        icon: Zap,
+        title: "Instant Booking",
+        desc: "Book & move in within 24 hours",
+        stat: "24 hrs",
+        gradient: "from-amber-500 to-amber-600",
+        text: "text-amber-500",
       },
-    ].map((f, i) => (
-      <div 
-        key={i} 
-        className="group relative bg-white/80 backdrop-blur-md p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white/50 hover:border-indigo-200 transition-all duration-500 hover:-translate-y-3 overflow-hidden"
+    ].map((feature, i) => (
+      <article
+        key={i}
+        className={`group relative bg-white/90 p-8 sm:p-10 rounded-3xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300 ${
+          i === 1 ? "ring-2 ring-emerald-100/60" : ""
+        }`}
       >
-        {/* Background Decorative Glow (appears on hover) */}
-        <div className={`absolute -right-10 -top-10 w-32 h-32 bg-gradient-to-br ${f.color} opacity-0 group-hover:opacity-10 blur-3xl transition-opacity duration-500`} />
-        
-        {/* Step Number Watermark */}
-        <span className="absolute right-8 top-6 text-8xl font-black text-gray-50 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
+        {/* Decorative Index */}
+        <span
+          aria-hidden="true"
+          className={`absolute top-4 right-4 text-4xl font-black opacity-[0.06] ${feature.text}`}
+        >
           0{i + 1}
         </span>
 
-        {/* Icon Container with Floating Animation */}
-        <div className={`w-16 h-16 bg-gradient-to-br ${f.color} text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-indigo-200/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
-          {f.icon}
+        {/* Icon */}
+        <div
+          className={`w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${feature.gradient} text-white rounded-2xl flex items-center justify-center mb-6 shadow-lg transition-transform duration-300 group-hover:scale-105`}
+        >
+          <feature.icon size={30} />
         </div>
 
-        {/* Text Content */}
-        <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight group-hover:text-indigo-600 transition-colors">
-          {f.title}
+        <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-3 group-hover:text-indigo-600 transition-colors">
+          {feature.title}
         </h3>
-        <p className="text-gray-500 leading-relaxed font-medium">
-          {f.desc}
+
+        <p className="text-slate-600 leading-relaxed mb-6">
+          {feature.desc}
         </p>
 
-        {/* Bottom Progress Bar Decoration */}
-        <div className="absolute bottom-0 left-0 h-1.5 w-0 bg-gradient-to-r from-indigo-500 to-purple-500 group-hover:w-full transition-all duration-700" />
+        <span className="inline-block text-lg font-black bg-gradient-to-r from-slate-900 to-slate-800 text-white px-5 py-2.5 rounded-xl shadow-md">
+          {feature.stat}
+        </span>
+      </article>
+    ))}
+  </div>
+
+  {/* Stats Row */}
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-8 p-8 sm:p-12 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl">
+    {[
+      { label: "Cities", value: "12+", icon: Users },
+      { label: "Properties", value: "5K+", icon: Star },
+      { label: "Happy Movers", value: "12K+", icon: Users },
+      { label: "Avg Rating", value: "4.8⭐", icon: Star },
+    ].map((stat, i) => (
+      <div key={i} className="text-center">
+        <stat.icon
+          aria-hidden="true"
+          className="w-12 h-12 sm:w-14 sm:h-14 text-indigo-500 mx-auto mb-4 opacity-70"
+        />
+
+        <div className="text-xl sm:text-2xl font-black bg-gradient-to-r from-slate-900 to-slate-700 text-white px-6 py-3 rounded-2xl shadow-lg mx-auto w-fit">
+          {stat.value}
+        </div>
+
+        <p className="text-slate-600 font-bold mt-3 uppercase tracking-wide text-xs sm:text-sm">
+          {stat.label}
+        </p>
       </div>
     ))}
   </div>
 </section>
-<section className="max-w-7xl mx-auto px-6 py-20 mb-10">
-        <div className="bg-slate-950 rounded-[4rem] p-10 md:p-20 flex flex-col lg:flex-row items-center gap-16 relative overflow-hidden">
-          <div className="lg:w-1/2 relative z-10">
-            <h2 className="text-4xl font-black text-white mb-6 leading-tight">The RoomGi <span className="text-indigo-400">Promise.</span></h2>
-            <p className="text-slate-400 font-bold mb-10 text-lg leading-relaxed">
-              Humne RoomGi shuru kiya kyunki humein pata hai ek naye sheher mein ghar dhundna kitna mushkil hai. Hum har property ko khud verify karte hain taaki aapko wahi mile jo aap screen par dekh rahe hain.
-            </p>
-            <div className="space-y-4">
-              {["100% Verified Owners", "No Hidden Charges", "Instant Deposit Refund Support"].map((txt) => (
-                <div key={txt} className="flex items-center gap-3">
-                  <div className="bg-indigo-500/20 p-1 rounded-full"><ShieldCheck className="text-indigo-400" size={18} /></div>
-                  <span className="font-bold text-white text-sm uppercase tracking-wider">{txt}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="lg:w-1/2 grid grid-cols-2 gap-4 relative z-10">
-             <div className="h-64 bg-slate-800 rounded-[2.5rem] overflow-hidden rotate-3 hover:rotate-0 transition-transform duration-500">
-                <img src="https://images.pexels.com/photos/7018391/pexels-photo-7018391.jpeg" className="w-full h-full object-cover opacity-80" />
-             </div>
-             <div className="h-64 mt-12 bg-slate-800 rounded-[2.5rem] overflow-hidden -rotate-3 hover:rotate-0 transition-transform duration-500">
-                <img src="https://images.pexels.com/photos/5691630/pexels-photo-5691630.jpeg" className="w-full h-full object-cover opacity-80" />
-             </div>
-          </div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/20 blur-[120px]" />
-        </div>
-      </section>
 
-    {/* ---------------- LISTINGS SECTION ---------------- */}
-<section className="max-w-7xl mx-auto px-6 py-24">
-  {/* ---------------- HEADER & FILTERS ---------------- */}
-  <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-8">
-    <div className="space-y-4">
-     
-      <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
-        Featured <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500">Stays</span>
+
+
+      {/* Featured Properties - SEO Optimized */}
+      <section
+  aria-labelledby="featured-properties-title"
+  className="max-w-7xl mx-auto px-6 pb-24 sm:pb-32"
+>
+  <header className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 sm:mb-20 gap-8">
+    <div>
+      <h2
+        id="featured-properties-title"
+        className="text-4xl sm:text-5xl lg:text-6xl font-black bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-900 bg-clip-text text-transparent mb-6 leading-tight"
+      >
+        Featured{" "}
+        <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          Properties
+        </span>
       </h2>
-      <p className="text-gray-500 text-lg max-w-md leading-relaxed font-medium">
-        Handpicked properties verified for quality and comfort.
+
+      <p className="text-lg sm:text-xl text-slate-600 font-medium max-w-lg">
+        Handpicked premium stays • Verified quality • Ready to move-in
       </p>
     </div>
 
-    {/* Modern Pill Filters */}
-    <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar -mx-6 px-6 md:mx-0 md:px-0">
-      {["All", "Popular", "Newest", "Budget"].map((tab) => (
-        <button
-          key={tab}
-          className={`px-8 py-3 rounded-[1.2rem] text-sm font-bold transition-all duration-300 whitespace-nowrap ${
-            tab === "All" 
-            ? "bg-gray-900 text-white shadow-xl shadow-gray-200" 
-            : "bg-white text-gray-500 border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 hover:text-indigo-600"
-          }`}
-        >
-          {tab}
-        </button>
-      ))}
-    </div>
-  </div>
-
-  {/* ---------------- LISTINGS GRID (FIXED: GRID REMOVED) ---------------- */}
-  <div className="relative">
-    {pgLoading ? (
-      <LandingPageSkeleton />
-    ) : pgData.length > 0 ? (
-      /* FIX: Yahan se 'grid' class hata di gayi hai. 
-         Ab ROOMCARD ka internal grid (grid-cols-4) block nahi hoga 
-         aur cards 'chipta' nahi dikhenge.
-      */
-      <div className="w-full">
-        <ROOMCARD
-          pgData={pgData}
-          wishlistItems={wishlistData?.items || []}
-          setIsAuthModalOpen={setIsAuthModalOpen}
-        />
-      </div>
-    ) : (
-      /* --- Elegant Empty State --- */
-      <div className="py-32 text-center bg-gray-50/50 rounded-[4rem] border-2 border-dashed border-gray-200/60 max-w-3xl mx-auto">
-        <div className="bg-white w-24 h-24 rounded-3xl shadow-soft flex items-center justify-center mx-auto mb-8 rotate-12 transition-transform">
-          <Search className="text-indigo-500 w-10 h-10" />
-        </div>
-        <h3 className="text-2xl font-bold text-gray-900 tracking-tight">No rooms found</h3>
-        <p className="text-gray-500 mt-3 font-medium max-w-xs mx-auto text-lg">
-          We couldn't find any stays. Try changing your filters.
-        </p>
-      </div>
-    )}
-  </div>
-  
-  <section className="max-w-7xl mx-auto px-6 py-32">
-        <div className="bg-indigo-600 rounded-[3.5rem] p-12 md:p-24 text-center relative overflow-hidden shadow-3xl shadow-indigo-200">
-          <div className="relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter">Are you a Property Owner?</h2>
-            <p className="text-indigo-100 font-bold mb-12 max-w-2xl mx-auto text-lg">
-              List your property for free and reach thousands of verified tenants. No brokerage, no middleman, direct bookings.
-            </p>
-            <button className="bg-white text-indigo-600 px-14 py-6 rounded-2xl font-black text-xl hover:bg-slate-950 hover:text-white transition-all shadow-xl">
-              Register As Owner
-            </button>
-          </div>
-          {/* Decorative shapes */}
-          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-slate-950/20 rounded-full blur-3xl" />
-        </div>
-      </section>
-
-  {/* ---------------- FOOTER ACTION ---------------- */}
-  <div className="mt-20 text-center">
-    <button 
-      onClick={() => navigate('/all-listings')}
-      className="group relative inline-flex items-center gap-4 px-10 py-5 bg-indigo-600 text-white rounded-[1.8rem] font-bold shadow-2xl shadow-indigo-200 hover:shadow-indigo-400/40 transition-all duration-500 hover:-translate-y-1 overflow-hidden"
+    {/* Filter Pills */}
+    <nav
+      aria-label="Property Filters"
+      className="flex flex-wrap gap-3"
     >
-      <span className="relative z-10 text-lg">Explore Nearby Properties</span>
-      <div className="absolute inset-0 bg-gray-900 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 ease-out" />
-      <svg 
-        className="w-6 h-6 relative z-10 group-hover:translate-x-2 transition-transform duration-500" 
-        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+      {filterOptions.map((option) => {
+        const isActive = activeFilter === option.key;
+
+        return (
+          <button
+            key={option.key}
+            onClick={() => setActiveFilter(option.key)}
+            aria-pressed={isActive}
+            className={`flex items-center gap-2 px-5 sm:px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg ${
+              isActive
+                ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-indigo-500/50"
+                : "bg-white/80 text-slate-600 border-2 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 hover:shadow-xl"
+            }`}
+          >
+            {option.label}
+            <span
+              className={`px-2 py-1 rounded-xl text-xs font-black ${
+                isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-700"
+              }`}
+            >
+              {option.count}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
+  </header>
+
+  {/* Listings */}
+  {processedPgData.length > 0 ? (
+    <ROOMCARD
+      pgData={processedPgData}
+      wishlistItems={wishlistData?.items || []}
+      setIsAuthModalOpen={setIsAuthModalOpen}
+    />
+  ) : (
+    <div
+      role="status"
+      className="py-32 sm:py-40 text-center bg-gradient-to-br from-slate-50 to-indigo-50 rounded-4xl border-2 border-dashed border-indigo-200/50"
+    >
+      <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-4xl flex items-center justify-center mx-auto mb-10 sm:mb-12 shadow-2xl animate-pulse">
+        <Search className="w-12 h-12 sm:w-16 sm:h-16 text-white" />
+      </div>
+
+      <h3 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">
+        No matches found
+      </h3>
+
+      <p className="text-lg sm:text-xl text-slate-600 mb-10 sm:mb-12 max-w-lg mx-auto">
+        Try adjusting your filters or search for popular cities like Mumbai,
+        Bangalore, Gurgaon
+      </p>
+
+      <button
+        onClick={() => setActiveFilter("All")}
+        className="px-10 sm:px-12 py-5 sm:py-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl font-black text-base sm:text-lg shadow-2xl hover:shadow-3xl transition-all"
       >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-      </svg>
-    </button>
+        Show All Properties
+      </button>
+    </div>
+  )}
+</section>
+
+      {/* CTA Section - Above the fold priority */}
+<section
+  aria-labelledby="cta-title"
+  className="relative w-full py-20 sm:py-28 overflow-hidden"
+>
+  {/* Unified premium background */}
+  <div className="absolute inset-0 bg-gradient-to-br from-[#2B2F6C] via-[#6D6EEA] to-[#9B8CFF]" />
+
+  {/* Soft top fade */}
+  <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/20 to-transparent" />
+
+  {/* Ambient glows */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(124,58,237,0.25),transparent_60%)]" />
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_70%,rgba(99,102,241,0.25),transparent_60%)]" />
+
+  <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="relative rounded-[2.75rem] bg-white/10 backdrop-blur-2xl border border-white/15 shadow-[0_40px_120px_rgba(0,0,0,0.45)] px-8 py-12 sm:px-12 sm:py-16 lg:px-16 lg:py-20 text-center">
+
+      {/* Glass edge ring */}
+      <div className="pointer-events-none absolute inset-0 rounded-[2.75rem] ring-1 ring-white/10" />
+
+      <h2
+        id="cta-title"
+        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight"
+      >
+        Ready to upgrade your living?
+      </h2>
+
+      <p className="text-sm sm:text-base md:text-lg text-white/80 max-w-2xl mx-auto mb-8 leading-relaxed">
+        Join 12K+ professionals living brokerage-free. Book your premium stay today.
+      </p>
+
+      <div
+        role="group"
+        aria-label="Call to action"
+        className="flex flex-col sm:flex-row gap-3 sm:gap-5 justify-center items-center"
+      >
+        {/* Primary CTA */}
+        <button
+          onClick={() => navigate("/all-listings")}
+          className="group relative flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-sm sm:text-base text-white shadow-[0_15px_40px_rgba(124,58,237,0.45)] overflow-hidden transition-all duration-300 hover:scale-[1.03]"
+        >
+          <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+          <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10" />
+
+          <span className="relative z-10 flex items-center gap-2">
+            Start Searching
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </span>
+        </button>
+
+        {/* Secondary CTA */}
+        <button
+          className="px-8 py-4 rounded-full border border-white/25 text-white/90 backdrop-blur-md hover:bg-white/10 transition-all font-medium text-sm sm:text-base"
+        >
+          List Your Property
+        </button>
+      </div>
+    </div>
   </div>
 </section>
 
-    {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
-  </div>
-);
+{/* White separation before footer */}
+<div className="w-full h-16 sm:h-20 bg-white" />
+
+
+
+
+      {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
+    </div>
+  );
 }

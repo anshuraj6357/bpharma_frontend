@@ -1,127 +1,166 @@
-import { useState, useEffect, memo } from "react";
+import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, MapPin, Bed, Users, Zap, ShieldCheck } from "lucide-react";
+import { Star, MapPin, Bed, Zap, ShieldCheck } from "lucide-react";
 import WishlistButton from "../components/wishlist.jsx";
 
-const RoomCard = memo(function ROOMCARD({
-  pgData,
+const RoomCard = memo(function RoomCard({
+  pgData = [],
   setIsAuthModalOpen,
-  wishlistItems,
 }) {
   const navigate = useNavigate();
 
-  if (!pgData || pgData.length === 0) {
+  if (!pgData.length) {
     return (
-      <div className="col-span-full py-20 text-center">
-        <p className="text-gray-400 font-medium">No Premium Rooms Available</p>
+      <div className="col-span-full py-24 text-center">
+        <p className="text-gray-400 text-sm">
+          No premium rooms available
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-wrap gap-x-5 gap-y-10 w-full justify-start">
+    <section
+      aria-label="Available rooms"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 w-full"
+    >
       {pgData.map((room) => {
-        const reviews = room.personalreview || [];
-        const avgRating = reviews.length > 0
-          ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-          : 0;
-return (
-  <div
-    key={room._id}
-    onClick={() => navigate(`/pg/${room._id}`)}
-    /* 1. DARKER BASE: Bina hover ke bhi card ka background solid Slate-50 hai 
-       2. TEXT COLOR: slate-950 (Extremely dark for high readability)
-    */
-    className="group relative flex flex-col w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.33%-16px)] xl:w-[calc(25%-18px)] 
-    bg-slate-50 rounded-[2.2rem] transition-all duration-500 cursor-pointer 
-    border border-slate-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)]
-    hover:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.12)] hover:-translate-y-2"
-  >
-    {/* --- IMAGE SECTION (White Bento Frame) --- */}
-    <div className="relative aspect-[4/5] m-2.5 overflow-hidden rounded-[1.8rem] bg-white shadow-inner">
-      <img
-        src={room?.roomImages?.[0] || "/room-placeholder.jpg"}
-        alt={room?.branch?.name}
-        loading="lazy"
-        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-      />
-      
-      {/* Badges - Darker Overlay for Visibility */}
-      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
-        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-white">
-          <ShieldCheck size={12} className="text-emerald-400" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Verified</span>
-        </div>
-      </div>
+        const reviews = room?.personalreview || [];
+        const avgRating =
+          reviews.length > 0
+            ? (
+                reviews.reduce((sum, r) => sum + r.rating, 0) /
+                reviews.length
+              ).toFixed(1)
+            : null;
 
-      {/* Wishlist - Sharp Design */}
-      <div className="absolute top-4 right-4 z-20" onClick={(e) => e.stopPropagation()}>
-        <div className="bg-white p-2.5 rounded-2xl shadow-xl border border-slate-100 active:scale-90 transition-transform">
-           <WishlistButton pg={room} onAuthOpen={() => setIsAuthModalOpen(true)} />
-        </div>
-      </div>
+        const price =
+          room?.category === "Hotel"
+            ? room?.rentperNight
+            : room?.price;
 
-      {/* Price: White Card on Darker Background Effect */}
-      <div className="absolute bottom-4 left-4 right-4">
-        <div className="bg-white p-4 rounded-[1.5rem] flex items-center justify-between shadow-2xl border border-slate-100">
-          <div className="flex flex-col">
-            <p className="text-[9px] font-black text-slate-500 uppercase tracking-tighter mb-0.5">Price starts at</p>
-            <p className="text-slate-950 font-black text-xl leading-none tracking-tighter">
-              ₹{room?.category === "Hotel" ? room?.rentperNight : room?.price}
-              <span className="text-xs font-bold text-slate-400">/{room?.category === "Hotel" ? 'nt' : 'mo'}</span>
-            </p>
-          </div>
-          <div className="h-10 w-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
-             <Zap size={16} fill="white" />
-          </div>
-        </div>
-      </div>
-    </div>
+        const priceSuffix =
+          room?.category === "Hotel" ? "night" : "month";
 
-    {/* --- CONTENT SECTION (High Contrast Dark Text) --- */}
-    <div className="px-6 pb-6 pt-2 flex flex-col flex-1">
-      <div className="flex justify-between items-center mb-3">
-        <div className="flex items-center gap-1.5 py-1 px-2.5 bg-slate-950 rounded-lg">
-          <Star size={12} fill="#fbbf24" className="text-amber-400" />
-          <span className="text-white text-[11px] font-black">{avgRating > 0 ? avgRating.toFixed(1) : "NEW"}</span>
-        </div>
-        <div className="flex items-center gap-1.5 text-slate-950 font-black text-[9px] uppercase tracking-widest opacity-80">
-            <Users size={14} className="text-indigo-600" />
-            {room?.category || 'Standard'}
-        </div>
-      </div>
+        return (
+          <article
+            key={room?._id}
+            onClick={() => navigate(`/pg/${room?._id}`)}
+            itemScope
+            itemType="https://schema.org/Hotel"
+            className="group cursor-pointer bg-white rounded-3xl overflow-hidden
+            border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500"
+          >
+            {/* Image */}
+            <div className="relative aspect-[4/5] overflow-hidden">
+              <img
+                src={room?.roomImages?.[0] || "/room-placeholder.jpg"}
+                alt={`${room?.branch?.name || "Room"} in ${room?.branch?.address || "city"}`}
+                loading="lazy"
+                itemProp="image"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
 
-      {/* Extremely Dark & Bold Title */}
-      <h3 className="text-[18px] font-black text-slate-950 leading-tight mb-1 line-clamp-1">
-        {room?.branch?.name}
-      </h3>
-      
-      <div className="flex items-center gap-1.5 text-slate-700 mb-5">
-        <MapPin size={13} className="text-indigo-600 shrink-0" />
-        <span className="text-[12px] font-extrabold truncate tracking-tight">{room?.branch?.address}</span>
-      </div>
+              {/* Verified */}
+              <div className="absolute top-4 left-4">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full
+                bg-black/70 backdrop-blur text-white text-[11px] font-medium">
+                  <ShieldCheck size={12} className="text-emerald-400" />
+                  Verified
+                </span>
+              </div>
 
-      {/* Footer Details - Darker Border */}
-      <div className="flex items-center justify-between pt-4 border-t border-slate-200 mt-auto">
-         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
-                <Bed size={15} className="text-slate-950" />
-                <span className="text-[10px] font-black text-slate-950 uppercase">AC</span>
+              {/* Wishlist */}
+              <div
+                className="absolute top-4 right-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="bg-white/90 backdrop-blur p-2 rounded-full shadow-md">
+                  <WishlistButton
+                    pg={room}
+                    onAuthOpen={() => setIsAuthModalOpen(true)}
+                  />
+                </div>
+              </div>
+
+              {/* Price */}
+              <div className="absolute bottom-4 left-4 right-4">
+                <div className="bg-white/95 backdrop-blur px-4 py-3 rounded-2xl
+                flex items-center justify-between shadow-md">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wide text-gray-500">
+                      Starting from
+                    </p>
+                    <p
+                      className="text-gray-900 text-lg font-semibold"
+                      itemProp="priceRange"
+                    >
+                      ₹{price}
+                      <span className="text-sm text-gray-400">
+                        /{priceSuffix}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="h-9 w-9 rounded-full bg-gray-900 text-white
+                  flex items-center justify-center">
+                    <Zap size={14} />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-                <Zap size={15} className="text-slate-950" />
-                <span className="text-[10px] font-black text-slate-950 uppercase">WIFI</span>
+
+            {/* Content */}
+            <div className="px-5 pt-4 pb-5 flex flex-col h-full">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5 text-sm">
+                  <Star size={14} className="text-amber-400" />
+                  <span className="font-medium text-gray-900">
+                    {avgRating || "New"}
+                  </span>
+                </div>
+                <span className="text-[11px] uppercase tracking-wide text-gray-400">
+                  {room?.category || "Standard"}
+                </span>
+              </div>
+
+              <h3
+                itemProp="name"
+                className="text-gray-900 font-semibold text-base leading-tight mb-1 line-clamp-1"
+              >
+                {room?.branch?.name}
+              </h3>
+
+              <div
+                itemProp="address"
+                className="flex items-center gap-1.5 text-gray-500 text-sm mb-4"
+              >
+                <MapPin size={14} />
+                <span className="truncate">
+                  {room?.branch?.address}
+                </span>
+              </div>
+
+              <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-4 text-gray-500 text-xs">
+                  <div className="flex items-center gap-1">
+                    <Bed size={14} />
+                    AC
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Zap size={14} />
+                    WiFi
+                  </div>
+                </div>
+
+                <span className="text-xs font-medium text-gray-900">
+                  View details →
+                </span>
+              </div>
             </div>
-         </div>
-         <div className="flex items-center gap-1 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">
-            <span className="text-[10px] font-black text-slate-950 uppercase tracking-tighter">View Detail</span>
-         </div>
-      </div>
-    </div>
-  </div>
-);
+          </article>
+        );
       })}
-    </div>
+    </section>
   );
 });
 

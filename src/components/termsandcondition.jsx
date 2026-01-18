@@ -6,103 +6,145 @@ export default function TermsConditions() {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const role = user?.role;
 
-  // Terms sections
   const termsSections = [
     {
-      title: "1. Platform Usage",
+      title: "1. Platform Overview",
       content:
-        "ROOMGI acts as a technology platform connecting users with PGs, hostels, and hotels. ROOMGI does not own or operate these properties.",
+        "ROOMGI is a technology platform that connects users with property owners, managers, agents, and service providers for PGs, hostels, rooms, rental homes, flats, villas, hotels, office spaces, and commercial properties. ROOMGI does not own or directly operate these properties."
     },
     {
-      title: "2. Property Information",
+      title: "2. Eligibility & Account Responsibility",
       content:
-        "All property details are provided by owners or managers. Users are responsible for verifying information before confirming a booking.",
+        "By using ROOMGI, you confirm that you are legally capable of entering into binding agreements. You are responsible for maintaining the confidentiality of your account and for all activities under your account."
     },
     {
-      title: "3. Liability Disclaimer",
+      title: "3. Property Listings & Accuracy",
       content:
-        "ROOMGI is not liable for disputes, service issues, or conflicts arising between users and accommodation providers.",
+        "All property information, images, pricing, availability, and rules are provided by property owners or managers. ROOMGI does not guarantee absolute accuracy and users are advised to verify all details before booking, renting, buying, or selling."
     },
     {
-      title: "4. Payments",
+      title: "4. Rentals, PGs & Short-Term Stays",
       content:
-        "Payments made through ROOMGI are transferred to the respective property owners as per the booking terms.",
+        "ROOMGI facilitates rental bookings for PGs, hostels, rooms, shared flats, hotels, and short stays. House rules, security deposits, entry/exit timings, and policies vary by property."
     },
     {
-      title: "5. User Responsibilities",
+      title: "5. Buying & Selling Properties",
       content:
-        "Users must provide accurate information and refrain from misuse, fraudulent activity, or violation of platform policies.",
+        "ROOMGI provides a platform for buyers and sellers to connect. We do not participate in property transactions, legal verification, or ownership transfer unless explicitly stated."
     },
     {
-      title: "6. Modifications to Terms",
+      title: "6. Office & Commercial Properties",
       content:
-        "ROOMGI reserves the right to update or modify these Terms & Conditions at any time. Continued use of the platform indicates acceptance of revised terms.",
+        "ROOMGI may list office spaces, coworking hubs, shops, and commercial units. Users must independently verify legal compliance, zoning, and suitability."
     },
+    {
+      title: "7. Payments & Fees",
+      content:
+        "All payments are processed via secure third-party gateways. ROOMGI does not store sensitive financial information. Service fees, if any, will be transparently disclosed."
+    },
+    {
+      title: "8. Cancellations & Refunds",
+      content:
+        "Cancellation and refund policies vary by property. Users must review individual property policies before confirming bookings or transactions."
+    },
+    {
+      title: "9. User Conduct",
+      content:
+        "Users must not engage in fraud, misrepresentation, abuse, illegal activity, or any behavior that harms other users or property owners."
+    },
+    {
+      title: "10. Owner & Agent Responsibilities",
+      content:
+        "Owners and agents must ensure that their listings are genuine, legal, and accurately represented. Misleading or fraudulent listings may be removed."
+    },
+    {
+      title: "11. Safety & Verification",
+      content:
+        "ROOMGI takes reasonable measures to promote verified listings. However, users are encouraged to perform their own due diligence."
+    },
+    {
+      title: "12. Dispute Resolution",
+      content:
+        "ROOMGI is not a party to disputes between users and property owners. Disputes must be resolved directly between the involved parties."
+    },
+    {
+      title: "13. Limitation of Liability",
+      content:
+        "ROOMGI shall not be liable for loss, damage, disputes, or service issues arising from property stays, purchases, or rentals."
+    },
+    {
+      title: "14. Platform Availability",
+      content:
+        "ROOMGI does not guarantee uninterrupted access and may temporarily suspend services for maintenance or updates."
+    },
+    {
+      title: "15. Intellectual Property",
+      content:
+        "All content, trademarks, and platform materials belong to ROOMGI unless otherwise stated."
+    },
+    {
+      title: "16. Termination",
+      content:
+        "ROOMGI reserves the right to suspend or terminate accounts that violate these terms."
+    },
+    {
+      title: "17. Changes to Terms",
+      content:
+        "ROOMGI may update these Terms & Conditions at any time. Continued use of the platform indicates acceptance."
+    },
+    {
+      title: "18. Governing Law",
+      content:
+        "These terms are governed by the laws of India. Any legal disputes shall fall under Indian jurisdiction."
+    }
   ];
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-green-50 via-white to-white">
-
-      {/* SEO Meta Tags */}
       <Helmet>
-        <title>Terms & Conditions | ROOMGI - Verified PGs & Rooms in India</title>
+        <title>Terms & Conditions | ROOMGI – Rentals, Homes, Hotels & Property Services</title>
         <meta
           name="description"
-          content="Read ROOMGI's Terms & Conditions to understand the rules, responsibilities, and policies for booking verified PGs, hostels, and hotels across India."
+          content="Read ROOMGI’s Terms & Conditions for rentals, PGs, homes, flats, hotels, offices, commercial spaces, buying & selling property across India."
         />
-        <meta name="keywords" content="ROOMGI, Terms and Conditions, PG booking India, Hostel booking India, Hotel booking India, Verified accommodation, Online booking rules" />
-        <meta name="robots" content="index, follow" />
-
-        {/* Open Graph / Social */}
-        <meta property="og:title" content="Terms & Conditions | ROOMGI" />
-        <meta property="og:description" content="Understand ROOMGI's Terms & Conditions for safe and verified PG, hostel, and hotel bookings in India." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourdomain.com/terms-conditions" />
-        <meta property="og:image" content="/images/roomgi-logo.png" />
-
-        {/* Structured Data - WebPage */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Terms & Conditions",
-            "description": "ROOMGI Terms & Conditions page detailing platform usage, user responsibilities, payments, and liabilities for PG, hostel, and hotel bookings in India.",
-            "url": "https://yourdomain.com/terms-conditions",
-            "publisher": {
-              "@type": "Organization",
-              "name": "ROOMGI",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://yourdomain.com/images/roomgi-logo.png"
-              }
-            }
-          })}
-        </script>
       </Helmet>
 
-      {/* Main Content */}
-      <main className="flex-1 pt-28 pb-20 px-6">
-        <div className="max-w-7xl mx-auto bg-white border rounded-3xl shadow-xl px-12 py-14">
+      <main className="flex-1 pt-24 pb-20 px-6">
+        <div className="max-w-7xl mx-auto">
 
-          {/* Header */}
-          <header className="text-center mb-14">
+          {/* Hero */}
+          <div className="bg-white/70 backdrop-blur-xl border rounded-3xl shadow-xl px-12 py-16 text-center mb-20">
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
               Terms & Conditions
             </h1>
-            <p className="text-green-600 text-xl font-semibold mt-2">
-              ROOMGI
+            <p className="text-green-600 text-lg font-semibold mt-3">
+              ROOMGI Legal & Usage Policies
             </p>
-            <p className="text-gray-600 mt-4 max-w-3xl mx-auto">
-              These Terms & Conditions govern your access to and use of the ROOMGI platform. By using our services, you agree to comply with the terms outlined below.
+            <p className="text-gray-600 mt-5 max-w-4xl mx-auto">
+              These Terms & Conditions govern your access to and use of ROOMGI’s
+              rental, buying, selling, hotel, PG, and commercial property services.
             </p>
-          </header>
 
-          {/* Terms Sections */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-gray-700">
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              <span className="px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium">Verified Platform</span>
+              <span className="px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">Secure Payments</span>
+              <span className="px-4 py-2 rounded-full bg-purple-100 text-purple-700 text-sm font-medium">Legal Compliance</span>
+            </div>
+          </div>
+
+          {/* Sections */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {termsSections.map((section, idx) => (
-              <section key={idx} className="bg-gray-50 p-6 rounded-2xl border">
-                <h2 className="text-xl font-semibold text-gray-900">{section.title}</h2>
-                <p className="mt-3">{section.content}</p>
+              <section
+                key={idx}
+                className="bg-white border rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                  {section.title}
+                </h2>
+                <p className="text-gray-600 leading-relaxed">
+                  {section.content}
+                </p>
               </section>
             ))}
           </div>
@@ -110,7 +152,7 @@ export default function TermsConditions() {
         </div>
       </main>
 
-     
+      {isAuthenticated && role !== "user" && <Footer />}
     </div>
   );
 }

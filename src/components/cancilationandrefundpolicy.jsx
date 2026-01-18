@@ -2,24 +2,24 @@ import { useSelector } from "react-redux";
 import Footer from "./Footer";
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
+import { useMemo } from "react";
+import { ShieldCheck, RefreshCcw, FileText, HelpCircle } from "lucide-react";
 
-// Reusable Policy Navigation
 function PolicyNav() {
   const policies = [
-    { name: "Privacy Policy", href: "/privacy-policy" },
-    { name: "Shipping Policy", href: "/shipping-policy" },
-    { name: "Terms & Conditions", href: "/terms-conditions" },
-    { name: "Cancellation & Refund Policy", href: "/cancellation-policy" },
-    { name: "Careers", href: "/careers" },
+    { name: "Privacy Policy", href: "/privacypolicy" },
+    { name: "Terms & Conditions", href: "/termsandcondition" },
+    { name: "Cancellation & Refund Policy", href: "/CancellationPolicy" },
+    { name: "Career", href: "/career" },
   ];
 
   return (
-    <nav className="flex flex-wrap justify-center gap-4 mt-6">
+    <nav className="flex flex-wrap justify-center gap-4 mt-8">
       {policies.map((policy) => (
         <Link
           key={policy.href}
           to={policy.href}
-          className="text-green-600 hover:text-green-800 hover:underline font-medium transition"
+          className="px-4 py-2 rounded-full border bg-white text-green-600 hover:bg-green-50 hover:text-green-800 font-medium transition shadow-sm"
         >
           {policy.name}
         </Link>
@@ -34,93 +34,77 @@ export default function CancellationPolicy() {
 
   const sections = [
     {
-      title: "1. Platform Role",
+      icon: <FileText className="w-6 h-6 text-green-600" />,
+      title: "Platform Role",
       content:
-        "ROOMGI is a technology platform connecting users with PGs, hostels, and hotels. We do not own or operate the listed properties; each is managed independently by its respective owner or host.",
+        "ROOMGI is a technology platform connecting users with property owners, managers, and agents for PGs, hostels, rental homes, flats, villas, hotels, office spaces, and commercial properties. ROOMGI does not own or operate these properties directly."
     },
     {
-      title: "2. Cancellation Policy",
+      icon: <ShieldCheck className="w-6 h-6 text-green-600" />,
+      title: "Property-Specific Cancellation Rules",
       content:
-        "Cancellation terms vary by property. Users are advised to review the cancellation details mentioned on the property listing before confirming a booking.",
+        "Each property listed on ROOMGI follows its own cancellation and refund policy. Users must carefully review the policy displayed on the property listing before confirming any booking, rental, or transaction."
     },
     {
-      title: "3. Refund Policy",
+      icon: <RefreshCcw className="w-6 h-6 text-green-600" />,
+      title: "Refund Eligibility",
       content:
-        "Refunds are issued only upon approval by the partner property. Eligible refunds are processed within 5–7 working days and credited back to the original payment method.",
+        "Refund eligibility depends on the individual property’s policy. Once approved, refunds are typically processed within 5–7 working days and credited back to the original payment method."
     },
     {
-      title: "4. Non-Refundable Situations",
+      icon: <HelpCircle className="w-6 h-6 text-green-600" />,
+      title: "Non-Refundable Scenarios",
       content: [
-        "No-show by the guest",
-        "Last-minute cancellations",
+        "No-show by the guest or tenant",
+        "Last-minute or same-day cancellations",
         "Violation of property rules",
-        "Non-compliance with property-specific terms",
-      ],
-    },
-    {
-      title: "5. Service & Convenience Charges",
-      content:
-        "Any service fee or convenience charge (if applicable) is non-refundable.",
-    },
-    {
-      title: "6. Need Help?",
-      content: [
-        "For assistance with cancellations or refunds, contact us at:",
-        "📧 support@roomgi.com",
-        "📞 +91 8104 559889",
+        "Incorrect user information",
+        "Early check-out or early move-out",
       ],
     },
   ];
 
+  const faqSchema = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do cancellations work on ROOMGI?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cancellations depend on the individual property's policy. Please review the listing before booking."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does a refund take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Refunds are usually processed within 5–7 working days after approval."
+        }
+      }
+    ]
+  }), []);
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-green-50 via-white to-white">
-
-      {/* SEO Meta Tags */}
       <Helmet>
-        <title>Cancellation & Refund Policy | ROOMGI - Verified PGs & Rooms in India</title>
+        <title>Cancellation & Refund Policy | ROOMGI</title>
         <meta
           name="description"
-          content="Read ROOMGI's Cancellation & Refund Policy for clear and fair booking rules. Understand property-specific cancellation, refund timelines, and non-refundable situations."
+          content="ROOMGI Cancellation & Refund Policy for PGs, rentals, hotels, homes, flats, offices, and commercial properties."
         />
-        <meta
-          name="keywords"
-          content="ROOMGI, Cancellation Policy, Refund Policy, PG booking India, Hostel booking India, Hotel booking India, Booking terms"
-        />
-        <meta name="robots" content="index, follow" />
-
-        {/* Open Graph */}
-        <meta property="og:title" content="Cancellation & Refund Policy | ROOMGI" />
-        <meta property="og:description" content="Transparent cancellation and refund policies for verified PG, hostel, and hotel bookings in India via ROOMGI." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourdomain.com/cancellation-policy" />
-        <meta property="og:image" content="/images/roomgi-logo.png" />
-
-        {/* Structured Data */}
         <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Cancellation & Refund Policy",
-            "description": "ROOMGI Cancellation & Refund Policy page describing platform role, booking cancellations, refund timelines, and non-refundable situations.",
-            "url": "https://yourdomain.com/cancellation-policy",
-            "publisher": {
-              "@type": "Organization",
-              "name": "ROOMGI",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://yourdomain.com/images/roomgi-logo.png"
-              }
-            }
-          })}
+          {JSON.stringify(faqSchema)}
         </script>
       </Helmet>
 
-      {/* Main Content */}
-      <main className="flex-1 pt-28 pb-20 px-6">
-        <div className="max-w-7xl mx-auto bg-white border rounded-3xl shadow-xl px-12 py-14">
+      <main className="flex-1 pt-24 pb-20 px-6">
+        <div className="max-w-7xl mx-auto">
 
-          {/* Header */}
-          <header className="text-center mb-16">
+          {/* Hero */}
+          <div className="bg-white/70 backdrop-blur-xl border rounded-3xl shadow-xl px-12 py-16 text-center">
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">
               Cancellation & Refund Policy
             </h1>
@@ -128,39 +112,50 @@ export default function CancellationPolicy() {
               ROOMGI
             </p>
             <p className="text-gray-600 mt-4 max-w-3xl mx-auto">
-              Transparent and fair cancellation and refund policies to ensure a smooth and trustworthy booking experience.
+              Transparent cancellation and refund rules for rentals, PGs, hotels,
+              homes, offices, and commercial properties.
             </p>
 
-            {/* Policy Navigation */}
             <PolicyNav />
-          </header>
+          </div>
 
-          {/* Policy Sections */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-gray-700">
+          {/* Sections */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
             {sections.map((section, idx) => (
-              <section key={idx} className="bg-gray-50 p-8 rounded-2xl border">
-                <h2 className="text-2xl font-semibold text-green-700">{section.title}</h2>
+              <div
+                key={idx}
+                className="bg-white border rounded-2xl p-8 shadow-sm hover:shadow-md transition group"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  {section.icon}
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {section.title}
+                  </h2>
+                </div>
+
                 {Array.isArray(section.content) ? (
-                  <ul className="list-disc ml-6 mt-3 space-y-2">
+                  <ul className="list-disc ml-6 space-y-2 text-gray-600">
                     {section.content.map((item, i) => (
                       <li key={i}>{item}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-3 leading-relaxed">{section.content}</p>
+                  <p className="text-gray-600 leading-relaxed">
+                    {section.content}
+                  </p>
                 )}
-              </section>
+              </div>
             ))}
           </div>
 
-          {/* Footer Note */}
-          <p className="text-center text-gray-500 text-sm mt-16">
+          <p className="text-center text-gray-500 text-sm mt-20">
             © {new Date().getFullYear()} ROOMGI — All Rights Reserved.
           </p>
 
         </div>
       </main>
 
+      {isAuthenticated && role !== "user" && <Footer />}
     </div>
   );
 }

@@ -15,6 +15,7 @@ import TermsConditions from "./components/termsandcondition";
 import ShippingPolicy from "./components/shippingpolicy";
 import HelpCenter from "./components/HelpCenter.jsx";
 import FAQs from "./components/FAQs.jsx";
+import Career from "./components/career.jsx";
 import CustomerSupport from "./components/CustomerSupport.jsx";
 import PartnerWithRoomgi from "./components/PartnerWithRoomgi.jsx";
 import AboutUs from "./components/AbutUs.jsx";
@@ -40,6 +41,7 @@ import WishlistPage from "./components/wishlistdetails";
 import FounderPage from "./components/founderpage.jsx"
 import Disclaimer from "./components/desclaimer.jsx";
 import InternshipCertificate from "./components/InternshipCertificate";
+
 
 
 
@@ -132,6 +134,7 @@ const isAdminRoute = Array.isArray(user?.role)
           <Route path="/shippingpolicy" element={<ShippingPolicy />} />
           <Route path="/helpcenter" element={<HelpCenter />} />
           <Route path="/faqs" element={<FAQs />} />
+           <Route path="/career" element={<Career />} />
           <Route path="/customersupport" element={<CustomerSupport />} />
           <Route path="/partnerwithroomgi" element={<PartnerWithRoomgi />} />
           <Route path="/aboutus" element={<AboutUs />} />
