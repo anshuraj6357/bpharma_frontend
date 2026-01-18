@@ -1,50 +1,50 @@
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import BranchRoomsPage from "./components/branch-rooms.jsx"
-import LandingPage from './components/LandingPage';
-import TenantDashboard from "./components/trackrentdashboard";
-import PGDetailsPage from './components/PGDetailsPage';
-import PGMap from "./components/pgmap.jsx";
-import AuthModal from "./components/AuthModal";
-import Wishlist from "./components/wishlist";
-import CancellationPolicy from "./components/cancilationandrefundpolicy";
-import ContactUs from "./components/contactus";
-import PrivacyPolicy from "./components/privacypolicy";
-import TermsConditions from "./components/termsandcondition";
-import ShippingPolicy from "./components/shippingpolicy";
-import HelpCenter from "./components/HelpCenter.jsx";
-import FAQs from "./components/FAQs.jsx";
-import Career from "./components/career.jsx";
-import CustomerSupport from "./components/CustomerSupport.jsx";
-import PartnerWithRoomgi from "./components/PartnerWithRoomgi.jsx";
-import AboutUs from "./components/AbutUs.jsx";
-import About from "./components/About.jsx";
-import Contact from "./components/Contact.jsx";
-import Searched from "./components/filtered.jsx";
-import AllPotos from "./components/allphotos";
-import DashboardHeader from "./admin/header";
-import AdminApp from "./admin/AdminApp";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import { hydrateUser } from "./Bothfeatures/features/authSlice";
-import ProtectedRoute from "./userprotectedroutes";
-import Bookings from "./components/booking";
-import CreateComplaint from "./components/complain";
-import ComplaintsPage from "./components/mycomplain"
-import Profile from "./components/myprofile"
-import SignupSuccess from "./components/signupsuccess";
-import ScrollToTop from "./components/ScrollToTop";
-import BookingSuccess from "./components/bookingssuccess"
-import PayRentPanel from "./components/payrent";
-import WishlistPage from "./components/wishlistdetails";
-import FounderPage from "./components/founderpage.jsx"
-import Disclaimer from "./components/desclaimer.jsx";
-import InternshipCertificate from "./components/InternshipCertificate";
-
-
-
-
+import BranchRoomsPage from "./user/branch-rooms.jsx"
+import LandingPage from './user/LandingPage';
+import TenantDashboard from "./user/trackrentdashboard";
+import PGDetailsPage from './user/PGDetailsPage';
+import PGMap from "./user/pgmap.jsx";
+import AuthModal from "./user/AuthModal";
+import Wishlist from "./user/wishlist";
+import CancellationPolicy from "./user/cancilationandrefundpolicy";
+import ContactUs from "./user/contactus";
+import PrivacyPolicy from "./user/privacypolicy";
+import TermsConditions from "./user/termsandcondition";
+import ShippingPolicy from "./user/shippingpolicy";
+import HelpCenter from "./user/HelpCenter.jsx";
+import FAQs from "./user/FAQs.jsx";
+import Career from "./user/career.jsx";
+import CustomerSupport from "./user/CustomerSupport.jsx";
+import PartnerWithRoomgi from "./user/PartnerWithRoomgi.jsx";
+import AboutUs from "./user/AbutUs.jsx";
+import About from "./user/About.jsx";
+import Contact from "./user/Contact.jsx";
+import Searched from "./user/filtered.jsx";
+import AllPotos from "./user/allphotos";
+import DashboardHeader from "./owner/header";
+import AdminApp from "./owner/AdminApp";
+import Header from "./user/Header";
+import Footer from "./user/Footer";
+import { hydrateUser } from "./backend-routes/slice/authSlice";
+import ProtectedRoute from "./protectedroutes/userprotectedroutes";
+import Bookings from "./user/booking";
+import CreateComplaint from "./user/complain";
+import ComplaintsPage from "./user/mycomplain"
+import Profile from "./user/myprofile"
+import SignupSuccess from "./user/signupsuccess";
+import ScrollToTop from "./user/ScrollToTop";
+import BookingSuccess from "./user/bookingssuccess"
+import PayRentPanel from "./user/payrent";
+import WishlistPage from "./user/wishlistdetails";
+import FounderPage from "./user/founderpage.jsx"
+import Disclaimer from "./user/desclaimer.jsx";
+import InternshipCertificate from "./user/InternshipCertificate";
+import ReportIssue from "./user/reportanissue.jsx"
+import MissionVision from "./user/missionandvision.jsx"
+import WhyRoomgi from "./user/why-roomgi.jsx"
+import SafetyGuidelinesPage from "./user/safetyguidlinepage.jsx"
 
 
 
@@ -145,7 +145,10 @@ const isAdminRoute = Array.isArray(user?.role)
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/internship-certificate"element={<InternshipCertificate />}/>
           <Route path="/branch-rooms/:id" element={<BranchRoomsPage/>}/>
-
+                    <Route path="/reportissue" element={<ReportIssue />} />
+<Route path="/mission" element={<MissionVision/>}></Route>
+<Route path="/why-roomgi" element={<WhyRoomgi/>}></Route>
+<Route path="/safety-guidelines" element={<SafetyGuidelinesPage/>}></Route>
 
 
           {/* Admin */}
