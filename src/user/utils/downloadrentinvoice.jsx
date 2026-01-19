@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import companyLogo from "../../assets/logo.png";
+import companyLogo from "../../assets/logofinal.webp";
 import companyStamp from "../../assets/company-stamp.png";
 import directorSignature from "../../assets/director-anshu-sign.png";
 

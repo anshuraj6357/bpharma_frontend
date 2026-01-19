@@ -1,6 +1,6 @@
 // BookingInvoice.js
 import jsPDF from "jspdf";
-import companyLogo from "../../assets/logo.png";
+// import companyLogo from "../../assets/logo.png";
 
 export const downloadInvoice = ({ branchName, roomNumber, amount, bookingId }) => {
   const doc = new jsPDF();

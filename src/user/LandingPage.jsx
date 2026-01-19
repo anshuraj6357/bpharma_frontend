@@ -10,6 +10,7 @@ import ROOMCARD from "../user/roomcard";
 import LandingPageSkeleton from "./loader/landingpageskeleton";
 import { useGetAllListedPgQuery } from "../backend-routes/userroutes/allpg.js";
 import { useGetWishlistQuery } from "../backend-routes/userroutes/authapi";
+import heroimg from "../assets/heroimg.webp";
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -189,7 +190,7 @@ export default function LandingPage() {
   {/* Background */}
   <div className="absolute inset-0">
     <img
-      src="https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop"
+      src={heroimg}
       loading="eager"
       fetchPriority="high"
       decoding="async"

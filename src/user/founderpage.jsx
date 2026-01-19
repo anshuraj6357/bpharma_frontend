@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet";
 import { 
   Linkedin, Mail, Terminal, Cpu, Code2, Rocket, Library, Coffee, Binary, ShieldCheck, Zap, ChevronRight 
 } from "lucide-react";
+import AbhinavImg from "../assets/AbhinavFinal.webp";
 
 const CEO = () => {
   // Memoizing data to prevent re-creation on every render (Performance Boost)
@@ -13,7 +14,7 @@ const CEO = () => {
       email: "abhinav@roomgi.com",
       college: "ABES Engineering College",
       degree: "B.Tech in AIML",
-      img: "/images/director.jpg",
+      img: AbhinavImg,
       quote: "Intelligence is not just about data, it's about making lives easier.",
       status: "Final Year Student",
       extra: "Driving AI Automation & Data Security",

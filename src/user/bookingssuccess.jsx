@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Confetti from "react-confetti";
 import Lottie from "lottie-react";
 
-import companyLogo from "../assets/logo.png";
+import companyLogo from "../assets/logofinal.webp";
 import successAnim from "../assets/success.json";
 import { downloadInvoice } from "../user/utils/downloadinvoice";
 
