@@ -1,6 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "https://roomgi-backend-project-2.onrender.com/property/owner/";
+// const USER_API = "https://roomgi-backend-project-2.onrender.com/property/owner/";
+
+const USER_API = "http://localhost:5000/property/owner/";
+
+
+
+
+
 
 const owner_property = createApi({
   reducerPath: "owner_property",

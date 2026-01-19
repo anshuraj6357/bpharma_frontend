@@ -1104,10 +1104,6 @@ export default function PGDetailsPage() {
 </div>
 
       </div>
-
-
-      {isAuthModalOpen && <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />}
-
     </div>
   );
 }

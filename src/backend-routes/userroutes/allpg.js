@@ -3,18 +3,29 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const user_PgApi = createApi({
     reducerPath: "user_PgApi",
     baseQuery: fetchBaseQuery({
-        baseUrl: "https://roomgi-backend-project-2.onrender.com/api/property/user",
+        baseUrl: "http://localhost:5000/api/property/user",
         credentials: "include",
     }),
     tagTypes: ["Pg"], // ✅ Added tag for versioning
     endpoints: (builder) => ({
-        getAllListedPg: builder.query({
-            query: () => ({
-                url: "/allpg",
-                method: "GET",
-            }),
-            providesTags: ["Pg"], // ✅ auto refetch on invalidation
-        }),
+    getAllListedPg: builder.query({
+  query: ({ cursor = null, limit = 12 }) => ({
+    url: "/allpg",
+    method: "GET",
+    params: {
+      cursor,
+      limit,
+    },
+  }),
+  providesTags: (result) =>
+    result?.data
+      ? [
+          ...result.data.map((pg) => ({ type: "Pg", id: pg._id })),
+          { type: "Pg", id: "PARTIAL-LIST" },
+        ]
+      : [{ type: "Pg", id: "PARTIAL-LIST" }],
+}),
+
         getMapPg: builder.query({
             query: () => ({
                 url: "/getmapofpg",

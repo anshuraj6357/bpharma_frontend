@@ -1,67 +1,73 @@
 import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 
-/* ---------- USER PAGES ---------- */
-import LandingPage from "./user/LandingPage";
-import PGDetailsPage from "./user/PGDetailsPage";
-import PGMap from "./user/pgmap.jsx";
-import Searched from "./user/filtered.jsx";
-import BranchRoomsPage from "./user/branch-rooms.jsx";
-import AllPotos from "./user/allphotos";
-import Wishlist from "./user/wishlist";
-import WishlistPage from "./user/wishlistdetails";
-import Bookings from "./user/booking";
-import PayRentPanel from "./user/payrent";
-import TenantDashboard from "./user/trackrentdashboard";
-import CreateComplaint from "./user/complain";
-import ComplaintsPage from "./user/mycomplain";
-import Profile from "./user/myprofile";
-import SignupSuccess from "./user/signupsuccess";
-import BookingSuccess from "./user/bookingssuccess";
-
-/* ---------- STATIC PAGES ---------- */
-import CancellationPolicy from "./user/cancilationandrefundpolicy";
-import ContactUs from "./user/contactus";
-import PrivacyPolicy from "./user/privacypolicy";
-import TermsConditions from "./user/termsandcondition";
-import ShippingPolicy from "./user/shippingpolicy";
-import HelpCenter from "./user/HelpCenter.jsx";
-import FAQs from "./user/FAQs.jsx";
-import Career from "./user/career.jsx";
-import CustomerSupport from "./user/CustomerSupport.jsx";
-import PartnerWithRoomgi from "./user/PartnerWithRoomgi.jsx";
-import AboutUs from "./user/AbutUs.jsx";
-import About from "./user/About.jsx";
-import Contact from "./user/Contact.jsx";
-import FounderPage from "./user/founderpage.jsx";
-import Disclaimer from "./user/desclaimer.jsx";
-import InternshipCertificate from "./user/InternshipCertificate";
-import ReportIssue from "./user/reportanissue.jsx";
-import MissionVision from "./user/missionandvision.jsx";
-import WhyRoomgi from "./user/why-roomgi.jsx";
-import SafetyGuidelinesPage from "./user/safetyguidlinepage.jsx";
-
-/* ---------- LAYOUT ---------- */
+/* ---------- LAYOUT (Common - No Lazy Load) ---------- */
 import Header from "./user/Header";
 import Footer from "./user/Footer";
 import DashboardHeader from "./owner/header";
-import AdminApp from "./owner/AdminApp";
-
-/* ---------- AUTH ---------- */
-import AuthModal from "./user/AuthModal";
+import ScrollToTop from "./user/ScrollToTop";
 import ProtectedRoute from "./protectedroutes/userprotectedroutes";
 import { hydrateUser } from "./backend-routes/slice/authSlice";
-import ScrollToTop from "./user/ScrollToTop";
+
+/* ---------- LAZY LOADED COMPONENTS ---------- */
+// User Pages
+const LandingPage = lazy(() => import("./user/LandingPage"));
+const PGDetailsPage = lazy(() => import("./user/PGDetailsPage"));
+const PGMap = lazy(() => import("./user/pgmap.jsx"));
+const Searched = lazy(() => import("./user/filtered.jsx"));
+const BranchRoomsPage = lazy(() => import("./user/branch-rooms.jsx"));
+const AllPotos = lazy(() => import("./user/allphotos"));
+const Wishlist = lazy(() => import("./user/wishlist"));
+const WishlistPage = lazy(() => import("./user/wishlistdetails"));
+const Bookings = lazy(() => import("./user/booking"));
+const PayRentPanel = lazy(() => import("./user/payrent"));
+const TenantDashboard = lazy(() => import("./user/trackrentdashboard"));
+const CreateComplaint = lazy(() => import("./user/complain"));
+const ComplaintsPage = lazy(() => import("./user/mycomplain"));
+const Profile = lazy(() => import("./user/myprofile"));
+const SignupSuccess = lazy(() => import("./user/signupsuccess"));
+const BookingSuccess = lazy(() => import("./user/bookingssuccess"));
+const AuthModal = lazy(() => import("./user/AuthModal"));
+
+// Static Pages
+const CancellationPolicy = lazy(() => import("./user/cancilationandrefundpolicy"));
+const ContactUs = lazy(() => import("./user/contactus"));
+const PrivacyPolicy = lazy(() => import("./user/privacypolicy"));
+const TermsConditions = lazy(() => import("./user/termsandcondition"));
+const ShippingPolicy = lazy(() => import("./user/shippingpolicy"));
+const HelpCenter = lazy(() => import("./user/HelpCenter.jsx"));
+const FAQs = lazy(() => import("./user/FAQs.jsx"));
+const Career = lazy(() => import("./user/career.jsx"));
+const CustomerSupport = lazy(() => import("./user/CustomerSupport.jsx"));
+const PartnerWithRoomgi = lazy(() => import("./user/PartnerWithRoomgi.jsx"));
+const AboutUs = lazy(() => import("./user/AbutUs.jsx"));
+const About = lazy(() => import("./user/About.jsx"));
+const Contact = lazy(() => import("./user/Contact.jsx"));
+const FounderPage = lazy(() => import("./user/founderpage.jsx"));
+const Disclaimer = lazy(() => import("./user/desclaimer.jsx"));
+const InternshipCertificate = lazy(() => import("./user/InternshipCertificate"));
+const ReportIssue = lazy(() => import("./user/reportanissue.jsx"));
+const MissionVision = lazy(() => import("./user/missionandvision.jsx"));
+const WhyRoomgi = lazy(() => import("./user/why-roomgi.jsx"));
+const SafetyGuidelinesPage = lazy(() => import("./user/safetyguidlinepage.jsx"));
+
+// Admin
+const AdminApp = lazy(() => import("./owner/AdminApp"));
+
+// Loading Component
+const PageLoader = () => (
+  <div className="h-screen w-full flex items-center justify-center bg-white">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+  </div>
+);
 
 function App() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  /* ---------- HYDRATE USER ---------- */
   useEffect(() => {
     const raw = localStorage.getItem("user");
     try {
@@ -73,7 +79,6 @@ function App() {
     }
   }, [dispatch]);
 
-  /* ---------- ADMIN CHECK ---------- */
   const isAdminRoute = Array.isArray(user?.role)
     ? user.role.includes("owner") || user.role.includes("branch-manager")
     : ["owner", "branch-manager"].includes(user?.role);
@@ -94,59 +99,56 @@ function App() {
       )}
 
       <main className="flex-1">
-        <Routes>
+        {/* Suspense is CRITICAL here */}
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* 🔒 USER PROTECTED */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/pg/:id" element={<PGDetailsPage />} />
+              <Route path="/pgmap/:branchId" element={<PGMap />} />
+              <Route path="/branch-rooms/:id" element={<BranchRoomsPage />} />
+              <Route path="/allpotos/:id" element={<AllPotos />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/wishlistdetails" element={<WishlistPage />} />
+              <Route path="/wishlistdetails/:id" element={<TenantDashboard />} />
+              <Route path="/mybooking" element={<Bookings />} />
+              <Route path="/payrent/:id" element={<PayRentPanel />} />
+              <Route path="/complain/:branchId" element={<CreateComplaint />} />
+              <Route path="/mycomplain" element={<ComplaintsPage />} />
+              <Route path="/myprofile" element={<Profile />} />
+              <Route path="/signup-success" element={<SignupSuccess />} />
+              <Route path="/bookingssuccess" element={<BookingSuccess />} />
+            </Route>
 
-          {/* 🔒 USER PROTECTED */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/pg/:id" element={<PGDetailsPage />} />
-            <Route path="/pgmap/:branchId" element={<PGMap />} />
-            <Route path="/branch-rooms/:id" element={<BranchRoomsPage />} />
-            <Route path="/allphotos/:id" element={<AllPotos />} />
+            {/* 🌍 PUBLIC */}
+            <Route path="/search/:city" element={<Searched />} />
+            <Route path="/login" element={<AuthModal />} />
+            <Route path="/cancellationpolicy" element={<CancellationPolicy />} />
+            <Route path="/contactus" element={<ContactUs />} />
+            <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+            <Route path="/termsandcondition" element={<TermsConditions />} />
+            <Route path="/shippingpolicy" element={<ShippingPolicy />} />
+            <Route path="/helpcenter" element={<HelpCenter />} />
+            <Route path="/faqs" element={<FAQs />} />
+            <Route path="/career" element={<Career />} />
+            <Route path="/customersupport" element={<CustomerSupport />} />
+            <Route path="/partnerwithroomgi" element={<PartnerWithRoomgi />} />
+            <Route path="/aboutus" element={<AboutUs />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/founder" element={<FounderPage />} />
+            <Route path="/disclaimer" element={<Disclaimer />} />
+            <Route path="/internship-certificate" element={<InternshipCertificate />} />
+            <Route path="/reportissue" element={<ReportIssue />} />
+            <Route path="/mission" element={<MissionVision />} />
+            <Route path="/why-roomgi" element={<WhyRoomgi />} />
+            <Route path="/safety-guidelines" element={<SafetyGuidelinesPage />} />
 
-            <Route path="/wishlist" element={<Wishlist />} />
-            <Route path="/wishlistdetails" element={<WishlistPage />} />
-            <Route path="/wishlistdetails/:id" element={<TenantDashboard />} />
-
-            <Route path="/mybooking" element={<Bookings />} />
-            <Route path="/payrent/:id" element={<PayRentPanel />} />
-
-            <Route path="/complain/:branchId" element={<CreateComplaint />} />
-            <Route path="/mycomplain" element={<ComplaintsPage />} />
-            <Route path="/myprofile" element={<Profile />} />
-
-            <Route path="/signup-success" element={<SignupSuccess />} />
-            <Route path="/bookingssuccess" element={<BookingSuccess />} />
-          </Route>
-
-          {/* 🌍 PUBLIC */}
-          <Route path="/search/:city" element={<Searched />} />
-          <Route path="/login" element={<AuthModal />} />
-
-          <Route path="/cancellationpolicy" element={<CancellationPolicy />} />
-          <Route path="/contactus" element={<ContactUs />} />
-          <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-          <Route path="/termsandcondition" element={<TermsConditions />} />
-          <Route path="/shippingpolicy" element={<ShippingPolicy />} />
-          <Route path="/helpcenter" element={<HelpCenter />} />
-          <Route path="/faqs" element={<FAQs />} />
-          <Route path="/career" element={<Career />} />
-          <Route path="/customersupport" element={<CustomerSupport />} />
-          <Route path="/partnerwithroomgi" element={<PartnerWithRoomgi />} />
-          <Route path="/aboutus" element={<AboutUs />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/founder" element={<FounderPage />} />
-          <Route path="/disclaimer" element={<Disclaimer />} />
-          <Route path="/internship-certificate" element={<InternshipCertificate />} />
-          <Route path="/reportissue" element={<ReportIssue />} />
-          <Route path="/mission" element={<MissionVision />} />
-          <Route path="/why-roomgi" element={<WhyRoomgi />} />
-          <Route path="/safety-guidelines" element={<SafetyGuidelinesPage />} />
-
-          {/* 🛠 ADMIN */}
-          <Route path="/admin/*" element={<AdminApp />} />
-        </Routes>
+            {/* 🛠 ADMIN */}
+            <Route path="/admin/*" element={<AdminApp />} />
+          </Routes>
+        </Suspense>
       </main>
 
       {!isAdminRoute && <Footer />}
