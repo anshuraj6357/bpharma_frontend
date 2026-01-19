@@ -183,7 +183,7 @@ export default function LandingPage() {
       }} />
 
       {/* Hero Section - Optimized for Core Web Vitals */}
-     <section
+    <section
   aria-labelledby="hero-heading"
   className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900/30 to-slate-900"
 >
@@ -201,34 +201,29 @@ export default function LandingPage() {
   </div>
 
   {/* Floating Trust Badges */}
-<div className="absolute top-4 left-4 right-4 lg:top-8 lg:left-12 lg:right-auto space-y-0 lg:space-y-4 flex flex-row lg:flex-col justify-center lg:justify-start gap-2 lg:gap-4 z-20">
-  {[
-    { icon: ShieldCheck, text: "100% Verified", color: "emerald" },
-    { icon: CreditCard, text: "Zero Brokerage", color: "indigo" },
-    { icon: Zap, text: "Instant Booking", color: "amber" },
-  ].map((badge, i) => (
-    <div
-      key={i}
-      className="flex items-center gap-1.5 lg:gap-2 bg-white/10 backdrop-blur-md p-1.5 lg:p-4 rounded-lg lg:rounded-2xl border border-white/20 shadow-xl"
-    >
-      {/* Icon size mobile par 12px aur desktop par 16px */}
-      <badge.icon 
-        className={`text-${badge.color}-400 shrink-0`} 
-        size={window.innerWidth < 1024 ? 12 : 16} 
-      />
-      
-      {/* Text size mobile par ultra-small (8px) aur desktop par xs (12px) */}
-      <p className="text-[8px] lg:text-xs font-black text-white uppercase tracking-tighter lg:tracking-wider whitespace-nowrap">
-        {badge.text}
-      </p>
-    </div>
-  ))}
-</div>
+  <div className="absolute top-4 left-4 right-4 lg:top-8 lg:left-12 lg:right-auto flex flex-row lg:flex-col justify-center lg:justify-start gap-2 lg:gap-4 z-20">
+    {[
+      { icon: ShieldCheck, text: "100% Verified", color: "emerald" },
+      { icon: CreditCard, text: "Zero Brokerage", color: "indigo" },
+      { icon: Zap, text: "Instant Booking", color: "amber" },
+    ].map((badge, i) => (
+      <div
+        key={i}
+        className="flex items-center gap-1.5 lg:gap-2 bg-white/10 backdrop-blur-md p-1.5 lg:p-4 rounded-lg lg:rounded-2xl border border-white/20 shadow-xl"
+      >
+        <badge.icon
+          className={`text-${badge.color}-400 shrink-0 w-3 h-3 lg:w-4 lg:h-4`}
+        />
 
+        <p className="text-[8px] lg:text-xs font-black text-white uppercase tracking-tighter lg:tracking-wider whitespace-nowrap">
+          {badge.text}
+        </p>
+      </div>
+    ))}
+  </div>
 
   {/* Main Content */}
   <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    
     {/* Premium Badge */}
     <div className="inline-flex items-center gap-2 px-5 py-2.5 mb-10 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 backdrop-blur-xl border border-indigo-400/30 rounded-full shadow-xl">
       <span className="h-2 w-2 bg-indigo-400 rounded-full animate-pulse" />
@@ -237,7 +232,7 @@ export default function LandingPage() {
       </span>
     </div>
 
-    {/* H1 for SEO */}
+    {/* H1 */}
     <h1
       id="hero-heading"
       className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white mb-6 leading-tight"
@@ -248,7 +243,7 @@ export default function LandingPage() {
       </span>
     </h1>
 
-    {/* SEO subheading */}
+    {/* Subheading */}
     <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-indigo-100/90 mb-12 max-w-3xl mx-auto leading-relaxed">
       Zero brokerage • 100% verified • Modern amenities • Instant booking
     </p>
@@ -257,7 +252,6 @@ export default function LandingPage() {
     <div className="max-w-4xl mx-auto">
       <div className="bg-white/95 backdrop-blur-3xl rounded-2xl p-3 sm:p-4 shadow-2xl border border-white/50">
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          
           <div className="flex items-center flex-1 px-4 py-3 border border-slate-100 rounded-xl">
             <MapPin size={22} className="text-indigo-500 mr-3 shrink-0" />
             <input
@@ -308,6 +302,7 @@ export default function LandingPage() {
     </div>
   </div>
 </section>
+
 
 
       {/* Trust Signals Section */}
