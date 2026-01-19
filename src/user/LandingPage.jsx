@@ -159,7 +159,7 @@ export default function LandingPage() {
     };
   }, []);
 
-  if (pgLoading || wishlistLoading) return <LandingPageSkeleton />;
+  
   if (pgError) {
     toast.error("Failed to load properties. Please refresh.");
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -466,12 +466,24 @@ export default function LandingPage() {
 
   {/* Listings */}
   {processedPgData.length > 0 ? (
-    <ROOMCARD
+    <>
+    {
+     (pgLoading || wishlistLoading) ? <LandingPageSkeleton />:
+      <>
+       <ROOMCARD
       pgData={processedPgData}
       wishlistItems={wishlistData?.items || []}
       setIsAuthModalOpen={setIsAuthModalOpen}
     />
-  ) : (
+      </>
+    }
+    </>
+   
+  ) : 
+  
+  
+  
+  (
     <div
       role="status"
       className="py-32 sm:py-40 text-center bg-gradient-to-br from-slate-50 to-indigo-50 rounded-4xl border-2 border-dashed border-indigo-200/50"
@@ -490,7 +502,7 @@ export default function LandingPage() {
       </p>
 
       <button
-        onClick={() => setActiveFilter("All")}
+        onClick={() =>navigate("/")}
         className="px-10 sm:px-12 py-5 sm:py-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl font-black text-base sm:text-lg shadow-2xl hover:shadow-3xl transition-all"
       >
         Show All Properties
