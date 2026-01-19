@@ -151,7 +151,7 @@ function App() {
         </Suspense>
       </main>
 
-      {!isAdminRoute && <Footer />}
+      {<Footer />}
     </div>
   );
 }
