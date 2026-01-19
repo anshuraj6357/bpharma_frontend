@@ -9,7 +9,7 @@ import {
 import {
   useAddRoomMutation,
 
-  useGetAllRoomownerQuery
+  useGetAllRoomQuery
 } from "../../../../backend-routes/ownerroutes/room";
 import {
 

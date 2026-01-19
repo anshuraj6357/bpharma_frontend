@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/payment";
+const USER_API = "https://roomgi-backend-project-2.onrender.com/api/payment/owner";
 
 export const owner_payment = createApi({
   reducerPath: "owner_payment",

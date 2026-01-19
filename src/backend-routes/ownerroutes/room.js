@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/property/";
+const USER_API = "https://roomgi-backend-project-2.onrender.com/api/room/owner";
 
 const owner_room = createApi({
   reducerPath: "owner_room",
@@ -60,7 +60,7 @@ getRoomsByBranch: builder.query({
     }),
 
 
-    getAllRoomowner: builder.query({
+    getAllRoom: builder.query({
       query: () => "allroomsaccordingtoowner",
       providesTags: ["Room"],
     }),
@@ -115,7 +115,7 @@ export const {
 
    useGetAllBranchbypropertyQuery,
 
-useGetAllRoomownerQuery,
+useGetAllRoomQuery,
   useAddRoomMutation,
 
   useGetRoomByIdQuery,

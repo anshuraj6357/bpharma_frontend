@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import {
   useDeleteRoomMutation,
-  useGetAllRoomownerQuery
+  useGetAllRoomQuery
 } from "../../../backend-routes/ownerroutes/room";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
@@ -21,7 +21,7 @@ import {
 
 function ShowRooms() {
   const navigate = useNavigate();
-  const { data, isLoading, error, refetch } = useGetAllRoomownerQuery();
+  const { data, isLoading, error, refetch } = useGetAllRoomQuery();
   const [deleteRoom] = useDeleteRoomMutation();
 
   // State
