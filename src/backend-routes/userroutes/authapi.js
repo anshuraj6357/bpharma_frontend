@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { userLoggedin, userLoggedout } from '../slice/authSlice';
 
 // const USER_API = import.meta.env.VITE_REACT_APP_AUTHAPI;
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/v1/user/";
+const USER_API = "http://roomgi-backend-project-2.onrender.com/api/v1/user/";
 
 const authApi = createApi({
   reducerPath: "authApi",
@@ -47,6 +47,14 @@ const authApi = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    // authapi.js snippet
+sendOtp: builder.mutation({
+  query: (email) => ({
+    url: "send-otp",
+    method: "POST",
+    body: email,
+  }),
+}),
     loginUser: builder.mutation({
       query: (formdata) => ({ url: "login", method: "POST", body: formdata }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -116,6 +124,7 @@ export const {
   useLogoutUserMutation,
   useLoginUserMutation,
   useLoadUserQuery,
+  useSendOtpMutation,
   useUpdateUserMutation,
 } = authApi;
 
