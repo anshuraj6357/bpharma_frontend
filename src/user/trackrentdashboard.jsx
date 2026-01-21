@@ -531,12 +531,55 @@ export default function TenantDashboard() {
                         </span>
                       </td>
                       <td className="px-8 py-4 text-right">
-                        <button 
-                          onClick={() => {/* Download Logic */}}
-                          className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                        >
-                          <Download size={18} />
-                        </button>
+                         <button
+                    disabled={invoiceLoadingId === p._id}
+                    onClick={async () => {
+                      if (invoiceLoadingId) return;
+
+                      try {
+                        setInvoiceLoadingId(p._id);
+
+                        // ✅ VERY IMPORTANT — allow UI to render spinner
+                        await new Promise((resolve) => setTimeout(resolve, 0));
+
+                        await downloadPaymentInvoice({
+                          paymentId: p._id,
+                          tenantName: tenant.name || "-",
+                          email: p.email || "-",
+                          branchName: branch.name || "-",
+                          roomNumber: p.roomNumber || "-",
+                          amountpaid: p.amountpaid || 0,
+                          walletused: p.walletused || 0,
+                          totalAmount: p.totalAmount || 0,
+                          mode: p.mode || "-",
+                          paymentStatus: p.status || "-",
+                          razorpay_payment_id: p.razorpay_payment_id || "-",
+                          razorpay_order_id: p.razorpay_order_id || "-",
+                          paymentInMonth: p.paymentInMonth || "-",
+                          createdAt: p.createdAt,
+                        });
+
+                      } catch (err) {
+                        console.error("Invoice download failed", err);
+                      } finally {
+                        setInvoiceLoadingId(null);
+                      }
+                    }}
+                    className={`px-3 py-1 text-sm font-semibold rounded-lg border flex items-center gap-2
+    ${invoiceLoadingId === p._id
+                        ? "cursor-not-allowed opacity-60 border-gray-300 text-gray-500"
+                        : "text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                      }`}
+                  >
+                    {invoiceLoadingId === p._id ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></span>
+                        Generating...
+                      </>
+                    ) : (
+                      "Download"
+                    )}
+                   </button>
                       </td>
                     </tr>
                   ))}

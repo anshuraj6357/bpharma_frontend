@@ -6,6 +6,8 @@ import {
     useToggleWishlistMutation,
 } from "../backend-routes/userroutes/authapi";
 
+import { useNavigate } from "react-router-dom";
+
 import ROOMCARD from "../user/roomcard";
 
 /* =======================
@@ -34,7 +36,7 @@ const WishlistSkeleton = () => {
 ======================= */
 export default function WishlistPage({ onAuthOpen }) {
     const { isAuthenticated } = useSelector((state) => state.auth);
-
+const navigate=useNavigate()
     const {
         data: wishlistData,
         isFetching,
@@ -112,69 +114,72 @@ export default function WishlistPage({ onAuthOpen }) {
        Main UI
     ======================= */
     return (
-        <div className="bg-gray-50 min-h-screen">
-            <div className="max-w-screen-2xl mx-auto px-8 sm:px-10 lg:px-14 py-10">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold mb-1">My Wishlist</h1>
-                    <p className="text-gray-500">
-                        Rooms you’ve saved for later
-                    </p>
-                    <div className="mt-4 h-px bg-gray-200" />
-                </div>
+       <div className="bg-gray-50 min-h-screen py-12">
+  <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 lg:px-14">
+    
+    {/* Header */}
+    <div className="mb-10 text-center sm:text-left">
+      <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-2">
+        My Wishlist
+      </h1>
+      <p className="text-gray-500 text-lg">
+        Rooms you’ve saved for later. Find your favorite stays easily.
+      </p>
+      <div className="mt-6 h-1 w-24 bg-gradient-to-r from-pink-500 to-red-500 rounded-full" />
+    </div>
 
-                {/* Content */}
-                {wishlist.length === 0 ? (
-                    <div className="min-h-[45vh] flex flex-col items-center justify-center text-center bg-white rounded-2xl shadow-sm border border-gray-100">
-
-                        {/* Icon */}
-                        <div className="w-20 h-20 flex items-center justify-center rounded-full bg-red-50 mb-6">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-10 w-10 text-red-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={1.8}
-                                    d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 21.343 3.172 10.828a4 4 0 010-5.656z"
-                                />
-                            </svg>
-                        </div>
-
-                        {/* Heading */}
-                        <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                            Your wishlist is empty
-                        </h2>
-
-                        {/* Description */}
-                        <p className="text-gray-500 max-w-md mb-6">
-                            Save rooms you like so you can easily find and compare them later.
-                        </p>
-
-                        {/* CTA */}
-                        <button
-                            onClick={() => window.location.href = "/"}
-                            className="px-6 py-3 rounded-full bg-gradient-to-r from-red-500 to-pink-500 text-white font-medium shadow-md hover:shadow-lg hover:scale-105 transition"
-                        >
-                            Explore Rooms
-                        </button>
-                    </div>
-                ) : (
-                    <div className="ml-12 sm:ml-16 lg:ml-24 xl:ml-32">
-                        <ROOMCARD
-                            pgData={wishlist}
-                            setIsAuthModalOpen={onAuthOpen}
-                            wishlistItems={wishlistData?.items || []}
-                            onRemove={handleRemove}
-                        />
-                    </div>
-                )}
-
-            </div>
+    {/* Content */}
+    {wishlist.length === 0 ? (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center text-center bg-white rounded-3xl shadow-lg border border-gray-200 p-8 sm:p-12 transition-transform transform hover:scale-105">
+        
+        {/* Heart Icon */}
+        <div className="w-24 h-24 flex items-center justify-center rounded-full bg-red-50 mb-6 animate-pulse">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 text-red-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3.172 5.172a4 4 0 015.656 0L12 8.343l3.172-3.171a4 4 0 115.656 5.656L12 21.343 3.172 10.828a4 4 0 010-5.656z"
+            />
+          </svg>
         </div>
+
+        {/* Empty State Heading */}
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">
+          Your wishlist is empty
+        </h2>
+
+        {/* Empty State Description */}
+        <p className="text-gray-500 max-w-md mb-6 text-lg">
+          Save rooms you like so you can easily find and compare them later.
+        </p>
+
+        {/* CTA Button */}
+        <button
+          onClick={() => navigate("/")}
+          className="px-8 py-4 rounded-full bg-gradient-to-r from-pink-500 to-red-500 text-white font-semibold shadow-lg hover:shadow-xl transform transition duration-300 hover:scale-105"
+        >
+          Explore Rooms
+        </button>
+      </div>
+    ) : (
+     
+        <ROOMCARD
+          pgData={wishlist}
+          setIsAuthModalOpen={onAuthOpen}
+          wishlistItems={wishlistData?.items || []}
+          onRemove={handleRemove}
+        />
+
+    )}
+  </div>
+</div>
+
     );
 }

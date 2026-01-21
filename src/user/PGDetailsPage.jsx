@@ -303,8 +303,6 @@ export default function PGDetailsPage() {
 
 
 
-    if (!isAuthenticated) return setIsAuthModalOpen(true);
-
     const [lng, lat] = pg?.branch?.location?.coordinates || [];
     if (!lat || !lng) return toast.error("PG location missing");
     if (!userLocation.lat) return toast.error("User location not available");
@@ -316,7 +314,6 @@ export default function PGDetailsPage() {
   };
 
   const sharePG = () => {
-    if (!isAuthenticated) return setIsAuthModalOpen(true);
     navigator.share
       ? navigator.share({
         title: `Check out ${pg.branch.name}`,
@@ -1067,20 +1064,44 @@ export default function PGDetailsPage() {
                    <ShieldCheck className="ml-auto text-emerald-400" size={20} />
                 </div>
               </div>
-
-              {isAuthenticated ? (
-                <button 
-                  onClick={() => handleBook({ totalAmount: totalRent, walletUsed: useWallet ? walletDiscount : 0, payableAmount: finalPayable })}
-                  className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-black text-lg transition-all active:scale-95 shadow-lg flex items-center justify-center gap-2"
-                >
-                  Confirm Booking
-                  <ArrowRight size={20} />
-                </button>
-              ) : (
-                <button disabled className="w-full py-4 bg-slate-800 text-slate-500 rounded-2xl font-black text-lg cursor-not-allowed border border-slate-700">
-                  Login to Book
-                </button>
-              )}
+{isAuthenticated ? (
+  pg.availabilityStatus === "Occupied" ? (
+    <button
+      disabled
+      className="group relative w-full py-4 bg-slate-100 border-2 border-slate-200 text-slate-400 rounded-2xl font-bold text-lg cursor-not-allowed flex items-center justify-center gap-2 overflow-hidden"
+    >
+      <span className="z-10">Currently Occupied</span>
+      {/* Subtle "unavailable" pattern */}
+      <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px]" />
+    </button>
+  ) : (
+    <button
+      onClick={() =>
+        handleBook({
+          totalAmount: totalRent,
+          walletUsed: useWallet ? walletDiscount : 0,
+          payableAmount: finalPayable,
+        })
+      }
+      className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-lg transition-all hover:shadow-xl hover:shadow-indigo-200 active:scale-[0.98] flex items-center justify-center gap-2"
+    >
+      Confirm & Pay ₹{finalPayable.toLocaleString()}
+      <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+    </button>
+  )
+) : (
+  <div className="space-y-3">
+    <button
+      className="w-full py-4 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 rounded-2xl font-bold text-lg transition-colors flex items-center justify-center gap-2"
+      onClick={() =>navigate("/login")}
+    >
+      Login to Book
+    </button>
+    <p className="text-center text-xs text-slate-500 font-medium">
+      Secure your spot in seconds after signing in.
+    </p>
+  </div>
+)}
             </div>
           </div>
         );
