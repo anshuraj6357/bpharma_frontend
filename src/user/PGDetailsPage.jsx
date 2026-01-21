@@ -58,7 +58,7 @@ function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) 
 
     try {
       const res = await fetch(
-        `https://roomgi-backend-project-2.onrender.com/api/payment/status/${bookingId}`,
+        `https://roomgi-backend-project-2.onrender.com/api/payment/user/status/${bookingId}`,
         { credentials: "include" }
       );
       console.log("📦 Polling response status:", res.status);
