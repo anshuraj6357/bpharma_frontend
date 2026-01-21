@@ -1,4 +1,4 @@
-import { memo, useMemo, useCallback } from "react";
+import { memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Star, MapPin, ShieldCheck, Users, Info, ArrowRight } from "lucide-react";
 import WishlistButton from "../user/wishlist.jsx";
@@ -65,10 +65,7 @@ const RoomCard = memo(function RoomCard({
         const isRentedRoom = room.category === "Rented-Room";
         const isGirlsOnly = room.allowedFor === "Girls";
 
-        const avgRating = useMemo(
-          () => calculateRating(room.personalreview),
-          [room.personalreview]
-        );
+        const avgRating = calculateRating(room.personalreview); // ✅ FIXED
 
         return (
           <article
