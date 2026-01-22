@@ -95,40 +95,6 @@ const AddPropertyModal = ({
             </div>
 
             {/* SECTION 3: Visuals */}
-            <div className="space-y-6">
-              <SectionHeading number="03" title="Visual Gallery" />
-              <div className="grid grid-cols-2 gap-4">
-                <label className="flex flex-col items-center justify-center aspect-[4/3] border-[3px] border-dashed border-slate-200 rounded-[2.5rem] bg-white hover:bg-indigo-50/50 hover:border-indigo-500 transition-all cursor-pointer group">
-                  <input
-                    type="file" multiple className="hidden"
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files);
-                      setFormData(p => ({
-                        ...p,
-                        images: [...(p.images || []), ...files],
-                        previewImages: [...(p.previewImages || []), ...files.map(f => URL.createObjectURL(f))],
-                      }));
-                    }}
-                  />
-                  <div className="bg-slate-900 p-4 rounded-2xl group-hover:scale-110 group-hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200">
-                    <Upload className="text-white" size={24} />
-                  </div>
-                  <span className="text-[11px] font-[900] text-slate-400 mt-4 uppercase tracking-widest">Add Media</span>
-                </label>
-
-                {formData.previewImages?.map((src, i) => (
-                  <motion.div key={i} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative aspect-[4/3] rounded-[2.5rem] overflow-hidden group border-4 border-white shadow-lg">
-                    <img src={src} className="w-full h-full object-cover" alt="preview" />
-                    <button
-                      type="button" onClick={() => removeImage(i)}
-                      className="absolute top-3 right-3 p-2 bg-red-600 text-white rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-lg scale-75 group-hover:scale-100"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* FOOTER ACTIONS */}
