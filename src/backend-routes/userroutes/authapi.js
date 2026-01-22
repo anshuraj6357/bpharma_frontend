@@ -16,7 +16,7 @@ const authApi = createApi({
       query: (formdata) => ({ url: "register", method: "POST", body: formdata }),
       invalidatesTags: ["User"], 
     }),
-    resetUserPassword: builder.mutation({
+    resetUserpassword: builder.mutation({
       query: ({ token, password }) => ({ url: `resetpassword/${token}`, method: `POST`, body: password }),
     }),
     profile: builder.query({
