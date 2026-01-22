@@ -5,7 +5,7 @@
     
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/complain/user";
+const USER_API = "http://localhost:5000/api/complain/user";
 
 const user_complaints = createApi({
   reducerPath: "complainapi",
@@ -35,6 +35,13 @@ const user_complaints = createApi({
       }),
       invalidatesTags: ["Complaint"],
     }),
+      getAllComplainByTenant: builder.query({
+      query: ({ cursor, limit = 10 } = {}) => ({
+        url: `get`,
+        params: { cursor, limit },
+      }),
+      providesTags: ["Complaint"],
+    }),
 
 
     // Tenant personal complaints with cursor
@@ -45,6 +52,7 @@ const user_complaints = createApi({
 export const {
  useDeleteComplainMutation,
  useCreateComplainMutation,
+ useGetAllComplainByTenantQuery
 } = user_complaints;
 
 export default user_complaints;

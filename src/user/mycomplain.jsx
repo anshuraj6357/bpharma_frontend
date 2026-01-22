@@ -7,7 +7,7 @@ import {
 } from "../backend-routes/userroutes/complaints";
 import {
   useGetAllComplainByTenantQuery,
-} from "../backend-routes/ownerroutes/complaints";
+} from "../backend-routes/userroutes/complaints";
 
 
 // --- Professional Toast Notification ---

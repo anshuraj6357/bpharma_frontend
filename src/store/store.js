@@ -11,7 +11,7 @@ import authApi from "../backend-routes/userroutes/authapi";
 import owner_branch from "../backend-routes/ownerroutes/branch";
 import owner_complain from "../backend-routes/ownerroutes/complaints";
 import owner_payment from "../backend-routes/ownerroutes/payments";
-import owner_property from "../backend-routes/ownerroutes/property";
+
 import owner_room from "../backend-routes/ownerroutes/room";
 import owner_tenant from "../backend-routes/ownerroutes/tenant";
 
@@ -35,7 +35,7 @@ const appReducer = combineReducers({
   [owner_complain.reducerPath]: owner_complain.reducer,
   [owner_payment.reducerPath]: owner_payment.reducer,
   [owner_room.reducerPath]: owner_room.reducer,
-  [owner_property.reducerPath]: owner_property.reducer,
+
   [owner_tenant.reducerPath]: owner_tenant.reducer,
 
   [user_complaints.reducerPath]: user_complaints.reducer,
@@ -68,7 +68,7 @@ export const appStore = configureStore({
       owner_complain.middleware,
       owner_payment.middleware,
       owner_room.middleware,
-      owner_property.middleware,
+ 
       owner_tenant.middleware,
 
       user_complaints.middleware,

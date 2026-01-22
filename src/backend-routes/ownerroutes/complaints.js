@@ -3,7 +3,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // const USER_API = "https://roomgi-backend-project-2.onrender.com/api/complain/owner";
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/complain/owner";
+const USER_API = "http://localhost:5000/api/complain/owner";
 
 
 
@@ -27,13 +27,7 @@ const owner_complain = createApi({
       query: () => ``,
       providesTags: ["Complaint"],
     }),
-      getAllComplainByTenant: builder.query({
-      query: ({ cursor, limit = 10 } = {}) => ({
-        url: `tenant`,
-        params: { cursor, limit },
-      }),
-      providesTags: ["Complaint"],
-    }),
+    
      // Branch based fetch with cursor
     getComplainByBranch: builder.query({
       query: ({ branchId, cursor, limit = 10 }) => ({
@@ -93,7 +87,7 @@ export const {
   useGetComplainByStatusQuery,
   useGetComplainByBranchQuery,
   useGetComplainByCategoryQuery,
-  useGetAllComplainByTenantQuery,
+  
 } = owner_complain;
 
 export default owner_complain;
