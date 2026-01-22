@@ -9,7 +9,7 @@ import DashboardHeader from "./owner/header";
 import ScrollToTop from "./user/ScrollToTop";
 import ProtectedRoute from "./protectedroutes/userprotectedroutes";
 import { hydrateUser } from "./backend-routes/slice/authSlice";
-
+import ResetPassword from "./user/changingpassword.jsx"
 /* ---------- LAZY LOADED COMPONENTS ---------- */
 // User Pages
 const LandingPage = lazy(() => import("./user/LandingPage"));
@@ -29,7 +29,7 @@ const Profile = lazy(() => import("./user/myprofile"));
 const SignupSuccess = lazy(() => import("./user/signupsuccess"));
 const BookingSuccess = lazy(() => import("./user/bookingssuccess"));
 const AuthModal = lazy(() => import("./user/AuthModal"));
-
+const ForgotPassword = lazy(() => import("./user/forgotemail"));
 // Static Pages
 const CancellationPolicy = lazy(() => import("./user/cancilationandrefundpolicy"));
 const ContactUs = lazy(() => import("./user/contactus"));
@@ -144,6 +144,10 @@ function App() {
             <Route path="/mission" element={<MissionVision />} />
             <Route path="/why-roomgi" element={<WhyRoomgi />} />
             <Route path="/safety-guidelines" element={<SafetyGuidelinesPage />} />
+                     <Route path="/forgot-password" element={<ForgotPassword />} />
+                                <Route path="/forgotpasswordpage/:token" element={<ResetPassword />} />
+
+
 
             {/* 🛠 ADMIN */}
             <Route path="/admin/*" element={<AdminApp />} />

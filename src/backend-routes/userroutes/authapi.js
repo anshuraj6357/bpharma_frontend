@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { userLoggedin, userLoggedout } from '../slice/authSlice';
 
 // const USER_API = import.meta.env.VITE_REACT_APP_AUTHAPI;
-const USER_API = "https://roomgi-backend-project-2.onrender.com/api/v1/user/";
+const USER_API =  "https://roomgi-backend-project-2.onrender.com/api/v1/user/";
 
 const authApi = createApi({
   reducerPath: "authApi",
@@ -10,14 +10,14 @@ const authApi = createApi({
     baseUrl: USER_API,
     credentials: 'include',
   }),
-  tagTypes: ["User", "Wishlist"], // ✅ Added tag types for versioning
+  tagTypes: ["User", "Wishlist"], 
   endpoints: (builder) => ({
     registerUser: builder.mutation({
       query: (formdata) => ({ url: "register", method: "POST", body: formdata }),
-      invalidatesTags: ["User"], // ✅ invalidate user cache after registration
+      invalidatesTags: ["User"], 
     }),
-    ForgotUser: builder.mutation({
-      query: (email) => ({ url: `forgotpassword`, method: `POST`, body: email }),
+    resetUserPassword: builder.mutation({
+      query: ({ token, password }) => ({ url: `resetpassword/${token}`, method: `POST`, body: password }),
     }),
     profile: builder.query({
       query: () => ({ url: `profile` }),
@@ -40,10 +40,10 @@ const authApi = createApi({
       providesTags: ["Wishlist"],
     }),
     ForgotUserpassword: builder.mutation({
-      query: ({ password, confermpassword, resettoken }) => ({
-        url: `forgotpassword/${resettoken}`,
+      query: ({ email }) => ({
+        url: `forgotpassword`,
         method: `POST`,
-        body: { password, confermpassword }
+        body: { email }
       }),
       invalidatesTags: ["User"],
     }),
@@ -119,7 +119,7 @@ export const {
   useGetWishlistQuery,
   useForgotUserpasswordMutation,
   useProfileQuery,
-  useForgotUserMutation,
+  useResetUserpasswordMutation,
   useRegisterUserMutation,
   useLogoutUserMutation,
   useLoginUserMutation,

@@ -1,3 +1,5 @@
+
+
 import { X, Loader2, Mail, Lock, User, Phone, Stars, ShieldCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -10,6 +12,10 @@ import {
 } from "../backend-routes/userroutes/authapi";
 import { userLoggedin } from "../backend-routes/slice/authSlice";
 import "react-toastify/dist/ReactToastify.css";
+
+// // ...imports stay same
+// import { X, Loader2, Mail, Lock, User, Phone, Stars, ShieldCheck } from "lucide-react"; // etc.
+
 
 export default function AuthModal() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -83,11 +89,14 @@ export default function AuthModal() {
       <div className="relative bg-white rounded-[2.5rem] max-w-4xl w-full flex flex-col md:flex-row overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-white">
         
         {/* CLOSE BUTTON */}
-        <button onClick={() => navigate(-1)} className="absolute top-4 right-4 md:top-6 md:right-6 z-50 bg-white/90 backdrop-blur-md text-slate-700 hover:text-slate-900 p-2 rounded-full shadow-md">
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute top-4 right-4 md:top-6 md:right-6 z-50 bg-white/90 backdrop-blur-md text-slate-700 hover:text-slate-900 p-2 rounded-full shadow-md"
+        >
           <X size={20} />
         </button>
 
-        {/* LEFT IMAGE SECTION */}
+          {/* LEFT IMAGE SECTION */}
         <div className="md:w-[42%] relative min-h-[260px] md:min-h-full overflow-hidden">
           <img src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=2070&auto=format&fit=crop" alt="Interior" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
@@ -105,54 +114,154 @@ export default function AuthModal() {
         <div className="flex-1 bg-[#fdfdfd] p-8 md:p-14">
           <div className="max-w-sm mx-auto">
             <h2 className="text-2xl font-black mb-6">
-              {isSignUp ? (showOTP ? "Verify Your Email" : "Join the Community") : "Welcome Back"}
+              {isSignUp
+                ? showOTP
+                  ? "Verify Your Email"
+                  : "Join the Community"
+                : "Welcome Back"}
             </h2>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               {!showOTP ? (
                 <>
-                  {isSignUp && <Input icon={User} label="Full Name" name="username" value={formData.username} onChange={handleChange} placeholder="Jane Doe" />}
-                  <Input icon={Mail} label="Email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" />
-                  <Input icon={Lock} label="Password" name="password" type="password" value={formData.password} onChange={handleChange} placeholder="••••••••" />
+                  {isSignUp && (
+                    <Input
+                      icon={User}
+                      label="Full Name"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      placeholder="Jane Doe"
+                    />
+                  )}
+                  <Input
+                    icon={Mail}
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="email@example.com"
+                  />
+                  <Input
+                    icon={Lock}
+                    label="Password"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="••••••••"
+                  />
+
+                  {/* FORGOT PASSWORD – ONLY IN LOGIN MODE */}
+                  {!isSignUp && (
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => navigate("/forgot-password")}
+                        className="text-[10px] font-bold text-indigo-600 uppercase tracking-tight hover:underline"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                  )}
+
                   {isSignUp && (
                     <>
                       <div className="space-y-1">
-                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1">Role</label>
-                        <select name="role" value={formData.role} onChange={handleChange} className="w-full px-4 py-3.5 border rounded-2xl text-sm font-semibold outline-none focus:ring-2 focus:ring-slate-100">
+                        <label className="text-[10px] font-black uppercase text-slate-400 ml-1">
+                          Role
+                        </label>
+                        <select
+                          name="role"
+                          value={formData.role}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3.5 border rounded-2xl text-sm font-semibold outline-none focus:ring-2 focus:ring-slate-100"
+                        >
                           <option value="">Select Role</option>
                           <option value="user">Looking for Room</option>
                           <option value="owner">Property Owner</option>
-                          <option value="branch-manager">Manager</option>
                         </select>
                       </div>
-                      <PhoneInput value={formData.phone} onChange={(val) => setFormData(p => ({...p, phone: val}))} />
+                      <PhoneInput
+                        value={formData.phone}
+                        onChange={(val) =>
+                          setFormData((p) => ({ ...p, phone: val }))
+                        }
+                      />
                     </>
                   )}
                 </>
               ) : (
-                /* OTP INPUT DISPLAY */
+                // OTP INPUT DISPLAY
                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                  <p className="text-xs text-slate-500 text-center mb-4">We sent a 6-digit code to <br/><span className="font-bold text-slate-800">{formData.email}</span></p>
-                  <Input icon={ShieldCheck} label="6-Digit OTP" name="otp" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))} placeholder="000000" maxLength={6} />
-                  <button type="button" onClick={() => setShowOTP(false)} className="text-[10px] font-bold text-indigo-600 uppercase tracking-tight hover:underline">Edit Details</button>
+                  <p className="text-xs text-slate-500 text-center mb-4">
+                    We sent a 6-digit code to <br />
+                    <span className="font-bold text-slate-800">
+                      {formData.email}
+                    </span>
+                  </p>
+                  <Input
+                    icon={ShieldCheck}
+                    label="6-Digit OTP"
+                    name="otp"
+                    value={otp}
+                    onChange={(e) =>
+                      setOtp(e.target.value.replace(/\D/g, ""))
+                    }
+                    placeholder="000000"
+                    maxLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowOTP(false)}
+                    className="text-[10px] font-bold text-indigo-600 uppercase tracking-tight hover:underline"
+                  >
+                    Edit Details
+                  </button>
                 </div>
               )}
 
               {/* ACTION BUTTON */}
               {isSignUp && !showOTP ? (
-                <button type="button" onClick={handleRequestOtp} disabled={otpLoading} className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all">
-                  {otpLoading ? <Loader2 className="animate-spin mx-auto" /> : "Send Verification OTP"}
+                <button
+                  type="button"
+                  onClick={handleRequestOtp}
+                  disabled={otpLoading}
+                  className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all"
+                >
+                  {otpLoading ? (
+                    <Loader2 className="animate-spin mx-auto" />
+                  ) : (
+                    "Send Verification OTP"
+                  )}
                 </button>
               ) : (
-                <button type="submit" disabled={registerLoading || loginLoading} className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all">
-                  {registerLoading || loginLoading ? <Loader2 className="animate-spin mx-auto" /> : isSignUp ? "Verify & Create Account" : "Sign In"}
+                <button
+                  type="submit"
+                  disabled={registerLoading || loginLoading}
+                  className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all"
+                >
+                  {registerLoading || loginLoading ? (
+                    <Loader2 className="animate-spin mx-auto" />
+                  ) : isSignUp ? (
+                    "Verify & Create Account"
+                  ) : (
+                    "Sign In"
+                  )}
                 </button>
               )}
             </form>
 
             <p className="mt-6 text-xs text-center text-slate-400 font-bold">
               {isSignUp ? "Already a member?" : "New here?"}
-              <button onClick={() => { setIsSignUp(!isSignUp); setShowOTP(false); }} className="ml-2 text-indigo-600 underline hover:text-indigo-800">
+              <button
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setShowOTP(false);
+                }}
+                className="ml-2 text-indigo-600 underline hover:text-indigo-800"
+              >
                 {isSignUp ? "Login" : "Sign Up"}
               </button>
             </p>
@@ -162,6 +271,14 @@ export default function AuthModal() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
 
 // Reusable Components with same UX
 function PhoneInput({ value, onChange }) {
@@ -188,12 +305,6 @@ function Input({ icon: Icon, label, ...props }) {
     </div>
   );
 }
-
-
-
-
-
-
 
 
 
