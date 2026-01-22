@@ -35,21 +35,42 @@ function AddRoomForm() {
   const facilityOptions = ["AC", "Non-AC", "WiFi", "Power Backup", "Laundry", "CCTV", "Parking", "Refrigerator"];
 
   // --- VALIDATION LOGIC ---
-  const validateStep = () => {
-    if (step === 1) {
-      return roomData.branch && roomData.roomNumber && roomData.city && roomData.category && roomData.description;
+const validateStep = () => {
+  if (step === 1) {
+    if (!roomData.branchid) return false;
+    if (!roomData.roomNumber) return false;
+    if (!roomData.category) return false;
+    if (!roomData.description) return false;
+
+    if (roomData.category === "Rented-Room") {
+      if (!roomData.renttype) return false;
+
+      if (roomData.renttype === "Room-Rent" && !roomData.roomtype) return false;
+      if (roomData.renttype === "Flat-Rent" && !roomData.flattype) return false;
     }
-    if (step === 2) {
-      if (roomData.category === "Pg") {
-        return roomData.type && roomData.services.length > 0 && roomData.services.every(s => s.name !== "" && s.price !== "");
-      }
-      return roomData.price > 0;
+
+    return true;
+  }
+
+  if (step === 2) {
+    if (roomData.category === "Pg") {
+      return (
+        roomData.type &&
+        roomData.services.length > 0 &&
+        roomData.services.every(
+          (s) => s.name !== "" && s.price !== ""
+        )
+      );
     }
-    if (step === 3) {
-      return roomData.images.length > 0 && roomData.facilities.length > 0;
-    }
-    return false;
-  };
+    return roomData.price > 0;
+  }
+
+  if (step === 3) {
+    return roomData.images.length > 0 && roomData.facilities.length > 0;
+  }
+
+  return false;
+};
 
   const isNextDisabled = !validateStep();
 
@@ -149,20 +170,30 @@ const slideVariants = {
 
       {/* Branch */}
       <InputWrapper label="Assign Branch *" icon={<Building2 size={18} />}>
-        <select
-          className="modern-input"
-          value={roomData.branchid}
-          onChange={(e) =>
-            setRoomData({ ...roomData, branchid: e.target.value })
-          }
-        >
-          <option value="">Select Branch</option>
-          {Allbranchdata?.allbranch?.map((b) => (
-            <option key={b._id} value={b._id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
+       <select
+  className="modern-input"
+  value={roomData.branchid || ""}
+  onChange={(e) => {
+    const selectedId = e.target.value;
+    const selectedBranch = Allbranchdata?.allbranch?.find(
+      (b) => b._id === selectedId
+    );
+
+    setRoomData({
+      ...roomData,
+      branchid: selectedId,                 // ID
+      branch: selectedBranch?.name || "",   // Name
+    });
+  }}
+>
+  <option value="">Select Branch</option>
+  {Allbranchdata?.allbranch?.map((b) => (
+    <option key={b._id} value={b._id}>
+      {b.name}
+    </option>
+  ))}
+</select>
+
       </InputWrapper>
 
       {/* Room Number */}
