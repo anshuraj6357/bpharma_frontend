@@ -133,68 +133,117 @@ export default function Tenants() {
 
     <div className="space-y-6">
   {/* --- HEADER SECTION --- */}
-  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-slate-900 p-8 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden text-white">
-    {/* Background Decorative Element */}
-    <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 blur-[100px] rounded-full -mr-32 -mt-32" />
-    
-    <div className="relative z-10">
-      <div className="flex items-center gap-4 mb-2">
-        <div className="bg-orange-500 p-3 rounded-2xl shadow-lg shadow-orange-500/20">
-          <Users size={28} className="text-white" />
-        </div>
-        <h1 className="text-3xl md:text-4xl font-[900] tracking-tight italic">
-          Tenants<span className="text-orange-500">.</span>
-        </h1>
+ <header className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6 
+bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 
+p-8 md:p-10 rounded-[2.5rem] 
+shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] 
+overflow-hidden text-white"
+>
+  {/* Ambient Gradient Blobs */}
+  <div className="absolute -top-32 -right-32 w-80 h-80 bg-orange-500/20 blur-[120px] rounded-full" />
+  <div className="absolute bottom-0 left-0 w-72 h-72 bg-indigo-500/10 blur-[120px] rounded-full" />
+
+  {/* Left Content */}
+  <div className="relative z-10">
+    <div className="flex items-center gap-4 mb-3">
+      <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-3.5 rounded-2xl shadow-lg shadow-orange-500/30">
+        <Users size={26} className="text-white" />
       </div>
-      <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] ml-1">
-        Occupancy & Resident Intelligence
-      </p>
+
+      <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+        Tenants<span className="text-orange-500">.</span>
+      </h1>
     </div>
 
-    <button
-      onClick={() => setAdding(true)}
-      className="relative z-10 flex items-center justify-center gap-3 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-orange-500/25 active:scale-95 group"
-    >
-      <Plus size={20} strokeWidth={3} className="group-hover:rotate-90 transition-transform duration-300" />
-      Add New Resident
-    </button>
+    <p className="text-slate-400 font-semibold uppercase tracking-[0.25em] text-[11px] ml-1">
+      Occupancy & Resident Intelligence
+    </p>
   </div>
 
+  {/* CTA Button */}
+  <button
+    onClick={() => setAdding(true)}
+    aria-label="Add new resident"
+    className="relative z-10 flex items-center justify-center gap-3 
+    bg-gradient-to-r from-orange-500 to-orange-600 
+    hover:from-orange-600 hover:to-orange-500
+    text-white px-8 py-4 rounded-2xl 
+    text-xs font-black uppercase tracking-widest 
+    transition-all shadow-xl shadow-orange-500/30 
+    active:scale-95 group"
+  >
+    <Plus
+      size={20}
+      strokeWidth={3}
+      className="group-hover:rotate-90 transition-transform duration-300"
+    />
+    Add New Resident
+  </button>
+</header>
+
+
   {/* --- FILTER & SEARCH BAR --- */}
-  <div className="bg-white p-3 rounded-[2rem] border border-slate-100 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] flex flex-col md:flex-row gap-3">
-    
-    {/* Search Input Group */}
-    <div className="flex-1 relative group">
-      <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-        <Search size={18} className="text-slate-400 group-focus-within:text-orange-500 transition-colors" />
-      </div>
-      <input
-        type="text"
-        placeholder="Search by name, room, or phone..."
-        className="w-full pl-14 pr-6 py-4 bg-slate-50 border-2 border-transparent focus:border-orange-500/20 focus:bg-white rounded-[1.5rem] outline-none transition-all font-bold text-sm text-slate-700 placeholder:text-slate-400"
+  <section
+  role="search"
+  aria-label="Tenant search and filters"
+  className="bg-gradient-to-br from-white via-slate-50 to-white 
+  p-4 md:p-5 rounded-[2rem] border border-slate-200/60 
+  shadow-[0_20px_60px_-25px_rgba(0,0,0,0.08)] 
+  flex flex-col md:flex-row gap-3 items-stretch"
+>
+  {/* Search Input */}
+  <div className="flex-1 relative group">
+    <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+      <Search
+        size={18}
+        className="text-slate-400 group-focus-within:text-orange-500 transition-colors"
       />
     </div>
 
-    {/* Filter Dropdown */}
-    <div className="relative min-w-[160px]">
-      <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-        <Filter size={16} className="text-slate-400" />
-      </div>
-      <select
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className="w-full pl-12 pr-10 py-4 bg-slate-50 border-2 border-transparent focus:border-slate-200 rounded-[1.5rem] outline-none appearance-none cursor-pointer font-black uppercase text-[10px] tracking-widest text-slate-500 transition-all hover:bg-slate-100"
-      >
-        <option value="all">All Records</option>
-        <option value="Active">🟢 Active</option>
-        <option value="In-Active">🔴 Inactive</option>
-      </select>
-      {/* Custom Arrow for Select */}
-      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300">
-        <ChevronDown size={16} />
-      </div>
+    <input
+      type="text"
+      placeholder="Search by name, room, or phone..."
+      aria-label="Search tenants"
+      className="w-full pl-14 pr-6 py-4 
+      bg-slate-50 border-2 border-transparent 
+      focus:border-orange-500/30 focus:bg-white 
+      rounded-[1.5rem] outline-none transition-all 
+      font-semibold text-sm text-slate-700 
+      placeholder:text-slate-400
+      shadow-inner focus:shadow-[0_0_0_3px_rgba(249,115,22,0.1)]"
+    />
+  </div>
+
+  {/* Filter Dropdown */}
+  <div className="relative min-w-[170px]">
+    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+      <Filter size={16} className="text-slate-400" />
+    </div>
+
+    <select
+      value={filter}
+      onChange={(e) => setFilter(e.target.value)}
+      aria-label="Filter tenants"
+      className="w-full pl-12 pr-10 py-4 
+      bg-slate-50 border-2 border-transparent 
+      focus:border-slate-300 
+      rounded-[1.5rem] outline-none appearance-none cursor-pointer 
+      font-bold uppercase text-[10px] tracking-widest 
+      text-slate-500 transition-all 
+      hover:bg-slate-100 focus:bg-white"
+    >
+      <option value="all">All Records</option>
+      <option value="Active">🟢 Active</option>
+      <option value="In-Active">🔴 Inactive</option>
+    </select>
+
+    {/* Custom Arrow */}
+    <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-slate-300">
+      <ChevronDown size={16} />
     </div>
   </div>
+</section>
+
 </div>
 
 
@@ -325,118 +374,142 @@ export default function Tenants() {
 
 
      {/* TENANT GRID */}
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4 sm:px-8 py-8">
+<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-10 px-4 sm:px-8 py-10 max-w-7xl mx-auto">
   {statusQueryloading
     ? Array.from({ length: 6 }).map((_, i) => <TenantCardSkeleton key={i} />)
     : tenant.map((t) => (
-        <motion.div
+        <motion.article
           key={t._id}
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="group relative bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)] 
-                     hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.12)] transition-all duration-500 flex flex-col justify-between overflow-hidden"
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="group relative flex flex-col justify-between rounded-[2rem] border border-slate-200/60 
+          bg-gradient-to-br from-white via-white to-slate-50 
+          p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
         >
-          {/* Subtle Background Accent */}
-          <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full opacity-10 transition-transform group-hover:scale-110 
-            ${t.status === "Active" ? "bg-emerald-500" : "bg-slate-500"}`} 
+          {/* Gradient Orb */}
+          <div
+            className={`absolute -top-20 -right-20 h-52 w-52 rounded-full blur-3xl opacity-20 transition-all duration-500
+            ${t.status === "Active" ? "bg-emerald-400" : "bg-slate-400"}`}
           />
 
-          {/* --- HEADER --- */}
-          <div className="relative z-10 flex justify-between items-start mb-8">
-            <div className="flex-1">
-              <h3 className="text-xl font-black text-slate-800 leading-tight group-hover:text-orange-500 transition-colors">
+          {/* Header */}
+          <header className="relative z-10 flex justify-between items-start mb-6">
+            <div>
+              <h3 className="text-lg font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
                 {t.name}
               </h3>
-              <div className="flex items-center gap-1.5 mt-2">
-                <div className="bg-slate-100 p-1 rounded-md">
-                   <Home size={12} className="text-slate-500" />
-                </div>
-                <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">
-                  Unit: <span className="text-slate-900">{t.roomNumber}</span>
+              <div className="flex items-center gap-2 mt-1 text-xs font-semibold text-slate-500">
+                <Home size={12} />
+                <span>
+                  Unit: <span className="text-slate-800">{t.roomNumber}</span>
+                </span>
+              </div>
+            </div>
+
+            <span
+              className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border backdrop-blur
+              ${
+                t.status === "Active"
+                  ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                  : "bg-slate-100 text-slate-500 border-slate-200"
+              }`}
+            >
+              {t.status}
+            </span>
+          </header>
+
+          {/* Content */}
+          <section className="relative z-10 space-y-5">
+            <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3">
+              <div className="flex items-center gap-3">
+                <Phone size={14} className="text-slate-400" />
+                <span className="text-sm font-medium text-slate-700">
+                  {t.contactNumber || "N/A"}
+                </span>
+              </div>
+              <span className="h-2 w-2 rounded-full bg-slate-300" />
+            </div>
+
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                  Current Dues
+                </p>
+                <p
+                  className={`text-lg font-bold ${
+                    t.dues > 0 ? "text-red-500" : "text-slate-700"
+                  }`}
+                >
+                  ₹{t.dues || "0"}
+                </p>
+              </div>
+
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
+                  Fixed Rent
+                </p>
+                <p className="text-lg font-bold text-slate-700">
+                  ₹{t.rent || "0"}
                 </p>
               </div>
             </div>
 
-            {/* STATUS BADGE: Glass Effect */}
-            <div className={`px-4 py-1.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border backdrop-blur-md
-              ${t.status === "Active" 
-                ? "bg-emerald-50/50 text-emerald-600 border-emerald-100" 
-                : "bg-slate-50/50 text-slate-500 border-slate-100"}`}
-            >
-              {t.status}
-            </div>
-          </div>
-
-          {/* --- DETAILS GRID --- */}
-          <div className="relative z-10 grid grid-cols-1 gap-4 mb-8">
-            {/* Phone Number with Action */}
-            <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/50 border border-transparent hover:border-slate-100 transition-all">
-              <div className="flex items-center gap-3">
-                <Phone size={14} className="text-slate-400" />
-                <span className="text-sm font-bold text-slate-600">{t.contactNumber || "N/A"}</span>
+            <div className="pt-4 border-t border-dashed border-slate-200 flex justify-between text-xs">
+              <div>
+                <p className="uppercase text-slate-400 font-semibold">
+                  Check-In
+                </p>
+                <p className="font-bold text-slate-700">
+                  {t.checkInDate
+                    ? new Date(t.checkInDate).toLocaleDateString()
+                    : "N/A"}
+                </p>
               </div>
-              <div className="h-2 w-2 rounded-full bg-slate-200" />
-            </div>
 
-            {/* Financial Status */}
-            <div className="flex items-center justify-between px-2">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">Current Dues</p>
-                <p className={`text-lg font-black ${t.dues > 0 ? 'text-red-500' : 'text-slate-700'}`}>₹{t.dues || "0"}</p>
-              </div>
-              <div className="text-right space-y-1">
-                <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">Fixed Rent</p>
-                <p className="text-lg font-black text-slate-700">₹{t.rent || "0"}</p>
+              <div className="text-right">
+                <p className="uppercase text-slate-400 font-semibold">
+                  Checkout
+                </p>
+                <p className="font-bold text-slate-700">
+                  {t.checkedoutdate
+                    ? new Date(t.checkedoutdate).toLocaleDateString()
+                    : "—"}
+                </p>
               </div>
             </div>
+          </section>
 
-            {/* Timeline */}
-            <div className="mt-2 pt-4 border-t border-dashed border-slate-100 flex justify-between items-center text-[11px]">
-              <div className="flex flex-col">
-                <span className="text-slate-400 font-bold uppercase tracking-tighter">Check-In</span>
-                <span className="text-slate-700 font-black">{t.checkInDate ? new Date(t.checkInDate).toLocaleDateString() : "N/A"}</span>
-              </div>
-              <div className="h-6 w-[1px] bg-slate-100" />
-              <div className="flex flex-col text-right">
-                <span className="text-slate-400 font-bold uppercase tracking-tighter">Expected Checkout</span>
-                <span className="text-slate-700 font-black">{t.checkedoutdate ? new Date(t.checkedoutdate).toLocaleDateString() : "—"}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* --- ACTIONS --- */}
-          <div className="relative z-10 flex gap-2">
+          {/* Actions */}
+          <footer className="relative z-10 flex gap-2 mt-6">
             {t.status === "Active" ? (
               <button
                 onClick={() => handleCheckoutTenant(t._id)}
                 disabled={statusloading}
-                className="flex-1 group/btn relative overflow-hidden bg-slate-900 text-white py-4 rounded-[1.25rem] text-xs font-black uppercase tracking-widest transition-all hover:bg-red-600 active:scale-95 disabled:opacity-50"
+                className="flex-1 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 
+                text-white py-3 text-xs font-bold uppercase tracking-wider
+                hover:from-red-600 hover:to-red-500 transition-all active:scale-95"
               >
-                <div className="relative z-10 flex items-center justify-center gap-2">
-                  {statusloading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      <LogOut size={16} />
-                      <span>Process Checkout</span>
-                    </>
-                  )}
-                </div>
+                {statusloading ? (
+                  <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                ) : (
+                  "Process Checkout"
+                )}
               </button>
             ) : (
-                <div className="w-full py-4 text-center bg-slate-50 rounded-[1.25rem] text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
-                    Inactive Record
-                </div>
+              <div className="flex-1 py-3 text-center rounded-xl bg-slate-100 text-[10px] font-bold uppercase text-slate-400 tracking-widest">
+                Inactive
+              </div>
             )}
-            
-            {/* Minimal Detail Button */}
-            <button className="p-4 bg-slate-50 text-slate-400 rounded-[1.25rem] hover:bg-slate-100 hover:text-slate-900 transition-all">
-                <MoreHorizontal size={20} />
+
+            <button className="rounded-xl p-3 bg-slate-100 text-slate-500 hover:bg-slate-200 transition">
+              <MoreHorizontal size={18} />
             </button>
-          </div>
-        </motion.div>
+          </footer>
+        </motion.article>
       ))}
 </div>
+
 
 
     </div>

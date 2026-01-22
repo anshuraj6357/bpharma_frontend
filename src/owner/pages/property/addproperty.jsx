@@ -1,142 +1,264 @@
 import React, { useEffect } from "react";
-import { X, Upload, MapPin, Building2, Loader2, ChevronRight, Stars, Trash2 } from "lucide-react";
+import { X, Building2, Loader2, ChevronRight, MapPin, Map } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  useGetStatesQuery,
+  useGetCitiesMutation,
+  useGetLocationNamesMutation,
+} from "../../../backend-routes/ownerroutes/branch";
 
 const AddPropertyModal = ({
   formData,
   setFormData,
-  handleChange,
-  handlePropertyChange,
   handleSaveProperty,
   addingBranch,
   setShowAddModal,
 }) => {
-  const onChange = handleChange || handlePropertyChange;
+  const { data: statesData, isLoading: loadingStates } = useGetStatesQuery();
+  const [getCities, { data: citiesData, isLoading: loadingCities }] = useGetCitiesMutation();
+  const [getLocations, { data: locationsData, isLoading: loadingLocs }] = useGetLocationNamesMutation();
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => (document.body.style.overflow = "unset");
   }, []);
 
-  const removeImage = (index) => {
-    const updatedImages = formData.images.filter((_, i) => i !== index);
-    const updatedPreviews = formData.previewImages.filter((_, i) => i !== index);
-    setFormData(prev => ({ ...prev, images: updatedImages, previewImages: updatedPreviews }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "locationName") {
+      const selectedLocation = locationsData?.data?.find((loc) => loc.name === value);
+      setFormData((prev) => ({
+        ...prev,
+        locationName: value,
+        pincode: selectedLocation?.pincode || "",
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "state") {
+      getCities({ state: value });
+      setFormData((prev) => ({ ...prev, city: "", locationName: "", pincode: "" }));
+    }
+
+    if (name === "city") {
+      getLocations({ state: formData.state, city: value });
+      setFormData((prev) => ({ ...prev, locationName: "", pincode: "" }));
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Backdrop: Ultra Dark Blur */}
+    <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4">
+      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onClick={() => setShowAddModal(false)}
-        className="absolute inset-0 bg-slate-950/60 backdrop-blur-xl"
+        onClick={() => !addingBranch && setShowAddModal(false)}
+        className="absolute inset-0 bg-slate-950/40 backdrop-blur-md"
       />
 
-      {/* Main Card */}
+      {/* Modal Container */}
       <motion.div
-        initial={{ scale: 0.9, opacity: 0, y: 40 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 40 }}
-        className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col max-h-[92vh] border border-white/20"
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="relative bg-slate-50 w-full max-w-2xl rounded-t-[2.5rem] sm:rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh]"
       >
-        {/* HEADER: Bold & Dark */}
-        <div className="px-10 py-8 bg-slate-900 flex justify-between items-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full -mr-16 -mt-16" />
-          
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/40">
-              <Building2 className="text-white" size={24} />
+        {/* Header - Sticky */}
+        <div className="px-6 py-5 bg-white border-b border-slate-100 flex justify-between items-center sticky top-0 z-20">
+          <div className="flex items-center gap-4">
+            <div className="bg-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
+              <Building2 className="text-white w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-2xl font-[900] text-white tracking-tight">List Property</h2>
-              <div className="flex items-center gap-2 mt-1">
-                <div className="flex -space-x-1">
-                  {[1, 2, 3].map(i => <Stars key={i} className="text-amber-400 fill-amber-400" size={12} />)}
-                </div>
-                <span className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.2em]">Elite Membership</span>
-              </div>
+              <h2 className="text-lg font-bold text-slate-900 leading-tight">Add Property</h2>
+              <p className="text-xs text-slate-500 font-medium">Enter branch details</p>
             </div>
           </div>
-
           <button
             onClick={() => setShowAddModal(false)}
-            className="p-3 bg-white/10 hover:bg-red-500/20 rounded-2xl transition-all text-white/50 hover:text-red-400 border border-white/10"
+            className="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all"
           >
             <X size={20} />
           </button>
         </div>
 
-        {/* FORM BODY */}
-        <form onSubmit={handleSaveProperty} className="overflow-y-auto px-10 py-10 custom-scrollbar bg-[#fcfcfd]">
-          <div className="space-y-12">
+        {/* Body - Scrollable */}
+        <form
+          onSubmit={handleSaveProperty}
+          className="overflow-y-auto px-6 py-6 pb-32 sm:pb-8 space-y-8"
+        >
+          {/* Section: Basic Info */}
+          <section className="space-y-4">
+             <div className="flex items-center gap-2 mb-2">
+                <div className="w-1 h-4 bg-indigo-500 rounded-full" />
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Basic Information</h3>
+             </div>
+             <Input label="Property / Branch Name" name="name" placeholder="e.g. Royal Heights" value={formData.name} onChange={handleChange} required />
+          </section>
+
+          {/* Section: Geography */}
+          <section className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-5">
+            <div className="flex items-center gap-2 mb-1">
+                <MapPin size={14} className="text-indigo-500" />
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Regional Data</h3>
+             </div>
             
-            {/* SECTION 1: Identity */}
-            <div className="space-y-6">
-              <SectionHeading number="01" title="Core Identity" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Input name="name" label="Property Name" placeholder="The Grand Residency" value={formData.name} onChange={onChange} required />
-                <Input name="city" label="City" placeholder="Mumbai" value={formData.city} onChange={onChange} required />
-                <Input name="state" label="State" placeholder="Maharashtra" value={formData.state} onChange={onChange} required />
-                <Input name="pincode" label="Pincode" placeholder="400001" value={formData.pincode} onChange={onChange} required />
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                label="State"
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+                options={statesData?.data || []}
+                placeholder={loadingStates ? "Loading..." : "Select State"}
+              />
+              <Select
+                label="City"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                options={citiesData?.data || []}
+                placeholder={loadingCities ? "Fetching..." : "Select City"}
+                disabled={!formData.state || loadingCities}
+              />
             </div>
 
-            {/* SECTION 2: Location */}
-            <div className="space-y-6">
-              <SectionHeading number="02" title="Location Details" />
-              <Input name="address" label="Primary Address" placeholder="Building, Wing & Flat Details" value={formData.address} onChange={onChange} required />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Input name="streetAdress" label="Street Name" placeholder="Palm Beach Road" value={formData.streetAdress} onChange={onChange} />
-                <Input name="landmark" label="Famous Landmark" placeholder="Opposite Central Mall" value={formData.landmark} onChange={onChange} />
-              </div>
+            <SelectLocation
+              label="Location / Area Name"
+              name="locationName"
+              value={formData.locationName}
+              onChange={handleChange}
+              options={locationsData?.data || []}
+              placeholder={loadingLocs ? "Searching..." : "Select Area"}
+              disabled={!formData.city || loadingLocs}
+            />
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4">
+                <div className="sm:col-span-1">
+                    <Input label="Pincode" name="pincode" placeholder="6-digits" value={formData.pincode} onChange={handleChange} required maxLength={6} />
+                </div>
+                <div className="sm:col-span-2">
+                    <Input label="Landmark" name="landmark" placeholder="Near Apollo Hospital" value={formData.landmark} onChange={handleChange} />
+                </div>
             </div>
+          </section>
 
-            {/* SECTION 3: Visuals */}
-          </div>
+          {/* Section: Specific Address */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+                <Map size={14} className="text-indigo-500" />
+                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Exact Address</h3>
+             </div>
+            <Input label="House / Plot No." name="streetAdress" placeholder="Plot No. 42, 2nd Cross" value={formData.streetAdress} onChange={handleChange} />
+            <TextArea label="Complete Address" name="address" placeholder="Flat No, Wing, Society Name..." value={formData.address} onChange={handleChange} required />
+          </section>
 
-          {/* FOOTER ACTIONS */}
-          <div className="flex items-center gap-6 mt-16 pt-8 border-t border-slate-100">
+          {/* Desktop Footer Actions */}
+          <div className="hidden sm:flex gap-4 pt-6">
             <button
-              type="button" onClick={() => setShowAddModal(false)}
-              className="flex-1 py-5 text-xs font-[900] uppercase tracking-[0.2em] text-slate-400 hover:text-red-500 transition-colors"
+              type="button"
+              onClick={() => setShowAddModal(false)}
+              className="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
             >
-              Cancel
+              Discard
             </button>
             <button
-              type="submit" disabled={addingBranch}
-              className="flex-[2] bg-indigo-600 text-white py-5 px-10 rounded-[1.5rem] text-xs font-black uppercase tracking-[0.2em] shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] hover:bg-slate-900 active:scale-95 transition-all disabled:opacity-70 flex justify-center items-center gap-4"
+              type="submit"
+              disabled={addingBranch}
+              className="flex-[2] bg-slate-900 text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-slate-200 hover:bg-indigo-600 transition-all flex justify-center items-center gap-3 disabled:bg-slate-300"
             >
-              {addingBranch ? <Loader2 className="animate-spin" size={20} /> : <>Publish Property <ChevronRight size={18} /></>}
+              {addingBranch ? <Loader2 className="animate-spin" /> : <>Save Property <ChevronRight size={16} /></>}
             </button>
           </div>
         </form>
+
+        {/* Mobile Action Bar - Fixed at Bottom */}
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg border-t border-slate-100 flex gap-3 z-30">
+          <button
+            type="button"
+            onClick={() => setShowAddModal(false)}
+            className="flex-1 py-4 bg-slate-100 rounded-2xl text-xs font-bold text-slate-600"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSaveProperty}
+            disabled={addingBranch}
+            className="flex-[2] bg-indigo-600 text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-100 flex justify-center items-center gap-2"
+          >
+            {addingBranch ? <Loader2 className="animate-spin w-4 h-4" /> : "Save Property"}
+          </button>
+        </div>
       </motion.div>
     </div>
   );
 };
 
-// --- Helper Components ---
-
-const SectionHeading = ({ number, title }) => (
-  <div className="flex items-center gap-3 mb-2">
-    <span className="text-[10px] font-black bg-indigo-100 text-indigo-600 w-6 h-6 flex items-center justify-center rounded-lg">{number}</span>
-    <h3 className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-400">{title}</h3>
-    <div className="flex-1 h-[1px] bg-slate-100 ml-2" />
-  </div>
-);
+/* ------------------ Refined Helpers ------------------ */
 
 const Input = ({ label, ...props }) => (
-  <div className="space-y-2 group">
-    <label className="text-[11px] font-[900] text-slate-800 uppercase tracking-wider ml-1 group-focus-within:text-indigo-600 transition-colors">
+  <div className="group">
+    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1 group-focus-within:text-indigo-500 transition-colors">
       {label}
     </label>
     <input
       {...props}
-      className="w-full px-6 py-4 bg-white border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 focus:bg-white transition-all text-sm font-bold text-slate-800 placeholder:text-slate-300 shadow-sm"
+      className="w-full px-5 py-3.5 mt-1.5 bg-white border border-slate-200 rounded-2xl font-semibold text-slate-800 placeholder:text-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none"
     />
+  </div>
+);
+
+const TextArea = ({ label, ...props }) => (
+    <div className="group">
+      <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1 group-focus-within:text-indigo-500 transition-colors">
+        {label}
+      </label>
+      <textarea
+        {...props}
+        rows={3}
+        className="w-full px-5 py-3.5 mt-1.5 bg-white border border-slate-200 rounded-2xl font-semibold text-slate-800 placeholder:text-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none resize-none"
+      />
+    </div>
+);
+
+const Select = ({ label, options, placeholder, ...props }) => (
+  <div className="group">
+    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1 group-focus-within:text-indigo-500 transition-colors">
+      {label}
+    </label>
+    <select
+      {...props}
+      className="w-full px-5 py-3.5 mt-1.5 bg-white border border-slate-200 rounded-2xl font-semibold text-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none appearance-none transition-all disabled:bg-slate-50 disabled:text-slate-400 cursor-pointer"
+    >
+      <option value="" disabled hidden>{placeholder}</option>
+      {options.map((opt) => (
+        <option key={opt} value={opt} className="font-semibold text-slate-800">{opt}</option>
+      ))}
+    </select>
+  </div>
+);
+
+const SelectLocation = ({ label, options, placeholder, ...props }) => (
+  <div className="group">
+    <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 ml-1 group-focus-within:text-indigo-500 transition-colors">
+      {label}
+    </label>
+    <select
+      {...props}
+      className="w-full px-5 py-3.5 mt-1.5 bg-white border border-slate-200 rounded-2xl font-semibold text-slate-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/5 outline-none appearance-none transition-all disabled:bg-slate-50 disabled:text-slate-400 cursor-pointer"
+    >
+      <option value="" disabled hidden>{placeholder}</option>
+      {options.map((opt) => (
+        <option key={opt.name} value={opt.name} className="font-semibold">
+          {opt.name} ({opt.pincode})
+        </option>
+      ))}
+    </select>
   </div>
 );
 

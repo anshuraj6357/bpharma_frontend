@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-// const USER_API = "https://roomgi-backend-project-2.onrender.com/api/branch/owner";
 const USER_API = "https://roomgi-backend-project-2.onrender.com/api/branch/owner";
 
 const owner_branch = createApi({
@@ -10,8 +9,7 @@ const owner_branch = createApi({
     credentials: "include",
   }),
 
-  // 🔥 MULTI TAG TYPES
-  tagTypes: ["Branch", "Room", "Property"],
+  tagTypes: ["Branch", "Room", "Property", "Location"],
 
   endpoints: (builder) => ({
 
@@ -40,32 +38,49 @@ const owner_branch = createApi({
       query: () => "getbranch/bybranchMnager",
       providesTags: ["Branch"],
     }),
-   
 
+    /* ===================== LOCATION ===================== */
 
-    //edit branch 
+    // Get all states
+    getStates: builder.query({
+      query: () => "states",
+      providesTags: ["Location"],
+    }),
 
-    //deletebranch
+    // Get cities by state
+    getCities: builder.mutation({
+      query: (payload) => ({
+        url: "cities",
+        method: "POST",
+        body: payload, // { state: "Delhi" }
+      }),
+      invalidatesTags: ["Location"],
+    }),
 
+    // Get locations by state + city
+    getLocationNames: builder.mutation({
+      query: (payload) => ({
+        url: "locations",
+        method: "POST",
+        body: payload, // { state: "Delhi", city: "New Delhi" }
+      }),
+      invalidatesTags: ["Location"],
+    }),
 
-
-
-   
   }),
 });
 
 export const {
   useAddbranchMutation,
   useGetAllBranchQuery,
-
   useGetAllBranchByOwnerQuery,
   useGetAllBranchbybranchIdQuery,
 
+  // Location hooks
+  useGetStatesQuery,
+  useGetCitiesMutation,
+  useGetLocationNamesMutation,
 
 } = owner_branch;
 
 export default owner_branch;
-
-
-
-

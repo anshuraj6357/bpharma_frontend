@@ -120,48 +120,44 @@ function BookingCard({ booking }) {
   return (
     <>
       <div
-        className="
-    bg-white/90 backdrop-blur-xl
-    rounded-3xl
-    border border-gray-200/50
-    shadow-lg hover:shadow-2xl
+  className="
+    relative
+    bg-white/80 backdrop-blur-xl
+    rounded-[28px]
+    border border-white/40
+    shadow-[0_20px_60px_rgba(0,0,0,0.08)]
+    hover:shadow-[0_25px_80px_rgba(0,0,0,0.12)]
     hover:-translate-y-1
     transition-all duration-300
     p-6
+    overflow-hidden
     group
-    relative
   "
-      >
-        {/* STATUS BADGE */}
-        <span
-          className={`
-      absolute top-4 right-4
-      inline-flex items-center gap-2
-      px-4 py-1.5
-      text-xs font-semibold uppercase tracking-wider
-      rounded-full
-      shadow-lg
-      ring-1 ring-white/30
-      backdrop-blur-md
-      transition-all duration-300
-      group-hover:scale-105
-      ${statusColors[booking.status]}
-    `}
-        >
-          <span
-            className={`
-        w-2.5 h-2.5 rounded-full
-        ${booking.status === "paid" && "bg-green-300 animate-pulse"}
-        ${booking.status === "processing" && "bg-yellow-300 animate-pulse"}
-        ${booking.status === "cancelled" && "bg-red-300"}
-      `}
-          />
-          <span className="capitalize">{booking.status}</span>
-        </span>
+>
+
+       <span
+  className={`
+    absolute top-4 right-4
+    px-4 py-1.5
+    text-[11px] font-bold uppercase tracking-wider
+    rounded-full
+    shadow-lg
+    backdrop-blur-md
+    ring-1 ring-white/30
+    ${statusColors[booking.status]}
+  `}
+>
+  <span className="flex items-center gap-2">
+    <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+    {booking.status}
+  </span>
+</span>
+
 
         {/* INFO */}
         <div className="space-y-1 pr-20">
-          <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+          <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">
+
             <Home size={18} className="text-indigo-600" />
             {booking.branch?.name}
           </h2>
@@ -211,16 +207,19 @@ function BookingCard({ booking }) {
             </span>
           </p>
 
-          <p className="flex justify-between text-base">
-            <span className="font-medium text-gray-700">Payable</span>
-            <span className="
-        font-extrabold
-        text-transparent bg-clip-text
-        bg-gradient-to-r from-indigo-600 to-purple-600
-      ">
-              ₹{booking.amount?.payableAmount}
-            </span>
-          </p>
+         <p className="flex justify-between text-lg">
+  <span className="font-medium text-gray-700">Payable</span>
+  <span
+    className="
+      font-extrabold
+      text-transparent bg-clip-text
+      bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600
+    "
+  >
+    ₹{booking.amount?.payableAmount}
+  </span>
+</p>
+
         </div>
 
         {/* RAZORPAY */}
@@ -398,14 +397,15 @@ function BookingSkeleton() {
 
 function Detail({ label, value, icon }) {
   return (
-    <div>
-      <p className="text-xs text-gray-500 flex items-center gap-1">
+    <div className="bg-gray-50/70 rounded-xl p-3">
+      <p className="text-[11px] uppercase tracking-wide text-gray-400 flex items-center gap-1">
         {icon} {label}
       </p>
-      <p className="font-semibold">{value}</p>
+      <p className="font-semibold text-gray-800 truncate">{value}</p>
     </div>
   );
 }
+
 
 function formatDate(date) {
   return new Date(date).toLocaleDateString("en-IN", {
