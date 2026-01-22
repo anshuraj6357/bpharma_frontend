@@ -31,7 +31,7 @@ export default function ForgotPassword() {
       <div className="relative bg-white rounded-[2.5rem] max-w-4xl w-full flex flex-col md:flex-row overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border border-white">
         {/* CLOSE BUTTON */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           className="absolute top-4 right-4 md:top-6 md:right-6 z-50 bg-white/90 backdrop-blur-md text-slate-700 hover:text-slate-900 p-2 rounded-full shadow-md"
         >
           <X size={20} />
