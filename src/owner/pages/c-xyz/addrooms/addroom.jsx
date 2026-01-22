@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import {
   useAddRoomMutation,
-
   useGetAllRoomQuery
 } from "../../../../backend-routes/ownerroutes/room";
 import {
@@ -24,6 +23,7 @@ function AddRoomForm() {
   const [roomData, setRoomData] = useState({
     roomNumber: "", type: "", price: "", facilities: [], images: [],
     branch: "", category: "", description: "", notAllowed: [], rules: [],
+    branchid:"",flattype:"",roomtype:"",renttype:"",
     allowedFor: "Anyone", furnishedType: "Semi Furnished",
     city: "", services: [{ name: "", price: "" }]
   });
@@ -138,35 +138,167 @@ const slideVariants = {
             <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-xl overflow-hidden">
               <div className="p-8 md:p-10">
                 <AnimatePresence mode="wait">
-                  {step === 1 && (
-                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <InputWrapper label="Assign Branch *" icon={<Building2 size={18}/>}>
-                          <select className="modern-input" value={roomData.branch} onChange={e => setRoomData({ ...roomData, branch: e.target.value })}>
-                            <option value="">Select Branch</option>
-                            {Allbranchdata?.allbranch?.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
-                          </select>
-                        </InputWrapper>
-                        <InputWrapper label="Room/Suite Number *" icon={<Home size={18}/>}>
-                          <input className="modern-input" placeholder="e.g. 101-B" value={roomData.roomNumber} onChange={e => setRoomData({ ...roomData, roomNumber: e.target.value })} />
-                        </InputWrapper>
-                        <InputWrapper label="City *" icon={<MapPin size={18}/>}>
-                          <input className="modern-input" placeholder="Location" value={roomData.city} onChange={e => setRoomData({ ...roomData, city: e.target.value })} />
-                        </InputWrapper>
-                        <InputWrapper label="Category *" icon={<Sparkles size={18}/>}>
-                          <select className="modern-input" value={roomData.category} onChange={e => setRoomData({ ...roomData, category: e.target.value })}>
-                            <option value="">Select Category</option>
-                            <option value="Pg">PG / Hostel</option>
-                            <option value="Hotel">Hotel</option>
-                            <option value="Rented-Room">Flat / Room</option>
-                          </select>
-                        </InputWrapper>
-                      </div>
-                      <InputWrapper label="Property Description *">
-                        <textarea className="modern-input min-h-[120px]" placeholder="Briefly describe the room..." value={roomData.description} onChange={e => setRoomData({ ...roomData, description: e.target.value })} />
-                      </InputWrapper>
-                    </motion.div>
-                  )}
+{step === 1 && (
+  <motion.div
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -20 }}
+    className="space-y-12"
+  >
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      {/* Branch */}
+      <InputWrapper label="Assign Branch *" icon={<Building2 size={18} />}>
+        <select
+          className="modern-input"
+          value={roomData.branchid}
+          onChange={(e) =>
+            setRoomData({ ...roomData, branchid: e.target.value })
+          }
+        >
+          <option value="">Select Branch</option>
+          {Allbranchdata?.allbranch?.map((b) => (
+            <option key={b._id} value={b._id}>
+              {b.name}
+            </option>
+          ))}
+        </select>
+      </InputWrapper>
+
+      {/* Room Number */}
+      <InputWrapper label="Room/Suite Number *" icon={<Home size={18} />}>
+        <input
+          className="modern-input"
+          placeholder="e.g. 101-B"
+          value={roomData.roomNumber}
+          onChange={(e) =>
+            setRoomData({ ...roomData, roomNumber: e.target.value })
+          }
+        />
+      </InputWrapper>
+
+      {/* Category */}
+      <InputWrapper label="Category *" icon={<Sparkles size={18} />}>
+        <select
+          className="modern-input"
+          value={roomData.category}
+          onChange={(e) =>
+            setRoomData({ ...roomData, category: e.target.value })
+          }
+        >
+          <option value="">Select Category</option>
+          <option value="Pg">PG / Hostel</option>
+          <option value="Rented-Room">Flat / Room</option>
+        </select>
+      </InputWrapper>
+
+      {/* Rent Type */}
+      {roomData.category === "Rented-Room" && (
+        <InputWrapper label="Rent Type *">
+          <select
+            className="modern-input"
+            value={roomData.renttype}
+            onChange={(e) =>
+              setRoomData({ ...roomData, renttype: e.target.value })
+            }
+          >
+            <option value="">Select Rent Type</option>
+            <option value="Room-Rent">Room Rent</option>
+            <option value="Flat-Rent">Flat Rent</option>
+          </select>
+        </InputWrapper>
+      )}
+
+      {/* Flat Type */}
+      {roomData.renttype === "Flat-Rent" && (
+        <InputWrapper label="Flat Type *">
+          <select
+            className="modern-input"
+            value={roomData.flattype}
+            onChange={(e) =>
+              setRoomData({ ...roomData, flattype: e.target.value })
+            }
+          >
+            <option value="">Select Flat Type</option>
+            <option value="1Rk">1RK</option>
+            <option value="1BHK">1BHK</option>
+            <option value="2BHK">2BHK</option>
+            <option value="3BHK">3BHK</option>
+            <option value="4BHK">4BHK</option>
+            <option value="5BHK">5BHK</option>
+          </select>
+        </InputWrapper>
+      )}
+
+      {/* Room Type */}
+      {roomData.renttype === "Room-Rent" && (
+        <InputWrapper label="Room Type *">
+          <select
+            className="modern-input"
+            value={roomData.roomtype}
+            onChange={(e) =>
+              setRoomData({ ...roomData, roomtype: e.target.value })
+            }
+          >
+            <option value="">Select Room Type</option>
+            <option value="Single">Single</option>
+            <option value="Double">Double</option>
+            <option value="Triple">Triple</option>
+          </select>
+        </InputWrapper>
+      )}
+
+    </div>
+
+    {/* PG SERVICES */}
+    {roomData.category === "Pg" && (
+      <div className="space-y-5 pt-6 border-t">
+        <h3 className="font-semibold text-gray-700 text-lg">
+          PG Pricing
+        </h3>
+
+        {roomData.services.map((service, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
+            <input
+              type="text"
+              className="modern-input bg-gray-100 cursor-not-allowed"
+              value="Monthly Rent"
+              disabled
+            />
+
+            <input
+              type="number"
+              placeholder="Enter price"
+              className="modern-input"
+              value={service.price}
+              onChange={(e) => {
+                const updatedServices = [...roomData.services];
+                updatedServices[index].name = "Monthly Rent";
+                updatedServices[index].price = e.target.value;
+                setRoomData({ ...roomData, services: updatedServices });
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    )}
+
+    {/* Description */}
+    <InputWrapper label="Property Description *">
+      <textarea
+        className="modern-input min-h-[120px]"
+        placeholder="Briefly describe the room..."
+        value={roomData.description}
+        onChange={(e) =>
+          setRoomData({ ...roomData, description: e.target.value })
+        }
+      />
+    </InputWrapper>
+  </motion.div>
+)}
 
                   {step === 2 && (
   <motion.div 

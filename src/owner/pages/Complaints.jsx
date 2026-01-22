@@ -88,51 +88,7 @@ export default function Complaints() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 p-4 sm:p-6 lg:p-8">
       {/* ENHANCED HEADER */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl shadow-xl border-b border-slate-200/50 rounded-3xl -mt-4 sm:-mt-6 mb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            {/* Title */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-4"
-            >
-              <div className="w-3 h-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-lg" />
-              <div>
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black bg-gradient-to-r from-slate-900 via-indigo-900 to-purple-900 bg-clip-text text-transparent">
-                  Resolutions
-                </h1>
-                <p className="text-sm font-semibold text-slate-600 mt-1">Complaint Management Dashboard</p>
-              </div>
-            </motion.div>
-
-            {/* Search & Actions */}
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="relative flex-1 min-w-[280px] max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search complaints, tenants..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-6 py-4 bg-slate-50/80 border border-slate-200 rounded-3xl 
-                  text-lg font-semibold text-slate-800 placeholder-slate-400 
-                  focus:outline-none focus:ring-4 focus:ring-indigo-200 focus:border-indigo-300 
-                  transition-all duration-300 shadow-sm hover:shadow-md"
-                />
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                className="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl 
-                shadow-xl hover:shadow-2xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300"
-                aria-label="Export data"
-              >
-                <Download className="w-6 h-6" />
-              </motion.button>
-            </div>
-          </div>
-        </div>
-      </header>
+     
 
       <main className="max-w-7xl mx-auto">
         {/* STATS CARDS */}
