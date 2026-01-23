@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { motion } from 'framer-motion';
-import {
+import {  
   useAddTenantMutation,
   useChangeStatusMutation,
   useGetStatusQuery,
