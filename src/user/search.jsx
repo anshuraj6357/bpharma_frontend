@@ -74,7 +74,7 @@ export default function SearchPage() {
         return;
       }
 
-      navigate(`/search/${city}}`);
+      navigate(`/search/${city}`);
     });
 
     return () =>

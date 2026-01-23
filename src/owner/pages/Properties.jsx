@@ -13,7 +13,6 @@ import { toast } from "react-toastify";
 // Removed react-helmet-async - install with: npm i react-helmet-async or use basic meta in index.html [web:11]
 import {
   useAddbranchMutation,
-  useGetAllBranchQuery,
   useGetAllBranchByOwnerQuery,
   useGetAllBranchbybranchIdQuery,
   useDeleteBranchMutation,
@@ -170,9 +169,6 @@ export default function Properties() {
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
 
-  const { data: allbranch, refetch: refetchAllBranch, isLoading: loadingAllBranch } =
-    useGetAllBranchQuery(undefined, { skip: user?.role !== "branch-manager" });
-
   const { data: allbranchowner, refetch: refetchAllBranchOwner, isLoading: loadingAllBranchOwner } =
     useGetAllBranchByOwnerQuery(undefined, { skip: user?.role !== "owner" });
 
@@ -197,11 +193,9 @@ export default function Properties() {
   });
 
   const branchFetched = useMemo(() => {
-    if (allbranch?.allbranch?.length > 0) return allbranch.allbranch;
     if (allbranchowner?.allbranch?.length > 0) return allbranchowner.allbranch;
-    if (branchmanagerdata?.allbranch?.length > 0) return branchmanagerdata.allbranch;
     return [];
-  }, [allbranch?.allbranch, allbranchowner?.allbranch, branchmanagerdata?.allbranch]);
+  }, [ allbranchowner?.allbranch, branchmanagerdata?.allbranch]);
 
 const processedProperties = useMemo(() => 
   branchFetched.map((property) => {
@@ -259,7 +253,7 @@ const processedProperties = useMemo(() =>
     } catch (err) {
       toast.error(err?.data?.message || "Failed to add property.");
     }
-  }, [formData, addbranch, user?.role, refetchAllBranchOwner, refetchAllBranch, refetchBranchManagerData]);
+  }, [formData, addbranch, user?.role, refetchAllBranchOwner, refetchBranchManagerData]);
 
   const handlePropertyChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -271,7 +265,7 @@ const processedProperties = useMemo(() =>
   }, [formData.previewImages]);
 
   const showAddRoom = !!branchmanagerdata?.allbranch?.length;
-  const isLoading = loadingAllBranch || loadingAllBranchOwner || loadingBranchManagerData;
+  const isLoading =   loadingAllBranchOwner || loadingBranchManagerData;
 
   return (
     <div className="space-y-5 min-h-screen">
