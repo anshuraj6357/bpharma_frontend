@@ -3,9 +3,11 @@ import {
   Instagram,
   Linkedin,
   Twitter,
+  Youtube,   // 👈 ADD THIS
   Mail,
   MapPin,
 } from "lucide-react";
+
 import { useNavigate } from "react-router-dom";
 
 export default function Footer() {
@@ -102,24 +104,32 @@ export default function Footer() {
 
         {/* Socials */}
         <div className="lg:col-span-2">
-          <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-gray-300 mb-6">Connect</h3>
-          <div className="flex flex-wrap gap-3">
-            {[{ Icon: Facebook, link: "https://facebook.com" },
-              { Icon: Instagram, link: "https://instagram.com" },
-              { Icon: Twitter, link: "https://x.com" },
-              { Icon: Linkedin, link: "https://linkedin.com" }].map((social, i) => (
-              <a
-                key={i}
-                href={social.link}
-                target="_blank"
-                rel="noreferrer"
-                className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-800 hover:bg-indigo-600 transition-all duration-300 hover:scale-110"
-              >
-                <social.Icon size={18} />
-              </a>
-            ))}
-          </div>
-        </div>
+  <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-gray-300 mb-6">
+    Connect
+  </h3>
+
+  <div className="flex flex-wrap gap-3">
+    {[
+      { Icon: Facebook, link: "https://www.facebook.com/share/166cumDMBE/" },
+      { Icon: Instagram, link: "https://www.instagram.com/roomgipvtltd?igsh=amhsMW4wZjU1bTdl" },
+      { Icon: Twitter, link: "https://x.com/teamroomgi" },
+      { Icon: Linkedin, link: "https://www.linkedin.com/company/110314873/" },
+      { Icon: Youtube, link: "https://youtube.com/@roomgipvtltd?si=ahPvRt1yosgnBBJy" } // 👈 ADD
+    ].map((social, i) => (
+      <a
+        key={i}
+        href={social.link}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Roomgi social link"
+        className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-800 hover:bg-red-600 transition-all duration-300 hover:scale-110"
+      >
+        <social.Icon size={18} />
+      </a>
+    ))}
+  </div>
+</div>
+
       </div>
 
       {/* Bottom bar */}

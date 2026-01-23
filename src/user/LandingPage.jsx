@@ -209,9 +209,9 @@
   
     <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-16">
       {[
-        { label: "Partner Cities", value: "12", suffix: "+", icon: MapPin, color: "text-indigo-400" },
-        { label: "Verified Properties", value: "5", suffix: "K+", icon: Star, color: "text-amber-400" },
-        { label: "Happy Residents", value: "12", suffix: "K+", icon: Users, color: "text-emerald-400" },
+        { label: "Partner Cities", value: "4", suffix: "+", icon: MapPin, color: "text-indigo-400" },
+        { label: "Verified Properties", value: "1", suffix: "K+", icon: Star, color: "text-amber-400" },
+        { label: "Happy Residents", value: "5", suffix: "K+", icon: Users, color: "text-emerald-400" },
       ].map((stat, i) => (
         <div key={i} className="flex flex-col items-center group">
           {/* Icon with Soft Glow */}
