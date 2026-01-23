@@ -194,20 +194,27 @@ export default function Properties() {
     return [];
   }, [allbranch?.allbranch, allbranchowner?.allbranch, branchmanagerdata?.allbranch]);
 
-  const processedProperties = useMemo(() => 
-    branchFetched.map((property) => {
-      const occupiedBeds = property?.rooms?.reduce((acc, room) => acc + (room.occupied || 0), 0) || 0;
-      const occupiedRental = property.rooms?.reduce((acc, room) => acc + (room.occupiedRentalRoom || 0), 0) || 0;
-      const totalRooms = property?.totalCapacity || 0;
-      const totalOccupied = property.totalOccupied || 0;
-      const totalVacant = totalRooms - totalOccupied;
-      const totalOccupancyRate = totalRooms ? Math.round((totalOccupied / totalRooms) * 100) : 0;
-      const totalpgbed = (property?.totalCapacity || 0) - (property.totalrentalRoom || 0) - (property.totelhotelroom || 0);
+const processedProperties = useMemo(() => 
+  branchFetched.map((property) => {
+    const { occupiedBeds, occupiedRental, totalRooms, totalOccupied } = 
+      property.rooms?.reduce((acc, room) => {
+        acc.occupiedBeds += room.occupied || 0;
+        acc.occupiedRental += room.occupiedRentalRoom || 0;
+        acc.totalRooms += room.capacity || 0;
+        acc.totalOccupied += room.occupied || 0;
+        return acc;
+      }, { occupiedBeds: 0, occupiedRental: 0, totalRooms: 0, totalOccupied: 0 }) || 
+      { occupiedBeds: 0, occupiedRental: 0, totalRooms: 0, totalOccupied: 0 };
 
-      return { ...property, occupiedBeds, occupiedRental, totalpgbed, totalRooms, totalOccupied, totalVacant, totalOccupancyRate };
-    }),
-    [branchFetched]
-  );
+    const totalVacant = totalRooms - totalOccupied;
+    const totalOccupancyRate = totalRooms ? Math.round((totalOccupied / totalRooms) * 100) : 0;
+    const totalpgbed = totalRooms - (property.totalrentalRoom || 0) - (property.totelhotelroom || 0);
+
+    return { ...property, occupiedBeds, occupiedRental, totalpgbed, totalRooms, totalOccupied, totalVacant, totalOccupancyRate };
+  }),
+  [branchFetched]
+);
+
 
   const handleDeleteProperty = useCallback(async (occupiedLength, id) => {
     if (occupiedLength !== 0) return toast.warn("Can't delete property: rooms are occupied.");
