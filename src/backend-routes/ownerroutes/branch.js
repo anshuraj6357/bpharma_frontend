@@ -28,6 +28,13 @@ const owner_branch = createApi({
       query: () => "get",
       providesTags: ["Branch"],
     }),
+    deleteBranch: builder.mutation({
+      query: (id) => "Delete",
+      method:"DeleteBranch",
+      body:{id},
+      providesTags: ["Branch"],
+    }),
+
 
     getAllBranchByOwner: builder.query({
       query: () => "getalllbranchowner",
@@ -75,6 +82,7 @@ export const {
   useGetAllBranchQuery,
   useGetAllBranchByOwnerQuery,
   useGetAllBranchbybranchIdQuery,
+  useDeleteBranchMutation,
 
   // Location hooks
   useGetStatesQuery,

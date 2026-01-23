@@ -16,10 +16,8 @@ import {
   useGetAllBranchQuery,
   useGetAllBranchByOwnerQuery,
   useGetAllBranchbybranchIdQuery,
+  useDeleteBranchMutation,
 } from "../../backend-routes/ownerroutes/branch";
-import {
-  useDeletePropertyMutation
-} from "../../backend-routes/ownerroutes/property";
 import AddPropertyModal from "./property/addproperty";
 
 // Memoized PropertyCard component
@@ -173,7 +171,7 @@ export default function Properties() {
     useGetAllBranchbybranchIdQuery();
 
   const [addbranch, { isLoading: addingBranch }] = useAddbranchMutation();
-  const [deleteProperty] = useDeletePropertyMutation();
+  const [deleteBranch] = useDeleteBranchMutation();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [deletingPropertyId, setDeletingPropertyId] = useState(null);
