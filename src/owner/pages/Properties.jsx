@@ -40,118 +40,127 @@ const PropertyCard = React.memo(
       animate={{ opacity: 1, y: 0 }}
       className="group relative"
     >
-      <div className="bg-white rounded-[2rem] border border-slate-100 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_60px_-20px_rgba(0,0,0,0.12)] transition-all duration-500 overflow-hidden h-full flex flex-col">
+     <div className="bg-gradient-to-br from-white via-white to-indigo-50 
+rounded-[2rem] border border-slate-200 
+shadow-[0_20px_50px_-20px_rgba(0,0,0,0.15)] 
+hover:shadow-[0_40px_80px_-25px_rgba(79,70,229,0.25)] 
+transition-all duration-500 overflow-hidden h-full flex flex-col">
 
-        {/* TOP STATUS BAR */}
-        <div className="flex justify-end p-4">
-          <div className="backdrop-blur-md bg-white/80 px-3 py-1.5 rounded-xl border border-white/40 shadow-sm">
-            <p
-              className={`text-[10px] font-black uppercase tracking-widest ${
-                totalVacant > 0 ? "text-emerald-600" : "text-red-600"
-              }`}
-            >
-              {totalVacant} Vacant
-            </p>
-          </div>
+  {/* TOP STATUS BAR */}
+  <div className="flex justify-end p-4">
+    <div
+      className={`px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-widest
+      border shadow-sm
+      ${
+        totalVacant > 0
+          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+          : "bg-red-50 text-red-700 border-red-200"
+      }`}
+    >
+      {totalVacant} Vacant
+    </div>
+  </div>
+
+  {/* CONTENT */}
+  <div className="px-6 pb-6 flex flex-col flex-1">
+    {/* TITLE */}
+    <div className="mb-5">
+      <h3 className="text-lg font-black text-slate-900 truncate mb-1">
+        {property.name}
+      </h3>
+
+      <p className="text-xs text-slate-600 font-bold flex items-center gap-1.5 uppercase tracking-wider">
+        <MapPin size={14} className="text-indigo-600" />
+        {property.city}
+        <span className="text-slate-300">|</span>
+        {property.landmark || "Prime Area"}
+      </p>
+    </div>
+
+    {/* STATS */}
+    <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl">
+        <p className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
+          Beds Occupied
+        </p>
+        <p className="text-sm font-black text-slate-900">
+          {occupiedBeds}
+          <span className="text-slate-400 font-semibold">/{totalpgbed}</span>
+        </p>
+      </div>
+
+      <div className="bg-slate-50 border border-slate-200 p-3 rounded-2xl">
+        <p className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
+          Rooms Rented
+        </p>
+        <p className="text-sm font-black text-slate-900">
+          {occupiedRental}
+          <span className="text-slate-400 font-semibold">
+            /{property.totalrentalRoom}
+          </span>
+        </p>
+      </div>
+    </div>
+
+    {/* OCCUPANCY */}
+    <div className="bg-indigo-100 rounded-2xl p-4 border border-indigo-200 mb-2">
+      <div className="flex justify-between items-end mb-2">
+        <div>
+          <p className="text-[10px] font-black text-indigo-700 uppercase tracking-widest">
+            Occupancy
+          </p>
+          <p className="text-lg font-black text-indigo-900">
+            {totalOccupied + occupiedRental}
+            <span className="text-indigo-500 text-sm font-bold">
+              /{totalRooms}
+            </span>
+          </p>
         </div>
 
-        {/* CONTENT */}
-        <div className="px-6 pb-6 flex flex-col flex-1 bg-[#fdfdfd]">
-          <div className="mb-5">
-            <h3 className="text-lg font-black text-slate-800 truncate mb-1 group-hover:text-indigo-600 transition-colors">
-              {property.name}
-            </h3>
-            <p className="text-xs text-slate-400 font-bold flex items-center gap-1.5 uppercase tracking-wider">
-              <MapPin size={14} className="text-indigo-500" />
-              {property.city}
-              <span className="text-slate-200">|</span>
-              {property.landmark || "Prime Area"}
-            </p>
-          </div>
+        <p className="text-xs font-black text-indigo-700 bg-white px-2 py-1 rounded-lg border border-indigo-300 shadow-sm">
+          {Math.round(totalOccupancyRate)}%
+        </p>
+      </div>
 
-          {/* STATS */}
-          <div className="grid grid-cols-2 gap-3 mb-6">
-            <div className="bg-white border border-slate-100 p-3 rounded-2xl shadow-sm">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                Beds Occupied
-              </p>
-              <p className="text-sm font-black text-slate-700">
-                {occupiedBeds}
-                <span className="text-slate-300 font-medium">/{totalpgbed}</span>
-              </p>
-            </div>
+      <div className="w-full h-2 bg-indigo-200 rounded-full overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${totalOccupancyRate}%` }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="h-full bg-indigo-700 rounded-full shadow-[0_0_12px_rgba(67,56,202,0.6)]"
+        />
+      </div>
+    </div>
 
-            <div className="bg-white border border-slate-100 p-3 rounded-2xl shadow-sm">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">
-                Rooms Rented
-              </p>
-              <p className="text-sm font-black text-slate-700">
-                {occupiedRental}
-                <span className="text-slate-300 font-medium">
-                  /{property.totalrentalRoom}
-                </span>
-              </p>
-            </div>
-          </div>
-
-          {/* OCCUPANCY */}
-          <div className="bg-indigo-50/50 rounded-2xl p-4 border border-indigo-100/50 mb-2">
-            <div className="flex justify-between items-end mb-2">
-              <div>
-                <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">
-                  Occupancy
-                </p>
-                <p className="text-lg font-black text-indigo-900">
-                  {totalOccupied + occupiedRental}
-                  <span className="text-indigo-300 text-sm font-bold">
-                    /{totalRooms}
-                  </span>
-                </p>
-              </div>
-
-              <p className="text-xs font-black text-indigo-600 bg-white px-2 py-1 rounded-lg border border-indigo-100 shadow-sm">
-                {Math.round(totalOccupancyRate)}%
-              </p>
-            </div>
-
-            <div className="w-full h-2 bg-indigo-100 rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${totalOccupancyRate}%` }}
-                transition={{ duration: 1, ease: "easeOut" }}
-                className="h-full bg-indigo-600 rounded-full shadow-[0_0_10px_rgba(79,70,229,0.4)]"
-              />
-            </div>
-          </div>
-
-          {/* ACTIONS */}
-          <div className="mt-auto pt-6 flex items-center justify-between">
-            <div className="flex -space-x-2">
-              <div className="w-7 h-7 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500">
-                +4
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <button className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all active:scale-90">
-                <Edit size={16} />
-              </button>
-
-              <button
-                onClick={() => onDelete(totalOccupied, property._id)}
-                disabled={deletingPropertyId === property._id}
-                className="p-2.5 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all active:scale-90 disabled:opacity-50"
-              >
-                {deletingPropertyId === property._id ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-red-500" />
-                ) : (
-                  <Trash2 size={16} />
-                )}
-              </button>
-            </div>
-          </div>
+    {/* ACTIONS */}
+    <div className="mt-auto pt-6 flex items-center justify-between">
+      <div className="flex -space-x-2">
+        <div className="w-7 h-7 rounded-full border-2 border-white bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-700">
+          +4
         </div>
       </div>
+
+      <div className="flex gap-2">
+        <button className="p-2.5 rounded-xl bg-white border border-slate-300 text-slate-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50 transition-all active:scale-90">
+          <Edit size={16} />
+        </button>
+
+        <button
+          onClick={() => onDelete(totalOccupied, property._id)}
+          disabled={deletingPropertyId === property._id}
+          className="p-2.5 rounded-xl bg-white border border-slate-300 text-slate-500 hover:text-red-600 hover:border-red-300 hover:bg-red-50 transition-all active:scale-90 disabled:opacity-50"
+        >
+          {deletingPropertyId === property._id ? (
+            <Loader2 className="w-4 h-4 animate-spin text-red-600" />
+          ) : (
+            <Trash2 size={16} />
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
     </motion.div>
   )
 );

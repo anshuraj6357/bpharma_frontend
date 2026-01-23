@@ -454,15 +454,31 @@ const slideVariants = {
       </div>
     ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <InputWrapper label="Base Pricing (₹) *" icon={<IndianRupee size={18} />}>
-          <input 
-            type="number" 
-            className="modern-input text-2xl font-black h-20 px-8" 
-            placeholder="0.00" 
-            value={roomData.price} 
-            onChange={e => setRoomData({ ...roomData, price: e.target.value })} 
-          />
-        </InputWrapper>
+       <InputWrapper label="Base Pricing (₹) *" icon={<IndianRupee size={18} />}>
+  <input
+    type="number"
+    min="0"
+    step="1"
+    inputMode="numeric"
+    className="modern-input text-2xl font-black h-20 px-8"
+    placeholder="0"
+    value={roomData.price}
+    onChange={(e) => {
+      const value = e.target.value;
+      // prevent negative values
+      if (value === "" || Number(value) >= 0) {
+        setRoomData({ ...roomData, price: value });
+      }
+    }}
+    onKeyDown={(e) => {
+      // block minus key manually
+      if (e.key === "-" || e.key === "e") {
+        e.preventDefault();
+      }
+    }}
+  />
+</InputWrapper>
+
         <div className="bg-orange-50 rounded-3xl p-6 flex flex-col justify-center border border-orange-100">
            <p className="text-orange-800 text-xs font-bold uppercase mb-1">Pricing Note</p>
            <p className="text-orange-600 text-xs leading-relaxed">This will be shown as the primary price for your listing.</p>

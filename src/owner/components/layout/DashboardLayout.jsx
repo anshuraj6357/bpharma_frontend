@@ -1,15 +1,18 @@
-import { useState } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { menuIcons } from "../../../constants/menuIcon.jsx";
-import Footer from "../../../user/Footer";
 import DashboardHeader from "../../header";
 import { ChevronRight, LogOut } from "lucide-react";
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
+
+  // Mobile sidebar auto-close on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const menuItems = [
     { id: "properties", label: "Properties", path: "/admin/properties" },
@@ -20,15 +23,8 @@ export default function DashboardLayout() {
     { id: "subscription", label: "Subscription", path: "/admin/subscription" },
   ];
 
-  const handleNavigation = (path) => {
-    navigate(path);
-    setIsMobileMenuOpen(false);
-  };
-
-  const isActive = (path) => location.pathname === path;
-
   return (
-    <div className="flex flex-col min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F8FAFC]">
       {/* HEADER */}
       <DashboardHeader
         isSidebarOpen={isSidebarOpen}
@@ -37,97 +33,112 @@ export default function DashboardLayout() {
         setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
 
-      <div className="flex flex-1 pt-16">
-        {/* --- SIDEBAR --- */}
-        <aside
-          className={`
-            ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} 
-            lg:translate-x-0 lg:flex
-            flex-col fixed top-16 bottom-0 z-[60]
-            bg-white border-r border-slate-200/60 shadow-[20px_0_40px_-20px_rgba(0,0,0,0.02)]
-            transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
-            ${isSidebarOpen ? "w-72" : "w-24"}
-          `}
-        >
-          {/* Menu Section */}
-          <nav className="p-4 pt-8 space-y-1.5 flex-1 custom-scrollbar overflow-y-auto">
-            <p className={`text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-4 transition-opacity duration-300 ${!isSidebarOpen && 'opacity-0'}`}>
-              Main Menu
-            </p>
-            
-            {menuItems.map((item) => {
-              const active = isActive(item.path);
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleNavigation(item.path)}
-                  className={`
-                    group relative w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300
-                    ${active 
-                      ? "bg-slate-900 text-white shadow-[0_10px_20px_-5px_rgba(15,23,42,0.3)] shadow-slate-900/30" 
-                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"}
-                  `}
-                >
-                  {/* Active Indicator Pin */}
-                  {active && (
+      {/* SIDEBAR */}
+      <aside
+        className={`
+          fixed top-16 left-0 bottom-0 z-[100]
+          bg-white border-r border-slate-200/60
+          transition-transform duration-300
+          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0
+          ${isSidebarOpen ? "w-72" : "w-24"}
+        `}
+      >
+        <nav className="p-4 pt-8 space-y-1.5 h-full overflow-y-auto">
+          <p
+            className={`text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 px-4 ${
+              !isSidebarOpen && "opacity-0"
+            }`}
+          >
+            Main Menu
+          </p>
+
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.id}
+              to={item.path}
+              className={({ isActive }) =>
+                `
+                group relative flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all
+                ${
+                  isActive
+                    ? "bg-slate-900 text-white shadow-lg"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                }
+              `
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  {/* Active bar */}
+                  {isActive && (
                     <div className="absolute left-0 w-1 h-6 bg-orange-500 rounded-r-full" />
                   )}
-                  
-                  <div className={`transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110'}`}>
+
+                  {/* ICON (THIS WILL RENDER NOW) */}
+                  <div className="w-5 h-5 flex items-center justify-center">
                     {menuIcons[item.id]}
                   </div>
 
+                  {/* Label */}
                   {isSidebarOpen && (
-                    <span className={`flex-1 text-left text-sm font-bold tracking-tight transition-all duration-300`}>
+                    <span className="flex-1 text-sm font-bold">
                       {item.label}
                     </span>
                   )}
 
-                  {isSidebarOpen && active && (
-                    <ChevronRight size={14} className="opacity-50" />
+                  {/* Chevron */}
+                  {isSidebarOpen && isActive && (
+                    <ChevronRight size={14} className="opacity-60" />
                   )}
 
-                  {/* Tooltip for collapsed mode */}
+                  {/* Tooltip */}
                   {!isSidebarOpen && (
-                    <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-[70] whitespace-nowrap shadow-xl">
+                    <div className="absolute left-full ml-4 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 whitespace-nowrap shadow-xl z-[200]">
                       {item.label}
                     </div>
                   )}
-                </button>
-              );
-            })}
-          </nav>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
 
-          {/* Bottom Action (Logout/Profile) */}
-          <div className="p-4 border-t border-slate-100">
-             <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-red-500 hover:bg-red-50 transition-colors group">
-                <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
-                {isSidebarOpen && <span className="text-sm font-black uppercase tracking-widest">Logout</span>}
-             </button>
+        {/* LOGOUT */}
+        <div className="p-4 border-t">
+          <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-red-500 hover:bg-red-50">
+            <LogOut size={20} />
+            {isSidebarOpen && (
+              <span className="text-sm font-black uppercase tracking-widest">
+                Logout
+              </span>
+            )}
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN */}
+      <main
+        className={`pt-16 transition-all ${
+          isSidebarOpen ? "lg:pl-72" : "lg:pl-24"
+        }`}
+      >
+        <div className="p-6 lg:p-12">
+          <div className="max-w-[1600px] mx-auto">
+            <Outlet />
           </div>
-        </aside>
+        </div>
 
-        {/* --- MAIN CONTENT --- */}
-        <main
-          className={`
-            flex-1 flex flex-col min-w-0 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
-            ${isSidebarOpen ? "lg:pl-72" : "lg:pl-24"}
-          `}
-        >
-          <div className="flex-1 p-6 lg:p-12">
-            {/* Page Container with subtle entry animation background */}
-            <div className="max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <Outlet />
-            </div>
-          </div>
-          <Footer />
-        </main>
-      </div>
+        {/* ADMIN FOOTER */}
+        <footer className="py-4 text-center text-xs text-slate-400 border-t">
+          © {new Date().getFullYear()} Roomgi Admin Panel
+        </footer>
+      </main>
 
-      {/* Mobile Overlay */}
+      {/* MOBILE OVERLAY */}
       {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[55] lg:hidden"
+        <div
+          className="fixed inset-0 bg-black/40 z-[90] lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
