@@ -282,40 +282,61 @@ const slideVariants = {
     </div>
 
     {/* PG SERVICES */}
-    {roomData.category === "Pg" && (
-      <div className="space-y-5 pt-6 border-t">
-        <h3 className="font-semibold text-gray-700 text-lg">
-          PG Pricing
-        </h3>
+   {roomData.category === "Pg" && (
+  <div className="space-y-5 pt-6 border-t">
+    <h3 className="font-semibold text-gray-700 text-lg">
+      PG Pricing
+    </h3>
 
-        {roomData.services.map((service, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-          >
-            <input
-              type="text"
-              className="modern-input bg-gray-100 cursor-not-allowed"
-              value="Monthly Rent"
-              disabled
-            />
+    {roomData.services.map((service, index) => (
+      <div
+        key={index}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
+        {/* Fixed label */}
+        <input
+          type="text"
+          className="modern-input bg-gray-100 cursor-not-allowed"
+          value="Monthly Rent"
+          disabled
+        />
 
-            <input
-              type="number"
-              placeholder="Enter price"
-              className="modern-input"
-              value={service.price}
-              onChange={(e) => {
-                const updatedServices = [...roomData.services];
-                updatedServices[index].name = "Monthly Rent";
-                updatedServices[index].price = e.target.value;
-                setRoomData({ ...roomData, services: updatedServices });
-              }}
-            />
-          </div>
-        ))}
+        {/* Price input (no negative allowed) */}
+        <input
+          type="number"
+          placeholder="Enter price"
+          className="modern-input"
+          min="0"
+          value={service.price || ""}
+          onKeyDown={(e) => {
+            if (["-", "e", "E"].includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            // ❌ Block negative numbers
+            if (value < 0) return;
+
+            const updatedServices = [...roomData.services];
+            updatedServices[index] = {
+              ...updatedServices[index],
+              name: "Monthly Rent",
+              price: value,
+            };
+
+            setRoomData({
+              ...roomData,
+              services: updatedServices,
+            });
+          }}
+        />
       </div>
-    )}
+    ))}
+  </div>
+)}
+
 
     {/* Description */}
     <InputWrapper label="Property Description *">
