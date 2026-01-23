@@ -13,7 +13,7 @@ export const user_PgApi = createApi({
                 url: `/allpg`,
                 method: "GET",
             }),
-            providesTags: ["Pg"], // ✅ auto refetch on invalidation
+            providesTags: ["Pg"], 
         }),
         getservicesarea: builder.query({
             query: () => ({

@@ -30,7 +30,7 @@ const owner_branch = createApi({
     }),
    deleteBranch: builder.mutation({
   query: (id) => ({
-    url: "/branch/delete",
+    url: "/DeleteBranch",
     method: "DELETE",
     body: { id },
   }),

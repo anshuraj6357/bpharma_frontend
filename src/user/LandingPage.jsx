@@ -26,20 +26,16 @@
 
 
 
-import { useState, useEffect,Suspense,lazy } from "react";
-
-
+  import { useState, useEffect,  useCallback, useMemo } from "react";
   import { useNavigate } from "react-router-dom";
-
+  import  SearchPage from "./search.jsx"
   import {
     Search, MapPin, ShieldCheck, CreditCard, Zap,
     ArrowRight, Star, Users, 
   } from "lucide-react";
    import {useSelector} from "react-redux"
-const SearchPage = lazy(() => import("./search.jsx"));
-const AuthModal = lazy(() => import("../user/AuthModal"));
-const ROOMCARD = lazy(() => import("../user/roomcard"));
-
+  import AuthModal from "../user/AuthModal";
+  import ROOMCARD from "../user/roomcard";
   import LandingPageSkeleton from "./loader/landingpageskeleton";
   import { useGetAllListedPgQuery } from "../backend-routes/userroutes/allpg.js";
   import { useGetWishlistQuery } from "../backend-routes/userroutes/authapi";
@@ -305,47 +301,50 @@ const ROOMCARD = lazy(() => import("../user/roomcard"));
     </header>
   
     {/* Listings */}
-{pgData.length > 0 ? (
-  <>
-    {(pgLoading || wishlistLoading) ? (
-      <LandingPageSkeleton />
-    ) : (
-      <Suspense fallback={<LandingPageSkeleton />}>
-        <ROOMCARD
-          pgData={pgData}
-          wishlistItems={wishlistData?.items || []}
-          setIsAuthModalOpen={setIsAuthModalOpen}
-        />
-      </Suspense>
+    {pgData.length > 0 ? (
+      <>
+      {
+       (pgLoading || wishlistLoading) ? <LandingPageSkeleton />:
+        <>
+         <ROOMCARD
+        pgData={pgData}
+        wishlistItems={wishlistData?.items || []}
+        setIsAuthModalOpen={setIsAuthModalOpen}
+      />
+        </>
+      }
+      </>
+     
+    ) : 
+    
+    
+    
+    (
+      <div
+        role="status"
+        className="py-32 sm:py-40 text-center bg-gradient-to-br from-slate-50 to-indigo-50 rounded-4xl border-2 border-dashed border-indigo-200/50"
+      >
+        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-4xl flex items-center justify-center mx-auto mb-10 sm:mb-12 shadow-2xl animate-pulse">
+          <Search className="w-12 h-12 sm:w-16 sm:h-16 text-white" />
+        </div>
+  
+        <h3 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">
+          No matches found
+        </h3>
+  
+        <p className="text-lg sm:text-xl text-slate-600 mb-10 sm:mb-12 max-w-lg mx-auto">
+          Try adjusting your filters or search for popular cities like Mumbai,
+          Bangalore, Gurgaon
+        </p>
+  
+        <button
+          onClick={() =>navigate("/")}
+          className="px-10 sm:px-12 py-5 sm:py-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl font-black text-base sm:text-lg shadow-2xl hover:shadow-3xl transition-all"
+        >
+          Show All Properties
+        </button>
+      </div>
     )}
-  </>
-) : (
-  <div
-    role="status"
-    className="py-32 sm:py-40 text-center bg-gradient-to-br from-slate-50 to-indigo-50 rounded-4xl border-2 border-dashed border-indigo-200/50"
-  >
-    <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-4xl flex items-center justify-center mx-auto mb-10 sm:mb-12 shadow-2xl animate-pulse">
-      <Search className="w-12 h-12 sm:w-16 sm:h-16 text-white" />
-    </div>
-
-    <h3 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">
-      No matches found
-    </h3>
-
-    <p className="text-lg sm:text-xl text-slate-600 mb-10 sm:mb-12 max-w-lg mx-auto">
-      Try adjusting your filters or search for popular cities like Mumbai,
-      Bangalore, Gurgaon
-    </p>
-
-    <button
-      onClick={() => navigate("/")}
-      className="px-10 sm:px-12 py-5 sm:py-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-3xl font-black text-base sm:text-lg shadow-2xl hover:shadow-3xl transition-all"
-    >
-      Show All Properties
-    </button>
-  </div>
-)}
-
   </section>
   
         {/* CTA Section - Above the fold priority */}
@@ -373,7 +372,7 @@ const ROOMCARD = lazy(() => import("../user/roomcard"));
           id="cta-title"
           className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight"
         >
-          Ready to upgrade your's living?
+          Ready to upgrade your living?
         </h2>
   
         <p className="text-sm sm:text-base md:text-lg text-white/80 max-w-2xl mx-auto mb-8 leading-relaxed">
@@ -425,12 +424,9 @@ const ROOMCARD = lazy(() => import("../user/roomcard"));
   <div className="w-full h-16 sm:h-20 bg-white" />
   
   
-  {isAuthModalOpen && (
-  <Suspense fallback={null}>
-    <AuthModal onClose={() => setIsAuthModalOpen(false)} />
-  </Suspense>
-)}
-
+  
+  
+        {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
       </div>
     );
   }

@@ -222,7 +222,7 @@ export default function Properties() {
     } finally {
       setDeletingPropertyId(null);
     }
-  }, [deleteProperty, refetchAllBranchOwner]);
+  }, [deleteBranch, refetchAllBranchOwner]);
 
   const handleSaveProperty = useCallback(async (e) => {
     e.preventDefault();
