@@ -5,8 +5,7 @@ import {
   useAppliedAllFilteredMutation,
 } from "../backend-routes/userroutes/filter";
 import { 
-  Loader2, Filter, Search, X, ChevronDown, 
-  MapPin, IndianRupee, Home, Building2, Hotel 
+  Loader2, Filter, Search, X, ChevronDown, IndianRupee,
 } from "lucide-react";
 import ROOMCARD from "../user/roomcard";
 
@@ -15,6 +14,7 @@ export default function Searched() {
   const { city } = useParams();
 
   const { data, isLoading } = useGetAllFilteredQuery(city);
+  console.log(data)
   const [applyFilters, { data: pgdata, isLoading: pgisLoading }] = useAppliedAllFilteredMutation();
 
   const [pgData, setPgData] = useState([]);
@@ -77,7 +77,7 @@ export default function Searched() {
       </div>
     );
   }
-
+  console.log("pgData",pgData)
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
       {/* HEADER & SEARCH SECTION */}
@@ -128,6 +128,7 @@ export default function Searched() {
                 {[1,2,3].map(i => <div key={i} className="h-80 bg-slate-200 animate-pulse rounded-3xl" />)}
             </div>
         ) : pgData?.length > 0 ? (
+        
           <ROOMCARD pgData={pgData} setIsAuthModalOpen={() => {}} isLoading={isLoading} />
         ) : (
           <div className="text-center py-32 bg-white rounded-[3rem] border border-dashed border-slate-300">

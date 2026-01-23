@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import SkeletonLoader from "./loader/skeletondetails.jsx";
 import { useProfileQuery } from "../backend-routes/userroutes/authapi";
 
-import AuthModal from "../user/AuthModal";
+
 import { useGetPgByIdQuery } from "../backend-routes/userroutes/allpg.js";
 import {
   useRazorpayPaymentVerifyMutation,
@@ -239,7 +239,7 @@ export default function PGDetailsPage() {
 
 
   const user = userdata?.profile;
-  console.log(user)
+
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -248,6 +248,7 @@ export default function PGDetailsPage() {
 
 
   const { data, isLoading, isError } = useGetPgByIdQuery(id);
+  console.log("data",data)
 
 
 
@@ -261,7 +262,7 @@ export default function PGDetailsPage() {
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const pg = data?.room;
-  console.log(pg)
+  console.log("pg",pg)
 
   const allImages = useMemo(() => {
     if (!pg) return [];
@@ -303,7 +304,7 @@ export default function PGDetailsPage() {
 
 
 
-    const [lng, lat] = pg?.branch?.location?.coordinates || [];
+    const [lng, lat] =data.location.coordinates || [];
     if (!lat || !lng) return toast.error("PG location missing");
     if (!userLocation.lat) return toast.error("User location not available");
 
@@ -329,6 +330,7 @@ export default function PGDetailsPage() {
       </div>
     );
   }
+
 
   if (isError || !pg) {
     return (
@@ -360,6 +362,14 @@ export default function PGDetailsPage() {
       Show all photos
     </button>
   );
+
+
+
+
+
+
+const totalServicePrice =
+  pg.services?.reduce((sum, s) => sum + Number(s.price || 0), 0) || 0;
 
 
 
@@ -989,6 +999,7 @@ export default function PGDetailsPage() {
 
         <div className="space-y-3">
           {pg.services?.length > 0 ? (
+      
             pg.services.map((s) => (
               <div key={s._id} className="flex justify-between items-center group">
                 <span className="text-slate-500 font-medium group-hover:text-slate-900 transition-colors">{s.name}</span>
@@ -1015,13 +1026,29 @@ export default function PGDetailsPage() {
 
         <div className="mt-4 pt-4 border-t border-dashed border-slate-200 flex justify-between items-baseline">
           <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">Total Value</span>
-          <span className="text-xl font-black text-slate-900">₹{pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0)}</span>
+         {pg?.category === "Pg" ? (
+  <div className="flex justify-between items-center pt-3 mt-3 border-t border-slate-200">
+   
+    <span className="text-indigo-600 font-black text-lg">
+      ₹{totalServicePrice}
+    </span>
+  </div>
+) : (
+  <span className="text-xl font-black text-slate-900">
+    ₹
+    {Number(pg.price || 0) +
+      Number(pg.advancedmonth || 0) * Number(pg.price || 0)}
+  </span>
+)}
+
+          
         </div>
       </div>
 
       {/* WALLET & FINAL CHECKOUT */}
       {(() => {
-        const totalRent = pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0);
+        
+        const totalRent =pg.services.length>0?totalServicePrice+ (pg.advancedmonth ? totalServicePrice * pg.advancedmonth : 0):pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0);
         const maxWalletAllowed = totalRent * 0.1;
         const walletDiscount = Math.min(user?.walletBalance || 0, maxWalletAllowed);
         const isWalletApplicable = totalRent > 1 && user?.walletBalance > 0;
