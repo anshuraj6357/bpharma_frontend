@@ -85,10 +85,7 @@ export default function SafetyGuidelinesPage() {
         </a>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-gray-950 text-white py-12 mt-20 text-center text-sm">
-        © {new Date().getFullYear()} ROOMGI Private Limited. All rights reserved.
-      </footer>
+
     </div>
   );
 }

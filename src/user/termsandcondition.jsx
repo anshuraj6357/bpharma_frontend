@@ -161,7 +161,6 @@ export default function TermsConditions() {
         </p>
       </footer>
 
-      <Footer />
     </div>
   );
 }

@@ -199,7 +199,6 @@ export default function PrivacyPolicy() {
         </p>
       </footer>
 
-      <Footer />
     </div>
   );
 }
