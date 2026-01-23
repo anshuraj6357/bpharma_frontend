@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Booking() {
   const { data, isLoading, isError } = useGetbookingQuery();
   const bookings = data?.bookings || [];
+  console.log(bookings[0])
 
   if (isError) {
     return (
