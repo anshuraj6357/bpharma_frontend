@@ -214,7 +214,7 @@ export default function Properties() {
     if (!confirm("Are you sure you want to delete this property?")) return;
     try {
       setDeletingPropertyId(id);
-      await deleteProperty(id).unwrap();
+      await deleteBranch(id).unwrap();
       toast.success("Property deleted.");
       refetchAllBranchOwner?.();
     } catch (err) {
