@@ -4,7 +4,7 @@
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
   <!-- ===================== -->
-  <!-- 🏠 HOME (HIGHEST) -->
+  <!-- HOME -->
   <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/</loc>
@@ -13,13 +13,13 @@
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://roomgi.com/images/hero-pg-booking.jpg</image:loc>
-      <image:title>Verified PGs Near You – Roomgi</image:title>
-      <image:caption>Find affordable, verified PGs with food & WiFi</image:caption>
+      <image:title>Verified PGs Near You - Roomgi</image:title>
+      <image:caption>Find affordable, verified PGs with food &amp; WiFi</image:caption>
     </image:image>
   </url>
 
   <!-- ===================== -->
-  <!-- 🔍 CITY SEARCH (MONEY PAGES) -->
+  <!-- CITY SEARCH -->
   <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/search/delhi</loc>
@@ -53,7 +53,7 @@
   </url>
 
   <!-- ===================== -->
-  <!-- 🏘 PG DETAIL PAGES (EXAMPLES – ADD MORE) -->
+  <!-- PG DETAIL PAGES -->
   <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/pg/65a12bc91e7a9c00123abcd</loc>
@@ -69,7 +69,7 @@
   </url>
 
   <!-- ===================== -->
-  <!-- 🧱 BRANCH / ROOM LIST -->
+  <!-- BRANCH / ROOM LIST -->
   <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/branch-rooms/sample-branch-id</loc>
@@ -79,7 +79,7 @@
   </url>
 
   <!-- ===================== -->
-  <!-- 🏷 BRAND / TRUST -->
+  <!-- BRAND / TRUST -->
   <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/about</loc>
@@ -107,7 +107,7 @@
   </url>
 
   <!-- ===================== -->
-  <!-- ❓ HELP / SUPPORT -->
+  <!-- HELP / SUPPORT -->
   <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/faqs</loc>
@@ -135,7 +135,7 @@
   </url>
 
   <!-- ===================== -->
-  <!-- 📜 LEGAL (LOW PRIORITY) -->
+  <!-- LEGAL -->
   <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/privacypolicy</loc>
@@ -157,7 +157,7 @@
   </url>
 
   <!-- ===================== -->
-  <!-- 🎯 CAREER / BRAND -->
+  <!-- CAREER -->
   <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/career</loc>
