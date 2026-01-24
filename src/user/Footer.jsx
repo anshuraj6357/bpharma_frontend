@@ -6,17 +6,15 @@ import {
   Youtube,
   Mail,
   MapPin,
-  ArrowRight,
   Download,
   Share,
+  ShieldCheck,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Footer() {
-  const navigate = useNavigate();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [showInstall, setShowInstall] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
@@ -26,7 +24,6 @@ export default function Footer() {
     const handler = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setShowInstall(true);
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -34,220 +31,192 @@ export default function Footer() {
   }, []);
 
   const handleInstallApp = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") setShowInstall(false);
-    setDeferredPrompt(null);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") setDeferredPrompt(null);
+    } else {
+      alert("To install: Tap your browser menu and select 'Add to Home Screen'");
+    }
   };
 
-  const navGroups = [
-    {
-      title: "Company",
-      links: [
-        { name: "About Roomgi", path: "/about" },
-        { name: "Mission & Vision", path: "/mission" },
-        { name: "Why Roomgi", path: "/why-roomgi" },
-        { name: "Careers", path: "/career" },
-      ],
-    },
-    {
-      title: "Support",
-      links: [
-        { name: "FAQs", path: "/faqs" },
-        { name: "Help Center", path: "/helpcenter" },
-        { name: "Report an Issue", path: "/reportissue" },
-        { name: "Contact Support", path: "/contact" },
-      ],
-    },
-    {
-      title: "Trust & Legal",
-      links: [
-        { name: "Safety Guidelines", path: "/safety-guidelines" },
-        { name: "Privacy Policy", path: "/privacypolicy" },
-        { name: "Terms & Conditions", path: "/termsandcondition" },
-      ],
-    },
-  ];
-
   return (
-    <footer className="relative overflow-hidden bg-[#020617] pt-24 pb-12 text-slate-300">
-      {/* SEO: Hidden H2 for Document Structure */}
-      <h2 className="sr-only">Roomgi Footer - Links and Contact Information</h2>
-
-      {/* Decorative Glow */}
-      <div className="pointer-events-none absolute -top-24 left-1/2 h-96 w-full -translate-x-1/2 bg-indigo-600/10 blur-[120px]" />
+    <footer className="relative overflow-hidden bg-[#020617] pt-24 pb-10 text-slate-400">
+      {/* Background Decor */}
+      <div className="pointer-events-none absolute -top-24 left-1/2 h-96 w-full -translate-x-1/2 bg-indigo-500/5 blur-[120px]" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
           
-          {/* 1. BRAND SECTION */}
-          <div className="lg:col-span-4">
-            <Link to="/" className="flex items-center gap-3 transition-opacity hover:opacity-90">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 text-2xl font-black text-white shadow-lg shadow-indigo-500/20">
-                R
-              </div>
-              <span className="text-3xl font-black tracking-tight text-white">
-                Roomgi<span className="text-indigo-500">.</span>
-              </span>
-            </Link>
-            
-            <p className="mt-6 max-w-sm text-sm leading-relaxed text-slate-400">
-              India’s premier broker-free rental ecosystem. Discover verified PGs, flats, and commercial spaces with complete transparency and zero hidden costs.
-            </p>
-
-            <address className="mt-8 not-italic">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3 group">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 border border-slate-800 group-hover:border-indigo-500/50 transition-colors">
-                    <MapPin size={16} className="text-indigo-400" />
-                  </div>
-                  <span className="text-sm">Noida, Uttar Pradesh, India</span>
+          {/* 1. BRAND & IDENTITY (4 Cols) */}
+          <div className="lg:col-span-4 space-y-8">
+            <div>
+              <Link to="/" className="flex items-center gap-3 group">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 text-2xl font-black text-white shadow-xl shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
+                  R
                 </div>
-                <a href="mailto:support@roomgi.com" className="flex items-center gap-3 group">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 border border-slate-800 group-hover:border-indigo-500/50 transition-colors">
-                    <Mail size={16} className="text-indigo-400" />
-                  </div>
-                  <span className="text-sm hover:text-white transition-colors">support@roomgi.com</span>
-                </a>
-              </div>
-            </address>
-          </div>
-
-          {/* 2. NAVIGATION LINKS */}
-          <nav className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-6">
-  {/* Column 1: Company */}
-  <div>
-    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">
-      Company
-    </h3>
-    <ul className="mt-6 space-y-4">
-      <li><Link to="/about" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />About Roomgi
-      </Link></li>
-      <li><Link to="/mission" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />Mission
-      </Link></li>
-      <li><Link to="/career" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />Careers
-      </Link></li>
-    </ul>
-  </div>
-
-  {/* Column 2: Leadership (RESTORED) */}
-  <div>
-    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">
-      Leadership
-    </h3>
-    <ul className="mt-6 space-y-4">
-      <li><Link to="/founder" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />Meet the Founder
-      </Link></li>
-      <li><Link to="/why-roomgi" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />Our Story
-      </Link></li>
-    </ul>
-  </div>
-
-  {/* Column 3: Support */}
-  <div>
-    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">
-      Support
-    </h3>
-    <ul className="mt-6 space-y-4">
-      <li><Link to="/faqs" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />FAQs
-      </Link></li>
-      <li><Link to="/contact" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />Contact
-      </Link></li>
-    </ul>
-  </div>
-
-  {/* Column 4: Legal */}
-  <div>
-    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">
-      Legal
-    </h3>
-    <ul className="mt-6 space-y-4">
-      <li><Link to="/privacypolicy" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />Privacy
-      </Link></li>
-      <li><Link to="/termsandcondition" className="group flex items-center text-sm hover:text-indigo-400 transition-all">
-        <span className="h-px w-0 bg-indigo-500 transition-all group-hover:mr-2 group-hover:w-3" />Terms
-      </Link></li>
-    </ul>
-  </div>
-</nav>
-          {/* 2. NAVIGATION LINKS */}
-
-
-          {/* 3. PWA & SOCIALS SECTION */}
-          <div className="lg:col-span-2">
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-white/50 mb-6">
-              Connect
-            </h3>
-            
-            <div className="flex flex-wrap gap-3 mb-8">
-              {[
-                { Icon: Facebook, href: "https://facebook.com/..." },
-                { Icon: Instagram, href: "https://instagram.com/..." },
-                { Icon: Youtube, href: "https://youtube.com/..." },
-                { Icon: Linkedin, href: "https://linkedin.com/..." },
-              ].map((social, i) => (
-                <a
-                  key={i}
-                  href={social.href}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white hover:-translate-y-1 transition-all"
-                >
-                  <social.Icon size={18} />
-                </a>
-              ))}
+                <span className="text-3xl font-black tracking-tighter text-white">
+                  Roomgi<span className="text-indigo-500">.</span>
+                </span>
+              </Link>
+              <p className="mt-6 text-sm leading-relaxed text-slate-400 max-w-sm">
+                India’s most transparent rental ecosystem. We connect people with 
+                verified PGs, flats, and offices with **zero brokerage**.
+              </p>
             </div>
 
-            {/* PWA INSTALL CARD */}
-            {showInstall && !isIOS && (
-              <div className="rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-700 p-5 shadow-2xl shadow-indigo-500/20 animate-in fade-in slide-in-from-bottom-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-white/10 rounded-lg">
-                    <Download size={18} className="text-white" />
-                  </div>
-                  <span className="text-xs font-bold text-white uppercase tracking-wider">Web App</span>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 group">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 group-hover:border-indigo-500/50 transition-all">
+                  <MapPin size={18} className="text-indigo-400" />
                 </div>
-                <p className="text-xs text-indigo-100 font-medium leading-relaxed mb-4">
-                  Install Roomgi for a faster, app-like experience.
-                </p>
-                <button
-                  onClick={handleInstallApp}
-                  className="w-full rounded-xl bg-white py-2.5 text-xs font-black text-indigo-600 hover:bg-indigo-50 transition-colors"
-                >
-                  INSTALL NOW
-                </button>
+                <div className="text-sm">
+                  <p className="text-white font-bold text-xs uppercase tracking-widest">Headquarters</p>
+                  <p>Noida, Uttar Pradesh, India</p>
+                </div>
               </div>
-            )}
 
-            {/* iOS INSTRUCTIONS */}
-            {isIOS && (
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-                <div className="flex items-center gap-2 text-[11px] font-bold text-slate-300 mb-2">
-                   <Share size={14} className="text-indigo-400" /> ADD TO HOME SCREEN
+              <a href="mailto:support@roomgi.com" className="flex items-center gap-4 group">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 group-hover:border-indigo-500/50 transition-all">
+                  <Mail size={18} className="text-indigo-400" />
                 </div>
-                <p className="text-[10px] leading-relaxed text-slate-500">
-                  Tap <span className="text-indigo-400 font-bold">Share</span> then select <span className="text-white font-bold">"Add to Home Screen"</span> from your Safari browser.
-                </p>
+                <div className="text-sm">
+                  <p className="text-white font-bold text-xs uppercase tracking-widest">Email Support</p>
+                  <p className="group-hover:text-white transition-colors">support@roomgi.com</p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          {/* 2. NAVIGATION (5 Cols) */}
+          <div className="lg:col-span-5">
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-2">
+              <div className="space-y-10">
+                {/* Company Section */}
+                <nav>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white">Company</h3>
+                  <ul className="mt-6 space-y-4 text-sm font-medium">
+                    {["About Roomgi", "Mission", "Careers"].map((item) => (
+                      <li key={item}>
+                        <Link to={`/${item.toLowerCase().replace(' ', '')}`} className="hover:text-indigo-400 transition-all flex items-center group">
+                          <span className="h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-3 group-hover:mr-2" />
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+                {/* Leadership Section */}
+                <nav>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white">Leadership</h3>
+                  <ul className="mt-6 space-y-4 text-sm font-medium">
+                    <li><Link to="/founder" className="hover:text-indigo-400 transition-all flex items-center group">
+                      <span className="h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-3 group-hover:mr-2" />Founder
+                    </Link></li>
+                    <li><Link to="/why-roomgi" className="hover:text-indigo-400 transition-all flex items-center group">
+                      <span className="h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-3 group-hover:mr-2" />Our Story
+                    </Link></li>
+                  </ul>
+                </nav>
               </div>
-            )}
+
+              <div className="space-y-10">
+                {/* Support Section */}
+                <nav>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white">Support</h3>
+                  <ul className="mt-6 space-y-4 text-sm font-medium">
+                    {["FAQs", "Contact", "Help Center"].map((item) => (
+                      <li key={item}>
+                        <Link to={`/${item.toLowerCase().replace(' ', '')}`} className="hover:text-indigo-400 transition-all flex items-center group">
+                          <span className="h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-3 group-hover:mr-2" />
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+                {/* Legal Section */}
+                <nav>
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white">Trust & Legal</h3>
+                  <ul className="mt-6 space-y-4 text-sm font-medium">
+                    {["Privacy Policy", "Terms and Condition"].map((item) => (
+                      <li key={item}>
+                        <Link to={`/${item.toLowerCase().replace(' ', '')}`} className="hover:text-indigo-400 transition-all flex items-center group">
+                          <span className="h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-3 group-hover:mr-2" />
+                          {item}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. PWA & SOCIALS (3 Cols) */}
+          <div className="lg:col-span-3 space-y-8">
+            <div>
+              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white mb-6">Connect With Us</h3>
+              <div className="flex flex-wrap gap-3">
+                {[Facebook, Instagram, Linkedin, Twitter, Youtube].map((Icon, i) => (
+                  <a key={i} href="#" className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white hover:-translate-y-1 transition-all duration-300">
+                    <Icon size={18} />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* PWA CARD */}
+            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-indigo-950 p-6 border border-white/5 shadow-2xl">
+              <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-40 transition-opacity">
+                <ShieldCheck size={40} className="text-indigo-400" />
+              </div>
+              
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 shadow-lg">
+                    <Download size={16} className="text-white" />
+                  </div>
+                  <span className="text-xs font-black text-white uppercase tracking-widest">Experience App</span>
+                </div>
+                
+                <p className="text-xs text-slate-400 leading-relaxed mb-6">
+                  Get real-time alerts and manage your bookings on the go.
+                </p>
+
+                {!isIOS ? (
+                  <button
+                    onClick={handleInstallApp}
+                    className="w-full rounded-xl bg-white py-3 text-xs font-black text-indigo-600 hover:bg-indigo-50 active:scale-95 transition-all shadow-lg shadow-white/5"
+                  >
+                    INSTALL NOW
+                  </button>
+                ) : (
+                  <div className="rounded-xl bg-white/5 border border-white/10 p-3">
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-white mb-1 uppercase tracking-tighter">
+                      <Share size={12} className="text-indigo-400" /> Safari Instructions
+                    </div>
+                    <p className="text-[10px] text-slate-500">
+                      Tap <b className="text-indigo-400">Share</b> then <b className="text-white">Add to Home Screen</b>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* BOTTOM BAR */}
+        {/* 4. COPYRIGHT BAR */}
         <div className="mt-20 border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-[11px] font-medium text-slate-500 uppercase tracking-widest">
-            © {new Date().getFullYear()} Roomgi Private Limited • Built with ❤️ in India
-          </p>
-          <div className="flex gap-8 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
-            <Link to="/sitemap.xml" className="hover:text-indigo-400 transition-colors">Sitemap</Link>
-            <Link to="/privacypolicy" className="hover:text-indigo-400 transition-colors">Privacy</Link>
+          <div className="flex flex-col md:flex-row items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+            <span>© {new Date().getFullYear()} Roomgi Private Limited</span>
+            <span className="hidden md:block">•</span>
+            <span className="text-indigo-500/80">Made with pride in India</span>
+          </div>
+          
+          <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+            <Link to="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</Link>
+            <Link to="/privacypolicy" className="hover:text-white transition-colors">Privacy</Link>
           </div>
         </div>
       </div>
