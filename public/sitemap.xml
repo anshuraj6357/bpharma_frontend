@@ -3,9 +3,7 @@
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
-  <!-- ===================== -->
   <!-- HOME -->
-  <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/</loc>
     <lastmod>2026-01-24</lastmod>
@@ -18,9 +16,7 @@
     </image:image>
   </url>
 
-  <!-- ===================== -->
   <!-- CITY SEARCH -->
-  <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/search/delhi</loc>
     <lastmod>2026-01-24</lastmod>
@@ -52,9 +48,7 @@
     <priority>0.9</priority>
   </url>
 
-  <!-- ===================== -->
   <!-- PG DETAIL PAGES -->
-  <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/pg/65a12bc91e7a9c00123abcd</loc>
     <lastmod>2026-01-24</lastmod>
@@ -68,9 +62,7 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- ===================== -->
   <!-- BRANCH / ROOM LIST -->
-  <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/branch-rooms/sample-branch-id</loc>
     <lastmod>2026-01-22</lastmod>
@@ -78,9 +70,7 @@
     <priority>0.7</priority>
   </url>
 
-  <!-- ===================== -->
   <!-- BRAND / TRUST -->
-  <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/about</loc>
     <lastmod>2026-01-20</lastmod>
@@ -106,9 +96,7 @@
     <priority>0.6</priority>
   </url>
 
-  <!-- ===================== -->
   <!-- HELP / SUPPORT -->
-  <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/faqs</loc>
     <lastmod>2026-01-18</lastmod>
@@ -134,9 +122,7 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- ===================== -->
   <!-- LEGAL -->
-  <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/privacypolicy</loc>
     <lastmod>2026-01-15</lastmod>
@@ -156,13 +142,11 @@
     <priority>0.4</priority>
   </url>
 
-  <!-- ===================== -->
   <!-- CAREER -->
-  <!-- ===================== -->
   <url>
     <loc>https://roomgi.com/career</loc>
     <lastmod>2026-01-10</lastmod>
-    <changefreq>quarterly</changefreq>
+    <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
