@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- ===================== -->
+  <!-- 🏠 HOME (HIGHEST) -->
+  <!-- ===================== -->
+  <url>
+    <loc>https://roomgi.com/</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://roomgi.com/images/hero-pg-booking.jpg</image:loc>
+      <image:title>Verified PGs Near You – Roomgi</image:title>
+      <image:caption>Find affordable, verified PGs with food & WiFi</image:caption>
+    </image:image>
+  </url>
+
+  <!-- ===================== -->
+  <!-- 🔍 CITY SEARCH (MONEY PAGES) -->
+  <!-- ===================== -->
+  <url>
+    <loc>https://roomgi.com/search/delhi</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/search/noida</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/search/ghaziabad</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/search/gurgaon</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/search/bangalore</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- ===================== -->
+  <!-- 🏘 PG DETAIL PAGES (EXAMPLES – ADD MORE) -->
+  <!-- ===================== -->
+  <url>
+    <loc>https://roomgi.com/pg/65a12bc91e7a9c00123abcd</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/pg/65b77cd91e7a9c0089xyz</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- ===================== -->
+  <!-- 🧱 BRANCH / ROOM LIST -->
+  <!-- ===================== -->
+  <url>
+    <loc>https://roomgi.com/branch-rooms/sample-branch-id</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ===================== -->
+  <!-- 🏷 BRAND / TRUST -->
+  <!-- ===================== -->
+  <url>
+    <loc>https://roomgi.com/about</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/contact</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/why-roomgi</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/partnerwithroomgi</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- ===================== -->
+  <!-- ❓ HELP / SUPPORT -->
+  <!-- ===================== -->
+  <url>
+    <loc>https://roomgi.com/faqs</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/helpcenter</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/customersupport</loc>
+    <lastmod>2026-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/safety-guidelines</loc>
+    <lastmod>2026-01-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- ===================== -->
+  <!-- 📜 LEGAL (LOW PRIORITY) -->
+  <!-- ===================== -->
+  <url>
+    <loc>https://roomgi.com/privacypolicy</loc>
+    <lastmod>2026-01-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/termsandcondition</loc>
+    <lastmod>2026-01-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/cancellationpolicy</loc>
+    <lastmod>2026-01-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- ===================== -->
+  <!-- 🎯 CAREER / BRAND -->
+  <!-- ===================== -->
+  <url>
+    <loc>https://roomgi.com/career</loc>
+    <lastmod>2026-01-10</lastmod>
+    <changefreq>quarterly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://roomgi.com/founder</loc>
+    <lastmod>2026-01-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>

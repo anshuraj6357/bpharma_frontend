@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import {
   useGetAllFilteredQuery,
   useAppliedAllFilteredMutation,
@@ -10,7 +10,6 @@ import {
 import ROOMCARD from "../user/roomcard";
 
 export default function Searched() {
-  const navigate = useNavigate();
   const { city } = useParams();
 
   const { data, isLoading } = useGetAllFilteredQuery(city);
@@ -77,7 +76,6 @@ export default function Searched() {
       </div>
     );
   }
-  console.log("pgData",pgData)
   return (
     <div className="min-h-screen bg-slate-50/50 pb-20">
       {/* HEADER & SEARCH SECTION */}

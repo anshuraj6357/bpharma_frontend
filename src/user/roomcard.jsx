@@ -1,21 +1,30 @@
 import { memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, MapPin, ShieldCheck, Users, Info, ArrowRight } from "lucide-react";
+import { Star, MapPin, ShieldCheck, Users, Info } from "lucide-react";
 import WishlistButton from "../user/wishlist.jsx";
 
 /* ---------------- IMAGE OPTIMIZATION ---------------- */
-const optimizeImg = (url) => {
-  if (!url) return "/room-placeholder.jpg";
+const optimizeImg = (input) => {
+  // If array → take first image
+  let url = Array.isArray(input) ? input[0] : input;
+
+  // If still not a string → fallback
+  if (typeof url !== "string") {
+    return "/room-placeholder.jpg";
+  }
+
+  // Cloudinary optimization
   return url.replace(
     "/upload/",
     "/upload/f_auto,q_auto,w_500,c_fill,g_auto/"
   );
 };
 
+
 /* ---------------- RATING CALC ---------------- */
 const calculateRating = (reviews = []) => {
-  if (!reviews.length) return null;
-  const total = reviews.reduce((sum, r) => sum + r.rating, 0);
+  if (!Array.isArray(reviews) || reviews.length === 0) return null;
+  const total = reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0);
   return (total / reviews.length).toFixed(1);
 };
 
@@ -28,11 +37,11 @@ const Skeleton = () => (
   </div>
 );
 
-/* ---------------- CARD ---------------- */
+/* ---------------- CARD COMPONENT ---------------- */
 const RoomCard = memo(function RoomCard({
   pgData = [],
   setIsAuthModalOpen,
-  isLoading,
+  isLoading = false,
 }) {
   const navigate = useNavigate();
 
@@ -41,9 +50,10 @@ const RoomCard = memo(function RoomCard({
     [navigate]
   );
 
+  /* ---------- LOADING ---------- */
   if (isLoading) {
     return (
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
         {[1, 2, 3, 4].map((i) => (
           <Skeleton key={i} />
         ))}
@@ -51,6 +61,7 @@ const RoomCard = memo(function RoomCard({
     );
   }
 
+  /* ---------- EMPTY ---------- */
   if (!pgData.length) {
     return (
       <p className="text-center text-slate-400 py-20">
@@ -59,48 +70,55 @@ const RoomCard = memo(function RoomCard({
     );
   }
 
+  /* ---------- CARDS ---------- */
   return (
     <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
       {pgData.map((room, index) => {
         const isRentedRoom = room.category === "Rented-Room";
         const isGirlsOnly = room.allowedFor === "Girls";
+        const avgRating = calculateRating(room.personalreview);
 
-        const avgRating = calculateRating(room.personalreview); // ✅ FIXED
+        const totalPgPrice =
+          room.category === "Pg"
+            ? room.services?.reduce(
+                (total, s) => total + Number(s.price || 0),
+                Number(room.rent || 0)
+              )
+            : null;
 
         return (
           <article
             key={room._id}
-            className="group bg-white rounded-2xl border border-slate-100 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)]
-                       transition-all duration-500 overflow-hidden flex flex-col relative"
+            onClick={() => goToDetail(room._id)}
+            className="group bg-white rounded-2xl border border-slate-100
+              hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)]
+              transition-all duration-500 overflow-hidden flex flex-col cursor-pointer"
           >
             {/* IMAGE */}
-            <div className="relative aspect-[4/4.5] bg-slate-50 overflow-hidden">
+            <div className="relative aspect-[4/4.5] overflow-hidden">
               <img
                 src={optimizeImg(
-                  room.roomImages?.[0] ||
-                    room.branch?.Propertyphoto?.[0]
+                  room.roomImages || room.branch?.Propertyphoto?.[0]
                 )}
-                alt={room.branch?.name}
+                alt={room.branch?.name || "Room"}
                 loading={index < 2 ? "eager" : "lazy"}
-                fetchpriority={index < 2 ? "high" : "auto"}
-                decoding="async"
                 width="500"
                 height="560"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
 
               {/* BADGES */}
-              <div className="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none">
+              <div className="absolute top-3 left-3 flex flex-col gap-1">
                 {room.verified && (
                   <span className="bg-green-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
                     <ShieldCheck size={12} /> VERIFIED
                   </span>
                 )}
                 <span
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded-md backdrop-blur-md ${
+                  className={`text-[10px] font-bold px-2.5 py-1 rounded-md ${
                     isGirlsOnly
-                      ? "bg-pink-500/90 text-white"
-                      : "bg-slate-900/80 text-white"
+                      ? "bg-pink-500 text-white"
+                      : "bg-slate-900 text-white"
                   }`}
                 >
                   {room.allowedFor?.toUpperCase() === "ANYONE"
@@ -120,80 +138,90 @@ const RoomCard = memo(function RoomCard({
                 />
               </div>
 
+              {/* RATING */}
+              <div className="absolute bottom-3 right-3 bg-white/95 px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                <Star size={12} className="text-amber-500" fill="currentColor" />
+                <span className="text-xs font-bold">
+                  {avgRating || "New"}
+                </span>
+              </div>
+
               {/* VACANCY */}
               {room.vacant > 0 && room.vacant <= 2 && (
-                <div className="absolute bottom-3 left-3 right-3 bg-white/95 text-red-600 text-[11px] font-bold py-1.5 px-3 rounded-lg flex items-center gap-2">
-                  <Info size={14} /> Only {room.vacant} left!
+                <div className="absolute bottom-3 left-3 bg-red-600 text-white text-[11px] font-bold py-1 px-2 rounded-lg flex items-center gap-1">
+                  <Info size={12} /> Only {room.vacant} left
                 </div>
               )}
             </div>
 
-            {/* DETAILS */}
+            {/* CONTENT */}
             <div className="p-4 flex flex-col flex-grow">
-              <div className="flex justify-between items-start mb-1">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold text-green-600 uppercase tracking-widest">
-                    {isRentedRoom ? "Independent Rental" : room.category}
-                  </p>
-                  <h3 className="text-base font-extrabold truncate group-hover:text-green-600">
-                    {room.branch?.name}
-                  </h3>
-                </div>
+              <p className="text-[10px] font-bold text-green-600 uppercase tracking-widest">
+                {isRentedRoom ? "Independent Rental" : room.category}
+              </p>
 
-                <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-1 rounded-lg border border-amber-100">
-                  <Star size={12} className="text-amber-500" fill="currentColor" />
-                  <span className="text-xs font-bold text-amber-700">
-                    {avgRating || "New"}
-                  </span>
-                </div>
-              </div>
+              <h3 className="text-base font-extrabold truncate group-hover:text-green-600">
+                {room.branch?.name}
+              </h3>
 
-              <div className="flex items-center gap-1 text-slate-500 text-xs mb-3">
+              <div className="flex items-center gap-1 text-slate-500 text-xs mt-1 mb-3">
                 <MapPin size={12} />
                 <span className="truncate">
                   {room.branch?.address}
                 </span>
               </div>
 
-              <div className="flex items-center gap-3 py-2.5 border-y border-slate-50 mb-4">
+              <div className="flex items-center gap-3 text-xs mb-4">
                 {isRentedRoom ? (
-                  <span className="text-[11px] font-bold bg-blue-50 px-2 py-0.5 rounded">
+                  <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold">
                     {room.flattype || "Studio"}
                   </span>
                 ) : (
                   <>
                     <Users size={14} />
-                    <span className="text-[11px] font-semibold">
+                    <span className="font-semibold">
                       {room.type} Sharing
                     </span>
                   </>
                 )}
-                <span className="text-[11px] text-slate-500">
+                <span className="text-slate-500">
                   {room.furnishedType || "Furnished"}
                 </span>
               </div>
 
               {/* PRICE + CTA */}
-              <div className="flex items-center justify-between mt-auto pt-2">
-                <div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">
-                    Starting from
-                  </p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-xl font-black">
+              <div className="mt-auto pt-3 border-t">
+                {room.category === "Pg" ? (
+                  <>
+                    <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">
+                      All Inclusive Price
+                    </p>
+                    <div className="text-xl font-black text-green-600">
+                      ₹{totalPgPrice}/mo
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">
+                      Starting from
+                    </p>
+                    <div className="text-xl font-black">
                       ₹{room.price}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      /{room.category === "Hotel" ? "night" : "mo"}
-                    </span>
-                  </div>
-                </div>
+                      <span className="text-xs text-slate-400">
+                        /{room.category === "Hotel" ? "night" : "mo"}
+                      </span>
+                    </div>
+                  </>
+                )}
 
                 <button
-                  onClick={() => goToDetail(room._id)}
-                  className="bg-slate-900 text-white p-2 rounded-xl hover:bg-green-600 transition-all"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToDetail(room._id);
+                  }}
+                  className="mt-3 w-full bg-slate-900 text-white py-2.5 rounded-xl font-bold hover:bg-green-600 transition"
                 >
-                  <ArrowRight size={18} />
+                  View Details
                 </button>
               </div>
             </div>

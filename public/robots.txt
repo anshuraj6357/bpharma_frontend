@@ -1,4 +1,20 @@
 User-agent: *
 Allow: /
 
+# ❌ Block non-SEO & private pages
+Disallow: /admin
+Disallow: /login
+Disallow: /wishlist
+Disallow: /wishlistdetails
+Disallow: /myprofile
+Disallow: /mybooking
+Disallow: /payrent
+Disallow: /complain
+Disallow: /forgot-password
+Disallow: /forgotpasswordpage
+
+# ❌ Block URL parameters (optional but recommended)
+Disallow: /*?
+
+# ✅ Sitemap location
 Sitemap: https://roomgi.com/sitemap.xml
