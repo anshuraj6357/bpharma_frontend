@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, MapPin, ShieldCheck, Users, Info } from "lucide-react";
+import { Star, MapPin,ArrowRight, ShieldCheck, Users, Info } from "lucide-react";
 import WishlistButton from "../user/wishlist.jsx";
 
 /* ---------------- IMAGE OPTIMIZATION ---------------- */
@@ -87,105 +87,119 @@ const RoomCard = memo(function RoomCard({
             : null;
 
         return (
-          <article
-            key={room._id}
-            onClick={() => goToDetail(room._id)}
-            className="group bg-white rounded-2xl border border-slate-100
-              hover:shadow-[0_18px_40px_rgba(0,0,0,0.08)]
-              transition-all duration-500 overflow-hidden flex flex-col cursor-pointer"
-          >
-            {/* IMAGE */}
-            <div className="relative aspect-[4/4.5] overflow-hidden">
-  <img
-    src={optimizeImg(room.roomImages || room.branch?.Propertyphoto?.[0])}
-    alt={room.branch?.name || "Room"}
-    loading={index < 2 ? "eager" : "lazy"}
-    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-  />
+         <article
+  key={room._id}
+  onClick={() => goToDetail(room._id)}
+  className="group relative flex flex-col bg-white rounded-[2rem] border border-slate-100 
+             hover:border-green-200 hover:shadow-[0_20px_50px_rgba(34,197,94,0.1)] 
+             transition-all duration-500 overflow-hidden cursor-pointer active:scale-[0.98]"
+>
+  {/* IMAGE SECTION */}
+  <div className="relative aspect-[4/5] overflow-hidden">
+    <img
+      src={optimizeImg(room.roomImages || room.branch?.Propertyphoto?.[0])}
+      alt={room.branch?.name || "Premium Accommodation"}
+      loading={index < 2 ? "eager" : "lazy"}
+      className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 
+        ${room.availabilityStatus === "Occupied" ? "grayscale opacity-80" : "brightness-[0.95] group-hover:brightness-100"}`}
+    />
 
-  {/* OCCUPIED OVERLAY */}
-  {room.availabilityStatus === "Occupied" && (
-    <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
-      <div className="bg-red-600 text-white text-xs font-extrabold tracking-widest px-4 py-1 rotate-[-90deg] rounded-md shadow-xl">
-        OCCUPIED
+    {/* OCCUPIED STATE - Sophisticated Minimalist */}
+    {room.availabilityStatus === "Occupied" && (
+      <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px]">
+        <div className="bg-white/90 px-6 py-2 rounded-full shadow-xl">
+          <span className="text-slate-900 font-black text-xs uppercase tracking-widest">Fully Booked</span>
+        </div>
+      </div>
+    )}
+
+    {/* FLOATING BADGES - Top Left */}
+    <div className="absolute top-4 left-4 flex flex-col gap-2 z-30">
+      {room.verified && (
+        <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1.5 rounded-full text-[10px] font-bold shadow-lg">
+          <ShieldCheck size={12} fill="white" />
+          <span>VERIFIED</span>
+        </div>
+      )}
+      <div className="bg-white/90 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-full text-[10px] font-bold shadow-sm border border-white/20">
+        {room.allowedFor?.toUpperCase() === "ANYONE" ? "👥 MIXED" : `👩 ${room.allowedFor?.toUpperCase()}`}
       </div>
     </div>
-  )}
-</div>
 
+    {/* WISHLIST - Top Right */}
+    <div className="absolute top-4 right-4 z-30" onClick={(e) => e.stopPropagation()}>
+      <div className="p-2 bg-white/20 backdrop-blur-md rounded-full hover:bg-white transition-colors duration-300">
+        <WishlistButton pg={room} onAuthOpen={() => setIsAuthModalOpen(true)} />
+      </div>
+    </div>
 
-            {/* CONTENT */}
-            <div className="p-4 flex flex-col flex-grow">
-              <p className="text-[10px] font-bold text-green-600 uppercase tracking-widest">
-                {isRentedRoom ? "Independent Rental" : room.category}
-              </p>
+    {/* RATING - Bottom Right */}
+    <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg border border-white">
+      <Star size={12} className="text-amber-500" fill="currentColor" />
+      <span className="text-xs font-bold text-slate-800">{avgRating || "New"}</span>
+    </div>
 
-              <h3 className="text-base font-extrabold truncate group-hover:text-green-600">
-                {room.branch?.name}
-              </h3>
+    {/* URGENCY TAG - Bottom Left */}
+    {room.vacant > 0 && room.vacant <= 2 && (
+      <div className="absolute bottom-4 left-4 bg-rose-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg animate-pulse shadow-lg">
+        LOW SEATS
+      </div>
+    )}
+  </div>
 
-              <div className="flex items-center gap-1 text-slate-500 text-xs mt-1 mb-3">
-                <MapPin size={12} />
-                <span className="truncate">
-                  {room.branch?.address}
-                </span>
-              </div>
+  {/* CONTENT SECTION */}
+  <div className="p-5 flex flex-col flex-grow">
+    <div className="flex justify-between items-start mb-2">
+      <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">
+        {isRentedRoom ? "Independent" : room.category}
+      </span>
+    </div>
 
-              <div className="flex items-center gap-3 text-xs mb-4">
-                {isRentedRoom ? (
-                  <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold">
-                    {room.flattype || "Studio"}
-                  </span>
-                ) : (
-                  <>
-                    <Users size={14} />
-                    <span className="font-semibold">
-                      {room.type} Sharing
-                    </span>
-                  </>
-                )}
-                <span className="text-slate-500">
-                  {room.furnishedType || "Furnished"}
-                </span>
-              </div>
+    <h3 className="text-lg font-bold text-slate-900 leading-tight mb-1 group-hover:text-green-600 transition-colors line-clamp-1">
+      {room.branch?.name}
+    </h3>
 
-              {/* PRICE + CTA */}
-              <div className="mt-auto pt-3 border-t">
-                {room.category === "Pg" ? (
-                  <>
-                    <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">
-                      All Inclusive Price
-                    </p>
-                    <div className="text-xl font-black text-green-600">
-                      ₹{totalPgPrice}/mo
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-[10px] text-slate-400 uppercase font-bold mb-1">
-                      Starting from
-                    </p>
-                    <div className="text-xl font-black">
-                      ₹{room.price}
-                      <span className="text-xs text-slate-400">
-                        /{room.category === "Hotel" ? "night" : "mo"}
-                      </span>
-                    </div>
-                  </>
-                )}
+    <div className="flex items-center gap-1 text-slate-500 text-xs mb-4">
+      <MapPin size={12} className="shrink-0" />
+      <span className="truncate">{room.branch?.address}</span>
+    </div>
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goToDetail(room._id);
-                  }}
-                  className="mt-3 w-full bg-slate-900 text-white py-2.5 rounded-xl font-bold hover:bg-green-600 transition"
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          </article>
+    {/* AMENITIES / SPECS */}
+    <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-1.5 text-slate-700 text-xs font-semibold bg-slate-50 px-2.5 py-1.5 rounded-lg">
+        <Users size={14} />
+        <span>{room.type} Sharing</span>
+      </div>
+      <div className="text-slate-400 text-xs font-medium">
+        {room.furnishedType || "Furnished"}
+      </div>
+    </div>
+
+    {/* PRICE & ACTION */}
+    <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between gap-4">
+      <div>
+        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Monthly</p>
+        <div className="flex items-baseline gap-0.5">
+          <span className="text-2xl font-black text-slate-900">₹{room.category === "Pg" ? totalPgPrice : room.price}</span>
+          <span className="text-xs font-bold text-slate-400">/mo</span>
+        </div>
+      </div>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          goToDetail(room._id);
+        }}
+        className="flex-grow bg-slate-900 text-white py-3 rounded-xl font-bold text-sm 
+                   hover:bg-green-600 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
+      >
+        View Details
+        <ArrowRight size={16} />
+      </button>
+    </div>
+  </div>
+</article>
+
         );
       })}
     </section>
