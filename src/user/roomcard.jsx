@@ -96,63 +96,23 @@ const RoomCard = memo(function RoomCard({
           >
             {/* IMAGE */}
             <div className="relative aspect-[4/4.5] overflow-hidden">
-              <img
-                src={optimizeImg(
-                  room.roomImages || room.branch?.Propertyphoto?.[0]
-                )}
-                alt={room.branch?.name || "Room"}
-                loading={index < 2 ? "eager" : "lazy"}
-                width="500"
-                height="560"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
+  <img
+    src={optimizeImg(room.roomImages || room.branch?.Propertyphoto?.[0])}
+    alt={room.branch?.name || "Room"}
+    loading={index < 2 ? "eager" : "lazy"}
+    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+  />
 
-              {/* BADGES */}
-              <div className="absolute top-3 left-3 flex flex-col gap-1">
-                {room.verified && (
-                  <span className="bg-green-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1">
-                    <ShieldCheck size={12} /> VERIFIED
-                  </span>
-                )}
-                <span
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded-md ${
-                    isGirlsOnly
-                      ? "bg-pink-500 text-white"
-                      : "bg-slate-900 text-white"
-                  }`}
-                >
-                  {room.allowedFor?.toUpperCase() === "ANYONE"
-                    ? "FOR ALL"
-                    : room.allowedFor?.toUpperCase()}
-                </span>
-              </div>
+  {/* OCCUPIED OVERLAY */}
+  {room.availabilityStatus === "Occupied" && (
+    <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
+      <div className="bg-red-600 text-white text-xs font-extrabold tracking-widest px-4 py-1 rotate-[-90deg] rounded-md shadow-xl">
+        OCCUPIED
+      </div>
+    </div>
+  )}
+</div>
 
-              {/* WISHLIST */}
-              <div
-                className="absolute top-3 right-3 z-10"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <WishlistButton
-                  pg={room}
-                  onAuthOpen={() => setIsAuthModalOpen(true)}
-                />
-              </div>
-
-              {/* RATING */}
-              <div className="absolute bottom-3 right-3 bg-white/95 px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
-                <Star size={12} className="text-amber-500" fill="currentColor" />
-                <span className="text-xs font-bold">
-                  {avgRating || "New"}
-                </span>
-              </div>
-
-              {/* VACANCY */}
-              {room.vacant > 0 && room.vacant <= 2 && (
-                <div className="absolute bottom-3 left-3 bg-red-600 text-white text-[11px] font-bold py-1 px-2 rounded-lg flex items-center gap-1">
-                  <Info size={12} /> Only {room.vacant} left
-                </div>
-              )}
-            </div>
 
             {/* CONTENT */}
             <div className="p-4 flex flex-col flex-grow">
