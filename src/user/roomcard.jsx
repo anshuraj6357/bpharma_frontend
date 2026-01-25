@@ -179,10 +179,24 @@ const RoomCard = memo(function RoomCard({
     <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between gap-4">
       <div>
         <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Monthly</p>
-        <div className="flex items-baseline gap-0.5">
-          <span className="text-2xl font-black text-slate-900">₹{room.category === "Pg" ? totalPgPrice : room.price}</span>
-          <span className="text-xs font-bold text-slate-400">/mo</span>
-        </div>
+       {room.category === "Pg" ? (
+  <div className="flex flex-col">
+    <p className="text-sm font-black text-gray-900">
+      ₹{Number(room.price) + room.services.reduce((a, b) => a + b.price, 0)}
+      <span className="text-[10px] font-medium text-gray-500"> /mo (Total)</span>
+    </p>
+    <span className="text-[8px] text-emerald-600 font-bold uppercase">
+      Incl. Services
+    </span>
+  </div>
+) : (
+  <p className="text-sm font-black text-gray-900">
+    ₹{room.price || room.rentperNight || room.rentperday}
+    <span className="text-[10px] font-medium text-gray-500">
+      /{room.category === 'Hotel' ? 'night' : 'mo'}
+    </span>
+  </p>
+)}
       </div>
 
       <button

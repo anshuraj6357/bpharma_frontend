@@ -43,9 +43,39 @@
   export default function LandingPage() {
     const navigate = useNavigate();
    
+  const [userLocation, setUserLocation] = useState({
+  lat: null,
+  lng: null,
+});
+useEffect(() => {
+  if (!navigator.geolocation) return;
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      setUserLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+      });
+    },
+    (error) => {
+      console.warn("Location permission denied");
+      // fallback → random verified PGs will load
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+    }
+  );
+}, []);
+
   
-  
-    const { data: pgApiData, isLoading: pgLoading, error: pgError } = useGetAllListedPgQuery();
+  const { data: pgApiData, isLoading: pgLoading, error: pgError } =
+  useGetAllListedPgQuery(
+    userLocation.lat && userLocation.lng
+      ? { lat: userLocation.lat, lng: userLocation.lng }
+      : {}
+  );
+
     const { data: wishlistData, isLoading: wishlistLoading } = useGetWishlistQuery();
   const {  isAuthenticated } = useSelector((state) => state.auth);
   

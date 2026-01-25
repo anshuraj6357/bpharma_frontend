@@ -292,7 +292,7 @@ const STATUS_CONFIG = {
         </button>
 
         <button
-          onClick={() => navigate(`/Wishlistdetails/${booking.branch?._id}`)}
+          onClick={() => navigate(`/Wishlistdetails/${booking.tenantId?._id}`)}
           className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700"
         >
           Pay Rent / Explore

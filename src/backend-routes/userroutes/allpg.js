@@ -8,13 +8,19 @@ export const user_PgApi = createApi({
     }),
     tagTypes: ["Pg"], // ✅ Added tag for versioning
     endpoints: (builder) => ({
-        getAllListedPg: builder.query({
-            query: () => ({
-                url: `/allpg`,
-                method: "GET",
-            }),
-            providesTags: ["Pg"], 
-        }),
+       getAllListedPg: builder.query({
+  query: (params = {}) => {
+    const { lat, lng } = params;
+
+    return {
+      url: `/allpg`,
+      method: "GET",
+      params: lat && lng ? { lat, lng } : {}, // ✅ dynamic query params
+    };
+  },
+  providesTags: ["Pg"],
+}),
+
         getservicesarea: builder.query({
             query: () => ({
                 url: `/services-cities`,

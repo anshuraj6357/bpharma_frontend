@@ -13,6 +13,7 @@ export default function TenantDetails() {
   const navigate = useNavigate();
   const { data, isLoading, error, refetch } = useGetTenantByIdQuery(id);
   const tenant = data?.foundTenant;
+  console.log(tenant)
 
   // SEO: Dynamic Page Title
   useEffect(() => {

@@ -10,13 +10,11 @@ import {
   XCircle, 
   AlertCircle, 
   Search, 
-  Filter, 
   Edit3, 
   Trash2, 
   Bed, 
   Building2, 
   Hotel as HotelIcon,
-  ChevronRight
 } from "lucide-react";
 
 function ShowRooms() {
@@ -160,10 +158,25 @@ const RoomCard = ({ room, onEdit, onDelete, isDeleting }) => {
         <div className="absolute bottom-3 left-3 right-3 bg-white/90 backdrop-blur-md p-2 rounded-xl flex justify-between items-center shadow-lg border border-white/20">
             <div>
                 <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">Starting from</p>
-                <p className="text-sm font-black text-gray-900">
-                    ₹{room.price || room.rentperNight || room.rentperday}
-                    <span className="text-[10px] font-medium text-gray-500">/{room.category === 'Hotel' ? 'night' : 'mo'}</span>
-                </p>
+               {room.category === "Pg" ? (
+  <div className="flex flex-col">
+    <p className="text-sm font-black text-gray-900">
+      ₹{Number(room.price) + room.services.reduce((a, b) => a + b.price, 0)}
+      <span className="text-[10px] font-medium text-gray-500"> /mo (Total)</span>
+    </p>
+    <span className="text-[8px] text-emerald-600 font-bold uppercase">
+      Incl. Services
+    </span>
+  </div>
+) : (
+  <p className="text-sm font-black text-gray-900">
+    ₹{room.price || room.rentperNight || room.rentperday}
+    <span className="text-[10px] font-medium text-gray-500">
+      /{room.category === 'Hotel' ? 'night' : 'mo'}
+    </span>
+  </p>
+)}
+               
             </div>
             <div className="p-2 bg-blue-600 rounded-lg text-white">
                 {room.category === 'Pg' ? <Bed size={16}/> : room.category === 'Hotel' ? <HotelIcon size={16}/> : <Building2 size={16}/>}
