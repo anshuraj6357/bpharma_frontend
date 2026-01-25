@@ -19,6 +19,24 @@ const optimizeImg = (input) => {
     "/upload/f_auto,q_auto,w_500,c_fill,g_auto/"
   );
 };
+/* ---------------- SAFE PRICE CALC ---------------- */
+const getTotalPrice = (room) => {
+  // PG → services based
+  if (room?.category === "Pg" && Array.isArray(room?.services)) {
+    return room.services.reduce(
+      (sum, s) => sum + Number(s?.price || 0),
+      Number(room?.price || 0)
+    );
+  }
+
+  // Hotel priority
+  if (room?.category === "Hotel") {
+    return room?.rentperNight || room?.rentperday || room?.price || 0;
+  }
+
+  // Rented Room
+  return room?.price || 0;
+};
 
 
 /* ---------------- RATING CALC ---------------- */
@@ -71,153 +89,144 @@ const RoomCard = memo(function RoomCard({
   }
 
   /* ---------- CARDS ---------- */
-  return (
-    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
-      {pgData.map((room, index) => {
-        const isRentedRoom = room.category === "Rented-Room";
-        const isGirlsOnly = room.allowedFor === "Girls";
-        const avgRating = calculateRating(room.personalreview);
+return (
+  <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
+    {Array.isArray(pgData) && pgData.map((room, index) => {
+      const isRentedRoom = room.category === "Rented-Room";
+      const avgRating = calculateRating(room.personalreview);
 
-        const totalPgPrice =
-          room.category === "Pg"
-            ? room.services?.reduce(
-                (total, s) => total + Number(s.price || 0),
-                Number(room.rent || 0)
-              )
-            : null;
+      return (
+        <article
+          key={room._id}
+          onClick={() => goToDetail(room._id)}
+          className="group relative flex flex-col bg-white rounded-[2rem] border border-slate-100 
+                     hover:border-green-200 hover:shadow-[0_20px_50px_rgba(34,197,94,0.1)] 
+                     transition-all duration-500 overflow-hidden cursor-pointer active:scale-[0.98]"
+        >
+          {/* IMAGE */}
+          <div className="relative aspect-[4/5] overflow-hidden">
+            <img
+              src={optimizeImg(room.roomImages || room.branch?.Propertyphoto?.[0])}
+              alt={room.branch?.name || "Room"}
+              loading={index < 2 ? "eager" : "lazy"}
+              className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 
+                ${room.availabilityStatus === "Occupied"
+                  ? "grayscale opacity-80"
+                  : "brightness-[0.95] group-hover:brightness-100"
+                }`}
+            />
 
-        return (
-         <article
-  key={room._id}
-  onClick={() => goToDetail(room._id)}
-  className="group relative flex flex-col bg-white rounded-[2rem] border border-slate-100 
-             hover:border-green-200 hover:shadow-[0_20px_50px_rgba(34,197,94,0.1)] 
-             transition-all duration-500 overflow-hidden cursor-pointer active:scale-[0.98]"
->
-  {/* IMAGE SECTION */}
-  <div className="relative aspect-[4/5] overflow-hidden">
-    <img
-      src={optimizeImg(room.roomImages || room.branch?.Propertyphoto?.[0])}
-      alt={room.branch?.name || "Premium Accommodation"}
-      loading={index < 2 ? "eager" : "lazy"}
-      className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 
-        ${room.availabilityStatus === "Occupied" ? "grayscale opacity-80" : "brightness-[0.95] group-hover:brightness-100"}`}
-    />
+            {room.availabilityStatus === "Occupied" && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40">
+                <span className="bg-white px-6 py-2 rounded-full text-xs font-black">
+                  Fully Booked
+                </span>
+              </div>
+            )}
 
-    {/* OCCUPIED STATE - Sophisticated Minimalist */}
-    {room.availabilityStatus === "Occupied" && (
-      <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/40 backdrop-blur-[2px]">
-        <div className="bg-white/90 px-6 py-2 rounded-full shadow-xl">
-          <span className="text-slate-900 font-black text-xs uppercase tracking-widest">Fully Booked</span>
-        </div>
-      </div>
-    )}
+            {/* BADGES */}
+            <div className="absolute top-4 left-4 z-30 space-y-2">
+              {room.verified && (
+                <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1.5 rounded-full text-[10px] font-bold">
+                  <ShieldCheck size={12} />
+                  VERIFIED
+                </div>
+              )}
+              <div className="bg-white/90 px-3 py-1.5 rounded-full text-[10px] font-bold">
+                {room.allowedFor === "Anyone"
+                  ? "👥 MIXED"
+                  : `👩 ${room.allowedFor?.toUpperCase()}`}
+              </div>
+            </div>
 
-    {/* FLOATING BADGES - Top Left */}
-    <div className="absolute top-4 left-4 flex flex-col gap-2 z-30">
-      {room.verified && (
-        <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1.5 rounded-full text-[10px] font-bold shadow-lg">
-          <ShieldCheck size={12} fill="white" />
-          <span>VERIFIED</span>
-        </div>
-      )}
-      <div className="bg-white/90 backdrop-blur-md text-slate-900 px-3 py-1.5 rounded-full text-[10px] font-bold shadow-sm border border-white/20">
-        {room.allowedFor?.toUpperCase() === "ANYONE" ? "👥 MIXED" : `👩 ${room.allowedFor?.toUpperCase()}`}
-      </div>
-    </div>
+            {/* WISHLIST */}
+            <div
+              className="absolute top-4 right-4 z-30"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <WishlistButton
+                pg={room}
+                onAuthOpen={() => setIsAuthModalOpen(true)}
+              />
+            </div>
 
-    {/* WISHLIST - Top Right */}
-    <div className="absolute top-4 right-4 z-30" onClick={(e) => e.stopPropagation()}>
-      <div className="p-2 bg-white/20 backdrop-blur-md rounded-full hover:bg-white transition-colors duration-300">
-        <WishlistButton pg={room} onAuthOpen={() => setIsAuthModalOpen(true)} />
-      </div>
-    </div>
+            {/* RATING */}
+            <div className="absolute bottom-4 right-4 bg-white px-2.5 py-1.5 rounded-xl flex items-center gap-1.5">
+              <Star size={12} className="text-amber-500" fill="currentColor" />
+              <span className="text-xs font-bold">
+                {avgRating || "New"}
+              </span>
+            </div>
+          </div>
 
-    {/* RATING - Bottom Right */}
-    <div className="absolute bottom-4 right-4 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg border border-white">
-      <Star size={12} className="text-amber-500" fill="currentColor" />
-      <span className="text-xs font-bold text-slate-800">{avgRating || "New"}</span>
-    </div>
-{/* 
-    {/* URGENCY TAG - Bottom Left */}
-    {/* {room. > 0 && room.vacant <= 2 && (
-      <div className="absolute bottom-4 left-4 bg-rose-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg animate-pulse shadow-lg">
-        LOW SEATS
-      </div>
-    )} */} 
-  </div>
+          {/* CONTENT */}
+          <div className="p-5 flex flex-col flex-grow">
+            <span className="text-[10px] font-bold text-green-600 uppercase mb-1">
+              {isRentedRoom ? "Independent" : room.category}
+            </span>
 
-  {/* CONTENT SECTION */}
-  <div className="p-5 flex flex-col flex-grow">
-    <div className="flex justify-between items-start mb-2">
-      <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">
-        {isRentedRoom ? "Independent" : room.category}
-      </span>
-    </div>
+            <h3 className="text-lg font-bold text-slate-900 line-clamp-1">
+              {room.branch?.name}
+            </h3>
 
-    <h3 className="text-lg font-bold text-slate-900 leading-tight mb-1 group-hover:text-green-600 transition-colors line-clamp-1">
-      {room.branch?.name}
-    </h3>
+            <div className="flex items-center gap-1 text-slate-500 text-xs mb-4">
+              <MapPin size={12} />
+              <span className="truncate">{room.branch?.address}</span>
+            </div>
 
-    <div className="flex items-center gap-1 text-slate-500 text-xs mb-4">
-      <MapPin size={12} className="shrink-0" />
-      <span className="truncate">{room.branch?.address}</span>
-    </div>
+            {/* AMENITIES */}
+            <div className="flex items-center gap-3 mb-6">
+              {room.type && (
+                <div className="flex items-center gap-1 text-xs font-semibold bg-slate-50 px-3 py-1.5 rounded-lg">
+                  <Users size={14} />
+                  {room.type} Sharing
+                </div>
+              )}
+              <span className="text-xs text-slate-400">
+                {room.furnishedType || "Furnished"}
+              </span>
+            </div>
 
-    {/* AMENITIES / SPECS */}
-    <div className="flex items-center gap-3 mb-6">
-      <div className="flex items-center gap-1.5 text-slate-700 text-xs font-semibold bg-slate-50 px-2.5 py-1.5 rounded-lg">
-        <Users size={14} />
-        <span>{room.type} Sharing</span>
-      </div>
-      <div className="text-slate-400 text-xs font-medium">
-        {room.furnishedType || "Furnished"}
-      </div>
-    </div>
+            {/* PRICE */}
+            <div className="mt-auto pt-4 border-t flex justify-between items-center gap-4">
+              <div>
+                <p className="text-[9px] text-slate-400 font-bold uppercase">
+                  {room.category === "Hotel" ? "Per Night" : "Monthly"}
+                </p>
 
-    {/* PRICE & ACTION */}
-    <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between gap-4">
-      <div>
-        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Monthly</p>
-       {room.category === "Pg" ? (
-  <div className="flex flex-col">
-    <p className="text-sm font-black text-gray-900">
-      ₹{Number(room.price) + room.services.reduce((a, b) => a + b.price, 0)}
-      <span className="text-[10px] font-medium text-gray-500"> /mo (Total)</span>
-    </p>
-    <span className="text-[8px] text-emerald-600 font-bold uppercase">
-      Incl. Services
-    </span>
-  </div>
-) : (
-  <p className="text-sm font-black text-gray-900">
-    ₹{room.price || room.rentperNight || room.rentperday}
-    <span className="text-[10px] font-medium text-gray-500">
-      /{room.category === 'Hotel' ? 'night' : 'mo'}
-    </span>
-  </p>
-)}
-      </div>
+                <p className="text-sm font-black text-gray-900">
+                  ₹{getTotalPrice(room)}
+                  <span className="text-[10px] text-gray-500">
+                    /{room.category === "Hotel" ? "night" : "mo"}
+                  </span>
+                </p>
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          goToDetail(room._id);
-        }}
-        className="flex-grow bg-slate-900 text-white py-3 rounded-xl font-bold text-sm 
-                   hover:bg-green-600 transition-all duration-300 active:scale-95 flex items-center justify-center gap-2"
-      >
-        View Details
-        <ArrowRight size={16} />
-      </button>
-    </div>
-  </div>
-</article>
+                {room.category === "Pg" && (
+                  <span className="text-[8px] text-emerald-600 font-bold uppercase">
+                    Incl. Services
+                  </span>
+                )}
+              </div>
 
-        );
-      })}
-    </section>
-  );
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToDetail(room._id);
+                }}
+                className="flex-grow bg-slate-900 text-white py-3 rounded-xl font-bold text-sm 
+                           hover:bg-green-600 transition-all flex items-center justify-center gap-2"
+              >
+                View Details
+                <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        </article>
+      );
+    })}
+  </section>
+);
+
 });
 
 export default RoomCard;
