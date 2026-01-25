@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const user_review = createApi({
     reducerPath: "user_review",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:5000/api/review/user",
+        baseUrl: `${import.meta.env.VITE_API_BASE_URL}/review/user`,
         credentials: "include", // optional, remove if not needed
     }),
     tagTypes: ["Review"],
