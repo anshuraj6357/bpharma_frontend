@@ -22,7 +22,7 @@ function AddRoomForm() {
   const [step, setStep] = useState(1);
   const [roomData, setRoomData] = useState({
     roomNumber: "", type: "", price: "", facilities: [], images: [],
-    branch: "", category: "", description: "", notAllowed: [], rules: [],
+    branch: "", category: "", description: "", notAllowed: [], rules: [],advancedmonth:"",
     branchid:"",flattype:"",roomtype:"",renttype:"",
     allowedFor: "Anyone", furnishedType: "Semi Furnished",
     city: "", services: [{ name: "", price: "" }]
@@ -35,42 +35,77 @@ function AddRoomForm() {
   const facilityOptions = ["AC", "Non-AC", "WiFi", "Power Backup", "Laundry", "CCTV", "Parking", "Refrigerator"];
 
   // --- VALIDATION LOGIC ---
+const isNonEmpty = (v) => v !== undefined && v !== null && String(v).trim() !== "";
+const isPositiveNumber = (v) => Number(v) > 0;
+
 const validateStep = () => {
-  if (step === 1) {
-    if (!roomData.branchid) return false;
-    if (!roomData.roomNumber) return false;
-    if (!roomData.category) return false;
-    if (!roomData.description) return false;
+  switch (step) {
+    /* ================= STEP 1 ================= */
+    case 1: {
+      if (!isNonEmpty(roomData.branchid)) return false;
+      if (!isNonEmpty(roomData.roomNumber)) return false;
+      if (!isNonEmpty(roomData.category)) return false;
+      if (!isNonEmpty(roomData.description)) return false;
 
-    if (roomData.category === "Rented-Room") {
-      if (!roomData.renttype) return false;
+      if (roomData.category === "Rented-Room") {
+        if (!isNonEmpty(roomData.renttype)) return false;
 
-      if (roomData.renttype === "Room-Rent" && !roomData.roomtype) return false;
-      if (roomData.renttype === "Flat-Rent" && !roomData.flattype) return false;
+        if (
+          roomData.renttype === "Room-Rent" &&
+          !isNonEmpty(roomData.roomtype)
+        ) {
+          return false;
+        }
+
+        if (
+          roomData.renttype === "Flat-Rent" &&
+          !isNonEmpty(roomData.flattype)
+        ) {
+          return false;
+        }
+      }
+
+      return true;
     }
 
-    return true;
-  }
+    /* ================= STEP 2 ================= */
+    case 2: {
+      // Advance / Security is mandatory
+      if (!isPositiveNumber(roomData.advancedmonth)) return false;
 
-  if (step === 2) {
-    if (roomData.category === "Pg") {
+      if (roomData.category === "Pg") {
+        if (!isNonEmpty(roomData.type)) return false;
+        if (!Array.isArray(roomData.services) || roomData.services.length === 0)
+          return false;
+
+        const validServices = roomData.services.every(
+          (s) =>
+            isNonEmpty(s.name) &&
+            isPositiveNumber(s.price)
+        );
+
+        return validServices;
+      }
+
+      // Non-PG pricing
+      return isPositiveNumber(roomData.price);
+    }
+
+    /* ================= STEP 3 ================= */
+    case 3: {
       return (
-        roomData.type &&
-        roomData.services.length > 0 &&
-        roomData.services.every(
-          (s) => s.name !== "" && s.price !== ""
-        )
+        Array.isArray(roomData.images) &&
+        roomData.images.length > 0 &&
+        Array.isArray(roomData.facilities) &&
+        roomData.facilities.length > 0
       );
     }
-    return roomData.price > 0;
-  }
 
-  if (step === 3) {
-    return roomData.images.length > 0 && roomData.facilities.length > 0;
+    default:
+      return false;
   }
-
-  return false;
 };
+
 
   const isNextDisabled = !validateStep();
 
@@ -166,38 +201,39 @@ const slideVariants = {
     exit={{ opacity: 0, x: -20 }}
     className="space-y-12"
   >
+    {/* ================= BASIC DETAILS ================= */}
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
       {/* Branch */}
       <InputWrapper label="Assign Branch *" icon={<Building2 size={18} />}>
-       <select
-  className="modern-input"
-  value={roomData.branchid || ""}
-  onChange={(e) => {
-    const selectedId = e.target.value;
-    const selectedBranch = Allbranchdata?.allbranch?.find(
-      (b) => b._id === selectedId
-    );
+        <select
+          className="modern-input"
+          value={roomData.branchid}
+          onChange={(e) => {
+            const selectedId = e.target.value;
+            const selectedBranch = Allbranchdata?.allbranch?.find(
+              (b) => b._id === selectedId
+            );
 
-    setRoomData({
-      ...roomData,
-      branchid: selectedId,                 // ID
-      branch: selectedBranch?.name || "",   // Name
-    });
-  }}
->
-  <option value="">Select Branch</option>
-  {Allbranchdata?.allbranch?.map((b) => (
-    <option key={b._id} value={b._id}>
-      {b.name}
-    </option>
-  ))}
-</select>
-
+            setRoomData({
+              ...roomData,
+              branchid: selectedId,
+              branch: selectedBranch?.name || "",
+              city: selectedBranch?.city || "",
+            });
+          }}
+        >
+          <option value="">Select Branch</option>
+          {Allbranchdata?.allbranch?.map((b) => (
+            <option key={b._id} value={b._id}>
+              {b.name}
+            </option>
+          ))}
+        </select>
       </InputWrapper>
 
       {/* Room Number */}
-      <InputWrapper label="Room/Suite Number *" icon={<Home size={18} />}>
+      <InputWrapper label="Room / Unit Number *" icon={<Home size={18} />}>
         <input
           className="modern-input"
           placeholder="e.g. 101-B"
@@ -214,7 +250,13 @@ const slideVariants = {
           className="modern-input"
           value={roomData.category}
           onChange={(e) =>
-            setRoomData({ ...roomData, category: e.target.value })
+            setRoomData({
+              ...roomData,
+              category: e.target.value,
+              renttype: "",
+              roomtype: "",
+              flattype: "",
+            })
           }
         >
           <option value="">Select Category</option>
@@ -230,7 +272,12 @@ const slideVariants = {
             className="modern-input"
             value={roomData.renttype}
             onChange={(e) =>
-              setRoomData({ ...roomData, renttype: e.target.value })
+              setRoomData({
+                ...roomData,
+                renttype: e.target.value,
+                roomtype: "",
+                flattype: "",
+              })
             }
           >
             <option value="">Select Rent Type</option>
@@ -251,12 +298,9 @@ const slideVariants = {
             }
           >
             <option value="">Select Flat Type</option>
-            <option value="1Rk">1RK</option>
-            <option value="1BHK">1BHK</option>
-            <option value="2BHK">2BHK</option>
-            <option value="3BHK">3BHK</option>
-            <option value="4BHK">4BHK</option>
-            <option value="5BHK">5BHK</option>
+            {["1RK","1BHK","2BHK","3BHK","4BHK","5BHK"].map(f => (
+              <option key={f} value={f}>{f}</option>
+            ))}
           </select>
         </InputWrapper>
       )}
@@ -272,241 +316,210 @@ const slideVariants = {
             }
           >
             <option value="">Select Room Type</option>
-            <option value="Single">Single</option>
-            <option value="Double">Double</option>
-            <option value="Triple">Triple</option>
+            {["Single","Double","Triple"].map(t => (
+              <option key={t} value={t}>{t}</option>
+            ))}
           </select>
         </InputWrapper>
       )}
-
     </div>
 
-    {/* PG SERVICES */}
-   {roomData.category === "Pg" && (
-  <div className="space-y-5 pt-6 border-t">
-    <h3 className="font-semibold text-gray-700 text-lg">
-      PG Pricing
-    </h3>
-
-    {roomData.services.map((service, index) => (
-      <div
-        key={index}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        {/* Fixed label */}
-        <input
-          type="text"
-          className="modern-input bg-gray-100 cursor-not-allowed"
-          value="Monthly Rent"
-          disabled
-        />
-
-        {/* Price input (no negative allowed) */}
-        <input
-          type="number"
-          placeholder="Enter price"
-          className="modern-input"
-          min="0"
-          value={service.price || ""}
-          onKeyDown={(e) => {
-            if (["-", "e", "E"].includes(e.key)) {
-              e.preventDefault();
-            }
-          }}
-          onChange={(e) => {
-            const value = e.target.value;
-
-            // ❌ Block negative numbers
-            if (value < 0) return;
-
-            const updatedServices = [...roomData.services];
-            updatedServices[index] = {
-              ...updatedServices[index],
-              name: "Monthly Rent",
-              price: value,
-            };
-
-            setRoomData({
-              ...roomData,
-              services: updatedServices,
-            });
-          }}
-        />
-      </div>
-    ))}
-  </div>
-)}
-
-
-    {/* Description */}
-    <InputWrapper label="Property Description *">
+    {/* ================= DESCRIPTION ================= */}
+    <InputWrapper label="Property Description *" icon={<Info size={18} />}>
       <textarea
-        className="modern-input min-h-[120px]"
-        placeholder="Briefly describe the room..."
+        className="modern-input min-h-[140px]"
+        placeholder="Briefly describe the room, amenities, and who it’s ideal for..."
         value={roomData.description}
         onChange={(e) =>
           setRoomData({ ...roomData, description: e.target.value })
         }
       />
+      <p className="text-[11px] text-slate-400 mt-1">
+        This helps users understand your property better and improves conversions.
+      </p>
     </InputWrapper>
   </motion.div>
 )}
 
                   {step === 2 && (
-  <motion.div 
-    key="step2" 
-    variants={slideVariants} 
-    initial="hidden" 
-    animate="visible" 
-    exit="exit" 
-    className="space-y-8"
-  >
-    {roomData.category === "Pg" ? (
-      <div className="space-y-8">
-        {/* Sharing Type Selection */}
-        <InputWrapper label="Sharing Configuration *" icon={<Users size={18} />}>
-          <div className="grid grid-cols-3 gap-4">
-            {['Single', 'Double', 'Triple'].map(t => (
+<motion.div
+  key="step2"
+  variants={slideVariants}
+  initial="hidden"
+  animate="visible"
+  exit="exit"
+  className="space-y-10"
+>
+  {/* ================= PG FLOW ================= */}
+  {roomData.category === "Pg" ? (
+    <>
+      {/* Sharing Type */}
+      <InputWrapper label="Sharing Configuration *" icon={<Users size={18} />}>
+        <div className="grid grid-cols-3 gap-4">
+          {["Single", "Double", "Triple"].map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setRoomData({ ...roomData, type: t })}
+              className={`py-4 rounded-2xl font-black text-sm border-2 transition-all ${
+                roomData.type === t
+                  ? "border-orange-500 bg-orange-50 text-orange-600 shadow-md"
+                  : "border-slate-200 text-slate-400 hover:border-slate-300"
+              }`}
+            >
+              {t}
+              <div className="text-[10px] opacity-60">Sharing</div>
+            </button>
+          ))}
+        </div>
+      </InputWrapper>
+
+      {/* Rent + Services */}
+      <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-200/60 space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-black text-slate-800 text-lg">
+              Rent Breakdown *
+            </h3>
+            <p className="text-xs text-slate-500">
+              Monthly rent & additional services
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              setRoomData({
+                ...roomData,
+                services: [...roomData.services, { name: "", price: "" }],
+              })
+            }
+            className="bg-orange-500 text-white p-3 rounded-xl shadow hover:bg-orange-600"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+
+        {roomData.services.map((s, i) => (
+          <div
+            key={i}
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-2xl border"
+          >
+            <input
+              placeholder="Service name (e.g. Rent)"
+              className="modern-input"
+              value={s.name}
+              onChange={(e) =>
+                handleServiceChange(i, "name", e.target.value)
+              }
+            />
+
+            <input
+              type="number"
+              placeholder="Price"
+              min="0"
+              className="modern-input"
+              value={s.price}
+              onKeyDown={(e) =>
+                ["-", "e", "E"].includes(e.key) && e.preventDefault()
+              }
+              onChange={(e) =>
+                handleServiceChange(i, "price", e.target.value)
+              }
+            />
+
+            {roomData.services.length > 1 && (
               <button
-                key={t}
-                onClick={() => setRoomData({ ...roomData, type: t })}
-                className={`py-4 rounded-2xl font-black text-sm border-2 transition-all flex flex-col items-center gap-1 ${
-                  roomData.type === t 
-                  ? 'border-orange-500 bg-orange-50 text-orange-600 shadow-md shadow-orange-100' 
-                  : 'border-slate-100 text-slate-400 bg-white hover:border-slate-200'
-                }`}
-              >
-                {t}
-                <span className="text-[10px] font-medium opacity-60">Sharing</span>
-              </button>
-            ))}
-          </div>
-        </InputWrapper>
-
-        {/* Services & Rent Breakdown */}
-        <div className="bg-slate-50 p-6 md:p-8 rounded-[2.5rem] border border-slate-200/60 relative overflow-hidden">
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="font-black text-slate-800 text-lg">Rent Breakdown *</h3>
-                <p className="text-slate-500 text-xs font-medium">Add room rent and additional service charges.</p>
-              </div>
-              <button 
                 type="button"
-                onClick={() => setRoomData({ ...roomData, services: [...roomData.services, { name: "", price: "" }] })}
-                className="bg-orange-500 text-white p-3 rounded-xl hover:bg-orange-600 transition-all shadow-lg shadow-orange-200"
+                onClick={() =>
+                  setRoomData({
+                    ...roomData,
+                    services: roomData.services.filter((_, idx) => idx !== i),
+                  })
+                }
+                className="text-red-500 font-bold"
               >
-                <Plus size={20} />
+                <Trash2 size={18} />
               </button>
-            </div>
-
-            <div className="space-y-4">
-              {roomData.services.map((s, i) => (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  key={i} 
-                  className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm"
-                >
-                  <div className="flex-1 space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Service Name</label>
-                    <div className="relative">
-                      <input 
-                        placeholder="e.g. Monthly Rent" 
-                        className="modern-input bg-slate-50/50 border-transparent focus:bg-white" 
-                        value={s.name} 
-                        onChange={e => handleServiceChange(i, "name", e.target.value)} 
-                      />
-                      {/* Quick Suggestions - Only show if empty */}
-                      {s.name === "" && (
-                        <div className="flex gap-2 mt-2">
-                          {['Rent', 'Food', 'WiFi', 'Laundry'].map(tag => (
-                            <button 
-                              key={tag}
-                              type="button"
-                              onClick={() => handleServiceChange(i, "name", tag)}
-                              className="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded-md hover:bg-orange-100 hover:text-orange-600 transition-colors"
-                            >
-                              +{tag}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="w-full md:w-40 space-y-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase ml-1">Price (₹)</label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
-                      <input 
-                        type="number" 
-                        placeholder="0" 
-                        className="modern-input pl-8 bg-slate-50/50 border-transparent focus:bg-white" 
-                        value={s.price} 
-                        onChange={e => handleServiceChange(i, "price", e.target.value)} 
-                      />
-                    </div>
-                  </div>
-
-                  {roomData.services.length > 1 && (
-                    <button 
-                      type="button"
-                      onClick={() => setRoomData({ ...roomData, services: roomData.services.filter((_, idx) => idx !== i) })} 
-                      className="self-end md:self-center p-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Total Display */}
-            <div className="mt-8 pt-6 border-t border-slate-200 flex justify-between items-center">
-              <span className="font-bold text-slate-500 uppercase tracking-widest text-xs">Total Monthly Rent</span>
-              <div className="text-right">
-                <span className="text-3xl font-black text-slate-900">₹{roomData.price || 0}</span>
-                <p className="text-[10px] text-orange-500 font-bold uppercase tracking-tighter">Auto-Calculated</p>
-              </div>
-            </div>
+            )}
           </div>
-        </div>
-      </div>
-    ) : (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-       <InputWrapper label="Base Pricing (₹) *" icon={<IndianRupee size={18} />}>
-  <input
-    type="number"
-    min="0"
-    step="1"
-    inputMode="numeric"
-    className="modern-input text-2xl font-black h-20 px-8"
-    placeholder="0"
-    value={roomData.price}
-    onChange={(e) => {
-      const value = e.target.value;
-      // prevent negative values
-      if (value === "" || Number(value) >= 0) {
-        setRoomData({ ...roomData, price: value });
-      }
-    }}
-    onKeyDown={(e) => {
-      // block minus key manually
-      if (e.key === "-" || e.key === "e") {
-        e.preventDefault();
-      }
-    }}
-  />
-</InputWrapper>
+        ))}
 
-        <div className="bg-orange-50 rounded-3xl p-6 flex flex-col justify-center border border-orange-100">
-           <p className="text-orange-800 text-xs font-bold uppercase mb-1">Pricing Note</p>
-           <p className="text-orange-600 text-xs leading-relaxed">This will be shown as the primary price for your listing.</p>
+        {/* Total */}
+        <div className="flex justify-between items-center border-t pt-6">
+          <span className="text-xs font-bold uppercase text-slate-500">
+            Total Monthly Rent
+          </span>
+          <span className="text-3xl font-black text-orange-500">
+            ₹{roomData.price || 0}
+          </span>
         </div>
       </div>
-    )}
-  </motion.div>
+
+      {/* Advance Month */}
+      <InputWrapper
+        label="Advance / Security Deposit (Months) *"
+        icon={<IndianRupee size={18} />}
+      >
+        <input
+          type="number"
+          min="0"
+          placeholder="e.g. 1 or 2"
+          className="modern-input"
+          value={roomData.advancedmonth}
+          onKeyDown={(e) =>
+            ["-", "e", "E"].includes(e.key) && e.preventDefault()
+          }
+          onChange={(e) =>
+            setRoomData({
+              ...roomData,
+              advancedmonth: e.target.value,
+            })
+          }
+        />
+        <p className="text-[11px] text-slate-400 mt-1">
+          Example: 1 = 1 month advance
+        </p>
+      </InputWrapper>
+    </>
+  ) : (
+    /* ================= NON-PG FLOW ================= */
+    <>
+      <InputWrapper label="Base Pricing (₹) *" icon={<IndianRupee size={18} />}>
+        <input
+          type="number"
+          min="0"
+          className="modern-input text-2xl font-black h-20"
+          value={roomData.price}
+          onKeyDown={(e) =>
+            ["-", "e", "E"].includes(e.key) && e.preventDefault()
+          }
+          onChange={(e) =>
+            setRoomData({ ...roomData, price: e.target.value })
+          }
+        />
+      </InputWrapper>
+
+      <InputWrapper
+        label="Advance / Security Deposit (Months) *"
+        icon={<IndianRupee size={18} />}
+      >
+        <input
+          type="number"
+          min="0"
+          className="modern-input"
+          value={roomData.advancedmonth}
+          onChange={(e) =>
+            setRoomData({
+              ...roomData,
+              advancedmonth: e.target.value,
+            })
+          }
+        />
+      </InputWrapper>
+    </>
+  )}
+</motion.div>
+
 )}
 
 

@@ -20,7 +20,7 @@ export default function DashboardLayout() {
     { id: "payments", label: "Payments", path: "/admin/payments" },
     { id: "rooms", label: "Rooms", path: "/admin/ShowRooms" },
     { id: "complaints", label: "Complaints", path: "/admin/complaints" },
-    { id: "subscription", label: "Subscription", path: "/admin/subscription" },
+    // { id: "subscription", label: "Subscription", path: "/admin/subscription" },
   ];
 
   return (
