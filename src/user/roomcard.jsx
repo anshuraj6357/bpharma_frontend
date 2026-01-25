@@ -138,13 +138,13 @@ const RoomCard = memo(function RoomCard({
       <Star size={12} className="text-amber-500" fill="currentColor" />
       <span className="text-xs font-bold text-slate-800">{avgRating || "New"}</span>
     </div>
-
+{/* 
     {/* URGENCY TAG - Bottom Left */}
-    {room.vacant > 0 && room.vacant <= 2 && (
+    {/* {room. > 0 && room.vacant <= 2 && (
       <div className="absolute bottom-4 left-4 bg-rose-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg animate-pulse shadow-lg">
         LOW SEATS
       </div>
-    )}
+    )} */} 
   </div>
 
   {/* CONTENT SECTION */}

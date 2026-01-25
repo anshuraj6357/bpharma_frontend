@@ -29,7 +29,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Booking() {
   const { data, isLoading, isError } = useGetbookingQuery();
   const bookings = data?.bookings || [];
-  console.log(bookings[0])
+  console.log(bookings[1])
 
   if (isError) {
     return (
@@ -68,35 +68,7 @@ export default function Booking() {
           </p>
         </motion.div>
 
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12 max-w-4xl mx-auto"
-        >
-          {[
-            { label: "Total", value: bookings.length, icon: Home, color: "indigo" },
-            { label: "Active", value: bookings.filter(b => b.status === "paid").length, icon: Clock, color: "yellow" },
-            { label: "Completed", value: bookings.filter(b => b.status === "In-Active").length, icon: CheckCircle, color: "green" },
-          ].map(({ label, value, icon: Icon, color }, i) => (
-            <motion.div
-              key={label}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3 + i * 0.1 }}
-              className="group bg-white/60 backdrop-blur-xl rounded-3xl p-6 border border-white/50 shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"
-            >
-              <div className={`w-12 h-12 rounded-2xl bg-gradient-to-r from-${color}-500 to-${color}-600 flex items-center justify-center mb-3 shadow-lg`}>
-                <Icon className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className="text-2xl font-black text-gray-900">{value}</p>
-                <p className="text-sm text-gray-500 uppercase tracking-wide font-medium">{label}</p>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        
 
         {/* Bookings Grid */}
         <motion.div
@@ -131,7 +103,7 @@ function BookingCard({ booking }) {
 
   const [createReview, { isLoading: reviewLoading }] = useCreateReviewMutation();
 
-  const isCheckedOut = booking.status === "In-Active";
+  const isCheckedOut = booking.tenantId&&booking.tenantId.status === "In-Active";
   const userReview = booking?.room?.personalreview?.find(
     (r) => r?.user?._id?.toString() === user?._id?.toString()
   );
@@ -154,6 +126,7 @@ function BookingCard({ booking }) {
       toast.success("🎉 Review submitted successfully!");
       setShowReview(false);
     } catch (err) {
+      console.log(err)
       toast.error(err?.data?.message || "Failed to submit review");
     }
   };
@@ -167,219 +140,216 @@ function BookingCard({ booking }) {
     };
     return config[status] || config.cancelled;
   };
+const STATUS_CONFIG = {
+  paid: {
+    label: "Active Booking",
+    color: "bg-emerald-100 text-emerald-700",
+    dot: "bg-emerald-500",
+  },
+  processing: {
+    label: "Processing",
+    color: "bg-amber-100 text-amber-700",
+    dot: "bg-amber-500",
+  },
+  "In-Active": {
+    label: "Completed",
+    color: "bg-slate-100 text-slate-600",
+    dot: "bg-slate-400",
+  },
+  cancelled: {
+    label: "Cancelled",
+    color: "bg-rose-100 text-rose-700",
+    dot: "bg-rose-500",
+  },
+};
 
   const { bg, text, icon: StatusIcon } = getStatusConfig(booking.status);
 
   return (
-    <>
-      <div className="group relative bg-white/70 backdrop-blur-2xl rounded-3xl border border-white/50 shadow-2xl hover:shadow-3xl hover:shadow-indigo-500/25 transition-all duration-500 overflow-hidden hover:-translate-y-3 hover:scale-[1.02]">
-        
-        {/* Status Badge */}
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          className={`
-            absolute -top-4 -right-4 w-24 h-24 rounded-2xl
-            bg-gradient-to-r ${bg}
-            flex items-center justify-center shadow-2xl
-            ring-4 ring-white/50
-            ${text}
-          `}
-        >
-          <StatusIcon className="w-8 h-8" />
-        </motion.div>
+   <div className="bg-white rounded-2xl border border-slate-200 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
 
-        {/* Header */}
-        <div className="p-8 pb-4 relative z-10">
-          <div className="flex items-start justify-between mb-6">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                {booking.branch?.name}
-              </h2>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <MapPin className="w-4 h-4" />
-                {booking.branch?.city}, {booking.branch?.state}
-              </div>
-            </div>
-            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-              <button
-                onClick={() => handleCopy(booking.bookingId)}
-                className="p-2 hover:bg-white/50 rounded-xl transition-all"
-                title="Copy Booking ID"
-              >
-                <Copy className={`w-5 h-5 ${copiedId === booking.bookingId ? 'text-emerald-500' : 'text-gray-500'}`} />
-              </button>
-            </div>
-          </div>
+  {/* ================= HEADER ================= */}
+  <div className="px-5 pt-5 pb-3 flex justify-between">
+    <div className="space-y-1">
+      <h2 className="text-lg font-bold text-slate-900">
+        {booking.branch?.name}
+      </h2>
 
-          {/* Booking ID */}
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-2xl border border-indigo-100 mb-6">
-            <p className="text-xs text-indigo-600 font-medium uppercase tracking-wide mb-1">Booking ID</p>
-            <p className="font-mono text-sm font-bold text-gray-900 truncate" title={booking.bookingId}>
-              {booking.bookingId}
-            </p>
-          </div>
-        </div>
-
-        {/* Details Grid */}
-        <div className="px-8 pb-8 grid grid-cols-2 gap-4">
-          <DetailItem label="Room" value={booking.roomNumber} icon={BedDouble} />
-          <DetailItem label="Payment" value={booking.paymentSource} icon={Wallet} />
-          <DetailItem label="Guest" value={booking.username} icon={User} />
-          <DetailItem label="Check-in" value={formatDate(booking.checkInDate)} icon={Calendar} />
-          <DetailItem 
-            label="Check-out" 
-            value={booking.checkedoutdate ? formatDate(booking.checkedoutdate) : "Ongoing"} 
-            icon={Calendar}
-          />
-        </div>
-
-        {/* Payment Breakdown */}
-        <div className="px-8 pb-8">
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl p-6 border border-indigo-100">
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-sm font-medium text-gray-700">Total Amount</span>
-                <span className="text-xl font-black text-gray-900">₹{booking.amount?.totalAmount}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Wallet Used</span>
-                <span className="text-emerald-600 font-semibold">−₹{booking.amount?.walletUsed}</span>
-              </div>
-              <div className="h-px bg-gradient-to-r from-gray-200 to-gray-300 my-3" />
-              <div className="flex justify-between items-end">
-                <span className="text-lg font-semibold text-gray-700">Payable</span>
-                <span className="text-2xl font-black bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  ₹{booking.amount?.payableAmount}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Razorpay Details */}
-        <div className="px-8 pb-6">
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <RazorpayDetail label="Order ID" value={booking.razorpay?.orderId} onCopy={() => handleCopy(booking.razorpay?.orderId)} />
-            <RazorpayDetail label="Payment ID" value={booking.razorpay?.paymentId} onCopy={() => handleCopy(booking.razorpay?.paymentId)} />
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="px-8 pb-8 pt-4">
-          <div className="space-y-3">
-            {!isCheckedOut && booking.status === "paid" && (
-              <>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate(`/complain/${booking.branch?._id}`)}
-                  className="w-full bg-gradient-to-r from-red-500 to-rose-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:from-red-600 hover:to-rose-700 transition-all duration-300 flex items-center justify-center gap-3"
-                >
-                  <AlertCircle size={20} />
-                  Raise Complaint
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate(`/Wishlistdetails/${booking.branch?._id}`)}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-blue-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:from-indigo-600 hover:to-blue-700 transition-all duration-300 flex items-center justify-center gap-3"
-                >
-                  <Heart size={20} />
-                  Pay Rent / Explore
-                </motion.button>
-              </>
-            )}
-
-            {isCheckedOut && !hasReviewed && (
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setShowReview(true)}
-                className="w-full bg-gradient-to-r from-amber-500 to-yellow-600 text-white py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:from-amber-600 hover:to-yellow-700 transition-all duration-300 flex items-center justify-center gap-3"
-              >
-                <Star size={20} />
-                Rate & Review Stay
-              </motion.button>
-            )}
-
-            {hasReviewed && isCheckedOut && (
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-6 text-center shadow-xl"
-              >
-                <CheckCircle className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-                <h3 className="text-lg font-bold text-emerald-800 mb-2">Thank you for your review!</h3>
-                <div className="flex justify-center gap-1 mb-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      size={20}
-                      className={i < userReview.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}
-                    />
-                  ))}
-                </div>
-                <p className="text-sm text-emerald-700">{userReview.review}</p>
-              </motion.div>
-            )}
-          </div>
-        </div>
+      <div className="flex items-center gap-1.5 text-xs text-slate-500">
+        <MapPin size={12} className="text-indigo-500" />
+        {booking.branch?.city}, {booking.branch?.state || "India"}
       </div>
 
-      <AnimatePresence>
-        {showReview && (
-          <ReviewModal
-            booking={booking}
-            loading={reviewLoading}
-            onClose={() => setShowReview(false)}
-            onSubmit={handleSubmitReview}
-          />
-        )}
-      </AnimatePresence>
-    </>
+      {/* STATUS */}
+      {(() => {
+        const status = STATUS_CONFIG[booking.status] || STATUS_CONFIG.cancelled;
+        return (
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${status.color}`}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
+            {status.label}
+          </span>
+        );
+      })()}
+    </div>
+
+    <button
+      onClick={() => handleCopy(booking.bookingId)}
+      className="p-2 rounded-lg hover:bg-slate-100"
+    >
+      <Copy size={16} className="text-slate-500" />
+    </button>
+  </div>
+
+  {/* ================= BOOKING ID ================= */}
+  <div className="px-5 pb-3">
+    <div className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+      <p className="text-[10px] font-bold text-slate-400 uppercase">
+        Booking ID
+      </p>
+      <p className="text-xs font-mono font-semibold text-slate-800 truncate">
+        {booking.bookingId}
+      </p>
+    </div>
+  </div>
+
+  {/* ================= DETAILS ================= */}
+  <div className="px-5 pb-4 grid grid-cols-2 gap-3">
+    <DetailItem
+      label="Payment"
+      value={booking.paymentSource}
+      icon={Wallet}
+    />
+
+    {booking.tenantId && (
+      <>
+        <DetailItem
+          label="Check-in"
+          value={formatDate(booking.tenantId.checkInDate)}
+          icon={Calendar}
+        />
+        <DetailItem
+          label="Check-out"
+          value={
+            booking.tenantId.checkedoutdate
+              ? formatDate(booking.tenantId.checkedoutdate)
+              : "Ongoing"
+          }
+          icon={Calendar}
+        />
+      </>
+    )}
+  </div>
+
+  {/* ================= PAYMENT SUMMARY ================= */}
+  <div className="px-5 pb-4">
+    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2 text-sm">
+      <div className="flex justify-between">
+        <span className="text-slate-500">Total</span>
+        <span className="font-bold">₹{booking.amount?.totalAmount}</span>
+      </div>
+
+      <div className="flex justify-between text-xs">
+        <span className="text-slate-400">Wallet</span>
+        <span className="text-emerald-600">
+          −₹{booking.amount?.walletUsed}
+        </span>
+      </div>
+
+      <div className="flex justify-between font-bold text-base pt-2 border-t">
+        <span>Payable</span>
+        <span className="text-indigo-600">
+          ₹{booking.amount?.payableAmount}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  {/* ================= RAZORPAY ================= */}
+  <div className="px-5 pb-4 grid grid-cols-2 gap-3 text-xs">
+    <RazorpayDetail
+      label="Order ID"
+      value={booking.razorpay?.orderId}
+      onCopy={() => handleCopy(booking.razorpay?.orderId)}
+    />
+    <RazorpayDetail
+      label="Payment ID"
+      value={booking.razorpay?.paymentId}
+      onCopy={() => handleCopy(booking.razorpay?.paymentId)}
+    />
+  </div>
+
+  {/* ================= ACTIONS ================= */}
+  <div className="px-5 pb-5 space-y-2">
+    {booking.status === "paid" && booking.tenantId && booking.tenantId.status=="Active" ?(
+      <>
+        <button
+          onClick={() => navigate(`/complain/${booking.branch?._id}`)}
+          className="w-full py-2.5 rounded-xl text-sm font-semibold bg-rose-500 text-white hover:bg-rose-600"
+        >
+          Raise Complaint
+        </button>
+
+        <button
+          onClick={() => navigate(`/Wishlistdetails/${booking.branch?._id}`)}
+          className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700"
+        >
+          Pay Rent / Explore
+        </button>
+      </>
+    ):<>
+    <button onClick={()=>setShowReview(true)}>
+      review
+    </button>
+    
+    </>}
+  </div>
+</div>
+
   );
 }
-
+   
 /* ===================== COMPONENTS ===================== */
 
 function DetailItem({ label, value, icon: Icon }) {
   return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className="group bg-white/50 backdrop-blur-sm rounded-2xl p-4 border border-white/60 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all duration-300 shadow-sm hover:shadow-md"
-    >
-      <div className="flex items-center gap-2 mb-2 opacity-75 group-hover:opacity-100 transition-opacity">
-        <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-          <Icon className="w-4 h-4 text-white" />
-        </div>
-        <span className="text-xs font-semibold uppercase tracking-wide text-gray-600">{label}</span>
+    <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
+      <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+        <Icon size={14} className="text-indigo-600" />
       </div>
-      <p className="font-bold text-gray-900 text-base truncate">{value}</p>
-    </motion.div>
-  );
-}
-
-function RazorpayDetail({ label, value, onCopy }) {
-  return (
-    <div className="space-y-1 group">
-      <span className="text-xs text-gray-500 uppercase tracking-wide">{label}</span>
-      <div className="flex items-center gap-2">
-        <span className="font-mono font-medium text-sm text-gray-900 bg-gray-100 px-3 py-1 rounded-xl truncate flex-1" title={value}>
+      <div>
+        <p className="text-[10px] uppercase font-bold text-slate-400">
+          {label}
+        </p>
+        <p className="text-sm font-semibold text-slate-800 truncate">
           {value}
-        </span>
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={onCopy}
-          className="p-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-600 group-hover:scale-110 transition-all duration-200"
-        >
-          <Copy className="w-4 h-4" />
-        </motion.button>
+        </p>
       </div>
     </div>
   );
 }
+
+
+function RazorpayDetail({ label, value, onCopy }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-[10px] uppercase font-bold text-slate-400">{label}</p>
+      <div className="flex items-center gap-2">
+        <span className="flex-1 truncate text-xs font-mono bg-slate-100 px-2 py-1 rounded-lg">
+          {value}
+        </span>
+        <button
+          onClick={onCopy}
+          className="p-1.5 rounded-lg hover:bg-slate-200"
+        >
+          <Copy size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 
 function ReviewModal({ booking, onClose, onSubmit, loading }) {
   const [rating, setRating] = useState(0);
@@ -550,11 +520,16 @@ function BookingSkeletons() {
   );
 }
 
-function formatDate(date) {
+export function formatDate(date) {
+  if (!date) return "—";
+
   return new Date(date).toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-    weekday: "short",
   });
 }
+
+
+
+ 
