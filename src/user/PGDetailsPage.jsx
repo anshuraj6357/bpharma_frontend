@@ -21,24 +21,14 @@ import {
 ============================ */
 function loadRazorpayScript() {
   return new Promise((resolve) => {
-    console.log("💡 Loading Razorpay script...");
-    if (window.Razorpay) {
-      console.log("✅ Razorpay script already loaded");
-      return resolve(true);
-    }
+    if (window.Razorpay) return resolve(true);
 
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
 
-    script.onload = () => {
-      console.log("✅ Razorpay script loaded successfully");
-      resolve(true);
-    };
-    script.onerror = () => {
-      console.error("❌ Razorpay script failed to load");
-      resolve(false);
-    };
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
 
     document.body.appendChild(script);
   });
@@ -48,31 +38,30 @@ function loadRazorpayScript() {
    BOOKING STATUS POLLING
 ============================ */
 function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) {
-  console.log("🔁 Starting booking status polling for bookingId:", bookingId);
-  const MAX_RETRIES = 20; // ~1 minute
+  const MAX_RETRIES = 20;
   let attempts = 0;
 
   const interval = setInterval(async () => {
     attempts++;
-    console.log(`⏳ Polling attempt ${attempts} for bookingId ${bookingId}`);
 
     try {
       const res = await fetch(
         `https://roomgi-backend-project-2.onrender.com/api/payment/user/status/${bookingId}`,
         { credentials: "include" }
       );
-      console.log("📦 Polling response status:", res.status);
 
       if (!res.ok) throw new Error("Status API failed");
 
       const data = await res.json();
-      console.log("📊 Polling data:", data);
 
       if (data.status === "paid") {
         clearInterval(interval);
-        setIsConfirmingBooking(false);
-        console.log("🎉 Booking confirmed!");
 
+        // ✅ CLEANUP (CRITICAL)
+        localStorage.removeItem("roomgi_payment_pending");
+        localStorage.removeItem("roomgi_payment_processing");
+
+        setIsConfirmingBooking(false);
         toast.success("Booking confirmed 🎉");
 
         navigate("/bookingssuccess", {
@@ -88,8 +77,11 @@ function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) 
 
       if (data.status === "failed") {
         clearInterval(interval);
+
+        localStorage.removeItem("roomgi_payment_pending");
+        localStorage.removeItem("roomgi_payment_processing");
+
         setIsConfirmingBooking(false);
-        console.error("❌ Payment failed / refunded");
         toast.error("Payment failed / refunded");
         navigate(-1);
       }
@@ -97,7 +89,6 @@ function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) 
       if (attempts >= MAX_RETRIES) {
         clearInterval(interval);
         setIsConfirmingBooking(false);
-        console.warn("⚠ Verification taking longer than usual");
         toast.warning("Verification taking longer than usual");
       }
     } catch (err) {
@@ -118,59 +109,40 @@ async function startPayment(
   setIsConfirmingBooking,
   user
 ) {
-  console.log("💳 Initiating payment for roomId:", roomId, "amount:", amount);
-
   try {
-    // 1️⃣ Load Razorpay SDK
     const loaded = await loadRazorpayScript();
     if (!loaded) {
       toast.error("Payment SDK failed to load");
-      console.error("❌ Razorpay SDK failed to load");
       return;
     }
-    console.log("✅ Razorpay SDK loaded");
 
-    // 2️⃣ Create Razorpay order on backend
-    console.log("📦 Creating Razorpay order...");
     const response = await razorpayPayment({
-      amount: amount.payableAmount * 100, // amount in INR
+      amount: amount.payableAmount * 100,
       receipt: `receipt_${Date.now()}_${roomId}`,
     }).unwrap();
 
-    console.log("📦 Razorpay order response:", response);
-
     const order = response?.order;
-    if (!order) {
-      toast.error("Order creation failed");
-      console.error("❌ Order creation failed, response:", response);
+    if (!order || order.amount < 100) {
+      toast.error("Invalid payment amount");
       return;
     }
 
-    // 3️⃣ Minimum amount check
-    if (order.amount < 100) { // Razorpay minimum 1 INR = 100 paise
-      toast.error("Amount too low. Minimum 1 INR required.");
-      console.error("❌ Order amount too low:", order.amount);
-      return;
-    }
-    console.log("✅ Order amount OK (paise):", order.amount);
-
-    // 4️⃣ Razorpay payment modal options
     const options = {
       key: "rzp_live_Rn8nwfw3Hdmb8E",
-      amount: order.amount, // already in paise from backend
+      amount: order.amount,
       currency: order.currency,
       name: "Roomgi",
       description: "Room Booking Payment",
       order_id: order.id,
 
       handler: async (rzpResponse) => {
-        console.log("💡 Razorpay handler called with response:", rzpResponse);
-
         try {
+          if (localStorage.getItem("roomgi_payment_processing")) return;
+          localStorage.setItem("roomgi_payment_processing", "true");
+
           setIsConfirmingBooking(true);
           toast.info("Confirming your booking ⏳");
 
-          // 5️⃣ Verify payment on backend
           const verifyData = await razorpayPaymentVerify({
             razorpay_order_id: rzpResponse.razorpay_order_id,
             razorpay_payment_id: rzpResponse.razorpay_payment_id,
@@ -179,31 +151,39 @@ async function startPayment(
             amount,
           }).unwrap();
 
-          console.log("📦 Payment verification data:", verifyData);
+          if (!verifyData?.booking?._id) throw new Error("Verify failed");
 
-          if (!verifyData?.success) {
-            toast.error("Payment verification failed");
-            console.error("❌ Payment verification failed");
-            setIsConfirmingBooking(false);
-            return;
-          }
+          // ✅ SAVE CORRECT DATA
+          localStorage.setItem(
+            "roomgi_payment_pending",
+            JSON.stringify({
+              bookingId: verifyData.booking._id,
+              orderId: rzpResponse.razorpay_order_id,
+              paymentId: rzpResponse.razorpay_payment_id,
+              roomId,
+              timestamp: Date.now(),
+            })
+          );
 
-          // 6️⃣ Start webhook-based booking status polling
-          console.log("🔁 Starting booking status polling for:", verifyData.booking._id);
-          startBookingStatusPolling(verifyData.booking._id, navigate, setIsConfirmingBooking);
-
+          startBookingStatusPolling(
+            verifyData.booking._id,
+            navigate,
+            setIsConfirmingBooking
+          );
         } catch (err) {
-          console.error("❌ Payment verification error:", err);
-          toast.error("Verification error");
+          localStorage.removeItem("roomgi_payment_pending");
+          localStorage.removeItem("roomgi_payment_processing");
           setIsConfirmingBooking(false);
+          toast.error("Payment verification failed");
         }
       },
 
       modal: {
         ondismiss: () => {
-          console.log("⚠ Payment modal dismissed by user");
-          toast.info("Payment cancelled");
+          localStorage.removeItem("roomgi_payment_pending");
+          localStorage.removeItem("roomgi_payment_processing");
           setIsConfirmingBooking(false);
+          toast.info("Payment cancelled");
         },
       },
 
@@ -216,16 +196,13 @@ async function startPayment(
       theme: { color: "#2563eb" },
     };
 
-    console.log("💡 Opening Razorpay modal with options:", options);
     new window.Razorpay(options).open();
-
   } catch (err) {
-    console.error("❌ Payment failed:", err);
-    toast.error("Payment failed");
+    localStorage.removeItem("roomgi_payment_processing");
     setIsConfirmingBooking(false);
+    toast.error("Payment failed");
   }
 }
-
 
 
 
@@ -281,6 +258,30 @@ export default function PGDetailsPage() {
       );
     }
   }, []);
+useEffect(() => {
+  const pending = localStorage.getItem("roomgi_payment_pending");
+  if (!pending) return;
+
+  const data = JSON.parse(pending);
+
+  // ⏳ Ignore very old attempts (10 min)
+  if (Date.now() - data.timestamp > 10 * 60 * 1000) {
+    localStorage.removeItem("roomgi_payment_pending");
+    return;
+  }
+
+  console.log("🔁 Resuming pending payment:", data);
+
+  setIsConfirmingBooking(true);
+  toast.info("Resuming payment verification ⏳");
+
+  // 👇 backend polling endpoint
+  startBookingStatusPolling(
+    data.bookingId || data.orderId,
+    navigate,
+    setIsConfirmingBooking
+  );
+}, []);
 
   const handleBook = (amount) => {
     if (!isAuthenticated) {
