@@ -1030,7 +1030,7 @@ const totalServicePrice =
   <div className="flex justify-between items-center pt-3 mt-3 border-t border-slate-200">
    
     <span className="text-indigo-600 font-black text-lg">
-      ₹{totalServicePrice}
+      ₹{totalServicePrice+pg.advancedmonth*totalServicePrice}
     </span>
   </div>
 ) : (
@@ -1140,7 +1140,7 @@ const totalServicePrice =
   <div className="grid grid-cols-1 gap-3">
     <ActionBtn 
       icon={<Phone size={20} />} 
-      label="Contact Owner" 
+      label="Contact us" 
       primary 
       onClick={() => window.open(`https://wa.me/919693915693`, '_blank')} 
     />

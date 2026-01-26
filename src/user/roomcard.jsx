@@ -21,6 +21,7 @@ const optimizeImg = (input) => {
 };
 /* ---------------- SAFE PRICE CALC ---------------- */
 const getTotalPrice = (room) => {
+  console.log(room)
   // PG → services based
   if (room?.category === "Pg" && Array.isArray(room?.services)) {
     return room.services.reduce(
@@ -195,7 +196,8 @@ return (
                 </p>
 
                 <p className="text-sm font-black text-gray-900">
-                  ₹{getTotalPrice(room)}
+                  {/* ₹{getTotalPrice(room)} */}
+                   ₹{room.price}
                   <span className="text-[10px] text-gray-500">
                     /{room.category === "Hotel" ? "night" : "mo"}
                   </span>

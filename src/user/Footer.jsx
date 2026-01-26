@@ -103,7 +103,7 @@ export default function Footer() {
                 <nav>
                   <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white">Company</h3>
                   <ul className="mt-6 space-y-4 text-sm font-medium">
-                    {["About Roomgi", "Mission", "Careers"].map((item) => (
+                    {["about", "Mission", "Career"].map((item) => (
                       <li key={item}>
                         <Link to={`/${item.toLowerCase().replace(' ', '')}`} className="hover:text-indigo-400 transition-all flex items-center group">
                           <span className="h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-3 group-hover:mr-2" />
@@ -146,7 +146,7 @@ export default function Footer() {
                 <nav>
                   <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white">Trust & Legal</h3>
                   <ul className="mt-6 space-y-4 text-sm font-medium">
-                    {["Privacy Policy", "Terms and Condition"].map((item) => (
+                    {["Privacy Policy", "TermsandCondition"].map((item) => (
                       <li key={item}>
                         <Link to={`/${item.toLowerCase().replace(' ', '')}`} className="hover:text-indigo-400 transition-all flex items-center group">
                           <span className="h-[2px] w-0 bg-indigo-500 transition-all group-hover:w-3 group-hover:mr-2" />
