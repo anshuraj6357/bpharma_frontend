@@ -21,19 +21,17 @@ const optimizeImg = (input) => {
 };
 /* ---------------- SAFE PRICE CALC ---------------- */
 const getTotalPrice = (room) => {
-  // PG → services based
   if (room?.category === "Pg" && Array.isArray(room?.services)) {
     return room.services.reduce(
       (sum, s) => sum + Number(s?.price || 0),
+      0 // ✅ VERY IMPORTANT
     );
   }
 
-  // Hotel priority
   if (room?.category === "Hotel") {
     return room?.rentperNight || room?.rentperday || room?.price || 0;
   }
 
-  // Rented Room
   return room?.price || 0;
 };
 
