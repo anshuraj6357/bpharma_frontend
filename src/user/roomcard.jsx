@@ -25,7 +25,6 @@ const getTotalPrice = (room) => {
   if (room?.category === "Pg" && Array.isArray(room?.services)) {
     return room.services.reduce(
       (sum, s) => sum + Number(s?.price || 0),
-      Number(room?.price || 0)
     );
   }
 
@@ -195,7 +194,7 @@ return (
                 </p>
 
                 <p className="text-sm font-black text-gray-900">
-                  ₹{getTotalPrice(room)}hg
+                  ₹{getTotalPrice(room)}
                   <span className="text-[10px] text-gray-500">
                     /{room.category === "Hotel" ? "night" : "mo"}
                   </span>

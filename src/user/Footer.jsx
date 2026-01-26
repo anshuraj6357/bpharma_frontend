@@ -13,11 +13,11 @@ import {
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 const socialLinks = [
-  { icon: Facebook, url: "https://www.facebook.com/roomgi" },
-  { icon: Instagram, url: "https://www.instagram.com/roomgi" },
+  { icon: Facebook, url: "https://www.facebook.com/share/1BxqbAZze5/" },
+  { icon: Instagram, url: "https://www.instagram.com/roomgipvtltd?utm_source=qr&igsh=amhsMW4wZjU1bTdl" },
   { icon: Linkedin, url: "https://www.linkedin.com/company/roomgi" },
-  { icon: Twitter, url: "https://twitter.com/roomgi" },
-  { icon: Youtube, url: "https://www.youtube.com/@roomgi" },
+  { icon: Twitter, url: "https://x.com/teamroomgi" },
+  { icon: Youtube, url: "https://youtube.com/@roomgipvtltd?si=I1bvrzE6LjReDgEN" },
 ];
 
 export default function Footer() {
