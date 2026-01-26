@@ -24,7 +24,7 @@ export default function AdminApp() {
     <Routes>
       {/* 🔒 PROTECTED ADMIN ROUTES */}
       <Route element={<ProtectedRoute allowedRoles={["branch-manager", "owner"]} />}>
-        <Route path="/" element={<DashboardLayout />}>
+        
           <Route index element={<Navigate to="properties" replace />} />
 
           <Route path="properties" element={<Properties />} />
@@ -45,7 +45,7 @@ export default function AdminApp() {
           {/* fallback */}
           <Route path="*" element={<Navigate to="properties" replace />} />
         </Route>
-      </Route>
+   
 
       {/* 🌐 PUBLIC AUTH ROUTES */}
       <Route path="login" element={<Login />} />
