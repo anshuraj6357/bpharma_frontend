@@ -94,7 +94,7 @@ export default function Header() {
           {/* LEFT */}
           <div className="flex items-center gap-4">
             <button
-              className="lg:hidden p-2 rounded-xl bg-slate-50 hover:bg-indigo-50"
+              className="lg:hidden p-2 rounded-xl bg-slate-50"
               onClick={() => setMobileMenu(true)}
             >
               <Menu size={20} />
@@ -131,7 +131,10 @@ export default function Header() {
           {/* RIGHT */}
           {!isAuthenticated ? (
             <div className="flex gap-3">
-              <button onClick={() => navigate("/login")} className="hidden md:block">
+              <button
+                onClick={() => navigate("/login")}
+                className="hidden md:block"
+              >
                 Log in
               </button>
               <button
@@ -167,11 +170,16 @@ export default function Header() {
                       {u.icon} {u.label}
                     </button>
                   ))}
+
                   <button
                     onClick={handleLogout}
                     className="w-full px-5 py-3 text-red-500 flex gap-3"
                   >
-                    {isLoading ? <Loader2 className="animate-spin" /> : <LogOut />}
+                    {isLoading ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      <LogOut />
+                    )}
                     Logout
                   </button>
                 </div>
@@ -184,19 +192,19 @@ export default function Header() {
       {/* ================= MOBILE MENU ================= */}
       {mobileMenu && (
         <>
-           <div
-    onClick={() => setMobileMenu(false)}
-    className="fixed inset-0 z-[110]
-      bg-black/40 backdrop-blur-sm
-      animate-fadeIn"
-  />
+          <div
+            onClick={() => setMobileMenu(false)}
+            className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm"
+          />
+
           <aside className="fixed top-4 left-4 bottom-4 w-[280px] bg-white z-[120] rounded-3xl p-8">
             <div className="flex justify-between mb-8">
               <img src={logo} className="h-10" />
               <X onClick={() => setMobileMenu(false)} />
             </div>
 
-            {[...navLinks, ...(isAuthenticated ? userLinks : [])].map((l) => (
+            {/* NAV LINKS – ALWAYS */}
+            {navLinks.map((l) => (
               <button
                 key={l.label}
                 onClick={() => {
@@ -205,9 +213,59 @@ export default function Header() {
                 }}
                 className="w-full text-left py-3 flex gap-4"
               >
-                {l.icon || <Home size={18} />} {l.label}
+                <Home size={18} /> {l.label}
               </button>
             ))}
+
+            {/* USER LINKS – ONLY LOGGED IN */}
+            {isAuthenticated &&
+              userLinks.map((l) => (
+                <button
+                  key={l.label}
+                  onClick={() => {
+                    navigate(l.path);
+                    setMobileMenu(false);
+                  }}
+                  className="w-full text-left py-3 flex gap-4"
+                >
+                  {l.icon} {l.label}
+                </button>
+              ))}
+
+            {/* LOGIN / SIGNUP – ONLY LOGGED OUT */}
+            {!isAuthenticated && (
+              <div className="mt-6 flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    navigate("/login");
+                    setMobileMenu(false);
+                  }}
+                  className="w-full py-2 rounded-xl border"
+                >
+                  Log in
+                </button>
+
+                <button
+                  onClick={() => {
+                    navigate("/login");
+                    setMobileMenu(false);
+                  }}
+                  className="w-full py-2 rounded-xl bg-slate-950 text-white"
+                >
+                  Sign up
+                </button>
+              </div>
+            )}
+
+            {/* LOGOUT – ONLY LOGGED IN */}
+            {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="mt-6 w-full py-2 rounded-xl text-red-500 flex items-center gap-3"
+              >
+                <LogOut /> Logout
+              </button>
+            )}
           </aside>
         </>
       )}
