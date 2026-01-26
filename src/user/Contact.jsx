@@ -104,9 +104,9 @@ export default function Contact() {
           <ContactCard
             icon={<Phone className="w-6 h-6" />}
             title="Call Support"
-            detail="+91 98765 43210"
+            detail="+91 9217577327"
             desc="Available 10 AM - 7 PM"
-            href="tel:+919876543210"
+            href="tel:+919217577327"
           />
 
           <ContactCard

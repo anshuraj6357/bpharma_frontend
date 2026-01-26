@@ -1,31 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   import { useState, useEffect,  useCallback, useMemo } from "react";
   import { useNavigate } from "react-router-dom";
   import  SearchPage from "./search.jsx"
@@ -93,14 +65,7 @@ useEffect(() => {
         setPgData(pgApiData.allrooms);
       }
     }, [pgApiData]);
-  
-  
-  
-  
-  
-  
-  
-    const filterOptions = [
+  const filterOptions = [
       { key: "All", label: "All Stays", count: pgData.length },
       { key: "Newest", label: "Newest", count: pgData.filter(p => p.createdAt > Date.now() - 30 * 24 * 60 * 60 * 1000).length },
     
@@ -122,11 +87,7 @@ useEffect(() => {
         document.title = "RoomGi - Find Your Perfect Stay";
       };
     }, []);
-  
-    
-   
-  
-    return (
+  return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50 font-inter selection:bg-indigo-100/60">
         {/* Structured Data for SEO */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{
@@ -142,19 +103,7 @@ useEffect(() => {
             }
           })
         }} />
-  
-   
-  
-  
-  
-    
-    <SearchPage/>
-  
-    
-    
-  
-  
-  
+  <SearchPage/>
         {/* Trust Signals Section */}
        <section
     aria-labelledby="trust-section-title"
@@ -165,7 +114,7 @@ useEffect(() => {
     </h2>
   
     {/* Feature Cards */}
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8 lg:gap-12 mb-20">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-8 lg:gap-12 mb-16 sm:mb-20">
     {[
       {
         icon: ShieldCheck,
@@ -194,7 +143,7 @@ useEffect(() => {
     ].map((feature, i) => (
       <article
         key={i}
-        className={`group relative bg-white/90 p-6 sm:p-10 rounded-2xl sm:rounded-3xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300 ${
+        className={`group relative bg-white/90  p-1.5 sm:p-10 rounded-2xl sm:rounded-3xl border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300 ${
           i === 1 ? "ring-2 ring-emerald-100/60" : ""
         }`}
       >
@@ -214,19 +163,21 @@ useEffect(() => {
         </div>
   
         {/* Title - Mobile par text-lg, Desktop par text-2xl */}
-        <h3 className="text-lg sm:text-2xl font-black text-slate-900 mb-2 sm:mb-3 group-hover:text-indigo-600 transition-colors">
+        <h3 className="text-lg sm:text-2xl font-black text-slate-900 mb-1 sm:mb-3 group-hover:text-indigo-600 transition-colors">
           {feature.title}
         </h3>
   
         {/* Description - Mobile par text-sm aur line-clamp taaki height barabar rahe */}
-        <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-4 sm:mb-6">
+        <p className="text-sm sm:text-base text-slate-600 leading-relaxed mb-2 sm:mb-6">
           {feature.desc}
         </p>
   
         {/* Stat Badge - Mobile par padding aur text chotta */}
-        <span className="inline-block text-sm sm:text-lg font-black bg-gradient-to-r from-slate-900 to-slate-800 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-xl shadow-md">
-          {feature.stat}
-        </span>
+        <span
+  className=" absolute top-4 right-4 sm:static text-sm sm:text-lg font-black bg-gradient-to-r from-slate-900 to-slate-800 text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-lg sm:rounded-xl shadow-md "
+>
+  {feature.stat}
+</span>
       </article>
     ))}
   </div>
@@ -272,10 +223,8 @@ useEffect(() => {
     </div>
   </div>
   </section>
-  
-  
-  
-        {/* Featured Properties - SEO Optimized */}
+
+  {/* Featured Properties - SEO Optimized */}
         <section
     aria-labelledby="featured-properties-title"
     className="max-w-7xl mx-auto px-6 pb-24 sm:pb-32"
@@ -346,9 +295,6 @@ useEffect(() => {
       </>
      
     ) : 
-    
-    
-    
     (
       <div
         role="status"
@@ -441,10 +387,6 @@ useEffect(() => {
             List Your Property
           </button>:<></>
   }
-  
-  
-    
-       
         </div>
       </div>
     </div>
@@ -452,10 +394,6 @@ useEffect(() => {
   
   {/* White separation before footer */}
   <div className="w-full h-16 sm:h-20 bg-white" />
-  
-  
-  
-  
         {isAuthModalOpen && <AuthModal onClose={() => setIsAuthModalOpen(false)} />}
       </div>
     );
