@@ -10,7 +10,7 @@ import ScrollToTop from "./user/ScrollToTop";
 import ProtectedRoute from "./protectedroutes/userprotectedroutes";
 import { hydrateUser } from "./backend-routes/slice/authSlice";
 import ResetPassword from "./user/changingpassword.jsx"
-import PWAInstallPopup from "../src/component/usepwinstallpopup.jsx";
+
 
 /* ---------- LAZY LOADED COMPONENTS ---------- */
 // User Pages
@@ -88,7 +88,7 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
- <PWAInstallPopup />
+
       {isAdminRoute ? (
         <DashboardHeader
           isSidebarOpen={isSidebarOpen}
