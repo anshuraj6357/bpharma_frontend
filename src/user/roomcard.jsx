@@ -195,7 +195,7 @@ return (
                 </p>
 
                 <p className="text-sm font-black text-gray-900">
-                  ₹{getTotalPrice(room)}
+                  ₹{getTotalPrice(room)}hg
                   <span className="text-[10px] text-gray-500">
                     /{room.category === "Hotel" ? "night" : "mo"}
                   </span>

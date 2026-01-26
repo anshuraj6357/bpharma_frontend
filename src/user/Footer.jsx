@@ -12,6 +12,13 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+const socialLinks = [
+  { icon: Facebook, url: "https://www.facebook.com/roomgi" },
+  { icon: Instagram, url: "https://www.instagram.com/roomgi" },
+  { icon: Linkedin, url: "https://www.linkedin.com/company/roomgi" },
+  { icon: Twitter, url: "https://twitter.com/roomgi" },
+  { icon: Youtube, url: "https://www.youtube.com/@roomgi" },
+];
 
 export default function Footer() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -154,56 +161,24 @@ export default function Footer() {
           </div>
 
           {/* 3. PWA & SOCIALS (3 Cols) */}
-          <div className="lg:col-span-3 space-y-8">
-            <div>
-              <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white mb-6">Connect With Us</h3>
-              <div className="flex flex-wrap gap-3">
-                {[Facebook, Instagram, Linkedin, Twitter, Youtube].map((Icon, i) => (
-                  <a key={i} href="#" className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white hover:-translate-y-1 transition-all duration-300">
-                    <Icon size={18} />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* PWA CARD */}
-            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-indigo-950 p-6 border border-white/5 shadow-2xl">
-              <div className="absolute top-0 right-0 p-3 opacity-20 group-hover:opacity-40 transition-opacity">
-                <ShieldCheck size={40} className="text-indigo-400" />
-              </div>
-              
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 shadow-lg">
-                    <Download size={16} className="text-white" />
-                  </div>
-                  <span className="text-xs font-black text-white uppercase tracking-widest">Experience App</span>
-                </div>
-                
-                <p className="text-xs text-slate-400 leading-relaxed mb-6">
-                  Get real-time alerts and manage your bookings on the go.
-                </p>
-
-                {!isIOS ? (
-                  <button
-                    onClick={handleInstallApp}
-                    className="w-full rounded-xl bg-white py-3 text-xs font-black text-indigo-600 hover:bg-indigo-50 active:scale-95 transition-all shadow-lg shadow-white/5"
-                  >
-                    INSTALL NOW
-                  </button>
-                ) : (
-                  <div className="rounded-xl bg-white/5 border border-white/10 p-3">
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-white mb-1 uppercase tracking-tighter">
-                      <Share size={12} className="text-indigo-400" /> Safari Instructions
-                    </div>
-                    <p className="text-[10px] text-slate-500">
-                      Tap <b className="text-indigo-400">Share</b> then <b className="text-white">Add to Home Screen</b>
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <div>
+      <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-white mb-6">
+        Connect With Us
+      </h3>
+      <div className="flex flex-wrap gap-3">
+        {socialLinks.map(({ icon: Icon, url }, i) => (
+          <a
+            key={i}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white hover:-translate-y-1 transition-all duration-300"
+          >
+            <Icon size={18} />
+          </a>
+        ))}
+      </div>
+    </div>
         </div>
 
         {/* 4. COPYRIGHT BAR */}

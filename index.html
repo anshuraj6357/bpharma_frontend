@@ -5,77 +5,99 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="preload" fetchpriority="high" as="image" href="/src/assets/heroimg.webp" type="image/webp" />
+    <!-- Preload Hero Image -->
+    <link
+      rel="preload"
+      as="image"
+      fetchpriority="high"
+      href="/src/assets/heroimg.webp"
+      type="image/webp"
+    />
 
+    <!-- Preconnects -->
     <link rel="preconnect" href="https://maps.googleapis.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-<!-- Replace your current Google Maps script with this -->
-<script async defer 
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBI_1GjWzjhnK--jH94wVq3dmdOGm6sUos&libraries=places&loading=async&callback=initMap">
-</script>
-<link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#16a34a" />
-<link rel="manifest" href="/manifest.webmanifest" />
-<meta name="theme-color" content="#16a34a" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<link rel="apple-touch-icon" href="/icons/icon-192.png" />
 
-
-
-    <title>Roomgi® | Verified PGs & Rooms Without Brokerage India</title>
-
-    <meta name="description" content="Roomgi Private Limited (CIN: U68100UP2026PTC240368) is India's trusted platform for rental rooms, PGs, and offices with zero brokerage and 100% verified listings." />
-    <meta name="keywords" content="Roomgi, PG without brokerage, rent rooms India, Roomgi Private Limited, student housing, rental technology" />
-    <meta name="author" content="Roomgi Private Limited" />
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#4f46e5" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 
+    <!-- SEO -->
+    <title>Roomgi® | Verified PGs & Rooms Without Brokerage India</title>
+    <meta
+      name="description"
+      content="Roomgi Private Limited (CIN: U68100UP2026PTC240368) is India's trusted platform for rental rooms, PGs, and offices with zero brokerage and 100% verified listings."
+    />
+    <meta
+      name="keywords"
+      content="Roomgi, PG without brokerage, rent rooms India, Roomgi Private Limited, student housing"
+    />
+    <meta name="author" content="Roomgi Private Limited" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://roomgi.com/" />
 
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Roomgi® | Perfect Stays Without Brokerage" />
-    <meta property="og:description" content="Find verified rooms and PGs across India. Zero brokerage, instant booking, and modern amenities." />
+    <meta
+      property="og:description"
+      content="Find verified rooms and PGs across India. Zero brokerage, instant booking."
+    />
     <meta property="og:url" content="https://roomgi.com/" />
     <meta property="og:image" content="https://roomgi.com/og-image.png" />
 
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
 
+    <!-- Structured Data -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Corporation",
-      "name": "Roomgi Private Limited",
-      "url": "https://roomgi.com",
-      "logo": "https://roomgi.com/logo.png",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "customer service",
-        "areaServed": "IN"
-      },
-      "identifier": {
-        "@type": "PropertyValue",
-        "propertyID": "CIN",
-        "value": "U68100UP2026PTC240368"
+      {
+        "@context": "https://schema.org",
+        "@type": "Corporation",
+        "name": "Roomgi Private Limited",
+        "url": "https://roomgi.com",
+        "logo": "https://roomgi.com/logo.png",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer service",
+          "areaServed": "IN"
+        },
+        "identifier": {
+          "@type": "PropertyValue",
+          "propertyID": "CIN",
+          "value": "U68100UP2026PTC240368"
+        }
       }
-    }
     </script>
 
+    <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-74WL52ZQ6J"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-74WL52ZQ6J', { 'animate_ad_views': false });
+      gtag("js", new Date());
+      gtag("config", "G-74WL52ZQ6J", { anonymize_ip: true });
+    </script>
+
+    <!-- Google Maps (NO callback in React) -->
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBI_1GjWzjhnK--jH94wVq3dmdOGm6sUos&libraries=places">
     </script>
   </head>
 
   <body>
     <div id="root"></div>
 
+    <!-- Razorpay -->
     <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
-    
+
+    <!-- React Entry -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
