@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import DashboardLayout from "./components/layout/DashboardLayout";
 import ProtectedRoute from "../protectedroutes/adminprotectedroutes";
 
 import Properties from "./pages/Properties";
