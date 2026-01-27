@@ -98,7 +98,7 @@ export default function Header() {
         }`}
       >
         <div
-          className={`max-w-7xl mx-auto px-6 flex items-center justify-between transition-all ${
+          className={`max-w-7xl mx-auto px-6 flex items-center justify-between ${
             isScrolled ? "py-3" : "py-5"
           }`}
         >
@@ -116,24 +116,26 @@ export default function Header() {
             </button>
           </div>
 
-          {/* DESKTOP NAV (PUBLIC ONLY) */}
-          <nav className="hidden lg:flex gap-10">
-            {navLinks.map((l) => (
+          {/* ================= DESKTOP NAV ================= */}
+          <nav className="hidden lg:flex gap-8 items-center">
+            {(navLinks
+            ).map((l) => (
               <Link
                 key={l.label}
                 to={l.path}
-                className={`font-semibold text-sm ${
+                className={`flex items-center gap-2 font-semibold text-sm ${
                   location.pathname === l.path
                     ? "text-indigo-600"
                     : "text-slate-500 hover:text-slate-900"
                 }`}
               >
+                {l.icon}
                 {l.label}
               </Link>
             ))}
           </nav>
 
-          {/* RIGHT */}
+          {/* ================= RIGHT ================= */}
           {!isAuthenticated ? (
             <button
               onClick={() => navigate("/login")}
@@ -142,43 +144,47 @@ export default function Header() {
               Login / Signup
             </button>
           ) : (
-            !isAdmin && (
-              <div ref={dropdownRef} className="relative">
-                <button
-                  onClick={() => setOpenDropdown((p) => !p)}
-                  className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-full"
-                >
-                  <span className="hidden md:block">{user?.username}</span>
-                  <div className="w-9 h-9 bg-indigo-600 text-white rounded-full flex items-center justify-center">
-                    {user?.username?.[0]?.toUpperCase()}
-                  </div>
-                </button>
+            <div ref={dropdownRef} className="relative hidden lg:block">
+              <button
+                onClick={() => setOpenDropdown((p) => !p)}
+                className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-full"
+              >
+                <span>{user?.username}</span>
+                <div className="w-9 h-9 bg-indigo-600 text-white rounded-full flex items-center justify-center">
+                  {user?.username?.[0]?.toUpperCase()}
+                </div>
+              </button>
 
-                {openDropdown && (
-                  <div className="absolute right-0 mt-4 w-64 bg-white rounded-3xl shadow-xl">
-                    {userLinks.map((u) => (
-                      <button
-                        key={u.label}
-                        onClick={() => {
-                          navigate(u.path);
-                          setOpenDropdown(false);
-                        }}
-                        className="w-full px-5 py-3 flex gap-3 hover:bg-slate-50"
-                      >
-                        {u.icon} {u.label}
-                      </button>
-                    ))}
+              {openDropdown && (
+                <div className="absolute right-0 mt-4 w-64 bg-white rounded-3xl shadow-xl">
+                  {(isAdmin ? adminMenuItems : userLinks).map((u) => (
                     <button
-                      onClick={handleLogout}
-                      className="w-full px-5 py-3 flex gap-3 text-red-500 hover:bg-red-50"
+                      key={u.label}
+                      onClick={() => {
+                        navigate(u.path);
+                        setOpenDropdown(false);
+                      }}
+                      className="w-full px-5 py-3 flex gap-3 hover:bg-slate-50"
                     >
-                      {isLoading ? <Loader2 className="animate-spin" /> : <LogOut />}
-                      Logout
+                      {u.icon}
+                      {u.label}
                     </button>
-                  </div>
-                )}
-              </div>
-            )
+                  ))}
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-5 py-3 flex gap-3 text-red-500 hover:bg-red-50"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="animate-spin" />
+                    ) : (
+                      <LogOut />
+                    )}
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </header>
@@ -192,7 +198,7 @@ export default function Header() {
           />
           <aside className="fixed top-4 left-4 bottom-4 w-[280px] bg-white z-[120] rounded-3xl p-8 overflow-y-auto">
             <div className="flex justify-between mb-8">
-              <img src={logo} className="h-10" />
+              <img src={logo} className="h-10" alt="Roomgi" />
               <X onClick={() => setMobileMenu(false)} />
             </div>
 
