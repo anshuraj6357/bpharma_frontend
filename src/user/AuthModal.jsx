@@ -131,7 +131,7 @@ export default function AuthModal() {
                       name="username"
                       value={formData.username}
                       onChange={handleChange}
-                      placeholder="Jane Doe"
+                      placeholder="Enter Your Name"
                     />
                   )}
                   <Input
@@ -179,7 +179,7 @@ export default function AuthModal() {
                           className="w-full px-4 py-3.5 border rounded-2xl text-sm font-semibold outline-none focus:ring-2 focus:ring-slate-100"
                         >
                           <option value="">Select Role</option>
-                          <option value="user">Looking for Room</option>
+                          <option value="user">User</option>
                           <option value="owner">Property Owner</option>
                         </select>
                       </div>

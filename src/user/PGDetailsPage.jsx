@@ -340,7 +340,7 @@ export default function PGDetailsPage() {
     );
   }
   const totalRent =
-    pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0);
+    pg.price + (pg.advancedmonth);
 
   const maxWalletAllowed = totalRent * 0.1;
   const walletDiscount = Math.min(user?.walletBalance || 0, maxWalletAllowed);
@@ -658,7 +658,7 @@ const totalServicePrice =
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Security Deposit</span>
             {pg.advancedmonth > 0 ? (
               <p className="text-lg font-bold text-gray-900 flex items-center gap-1">
-                {pg.advancedmonth} <span className="text-sm text-gray-500 font-medium">Months</span>
+                {pg.advancedmonth} <span className="text-sm text-gray-500 font-medium">Rs</span>
               </p>
             ) : (
               <span className="w-fit text-[10px] px-2 py-1 bg-emerald-50 text-emerald-600 rounded-md font-bold uppercase tracking-tighter">No Advance</span>
@@ -998,20 +998,12 @@ const totalServicePrice =
         </div>
 
         <div className="space-y-3">
-          {pg.services?.length > 0 ? (
-      
-            pg.services.map((s) => (
-              <div key={s._id} className="flex justify-between items-center group">
-                <span className="text-slate-500 font-medium group-hover:text-slate-900 transition-colors">{s.name}</span>
-                <span className="text-slate-900 font-bold">₹{s.price}</span>
-              </div>
-            ))
-          ) : (
+          
             <div className="flex justify-between items-center">
               <span className="text-slate-500 font-medium">Standard Room Rent</span>
               <span className="text-slate-900 font-bold">₹{pg.price}</span>
             </div>
-          )}
+          
 
           {pg.advancedmonth > 0 && (
             <div className="flex justify-between items-center py-2 px-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
@@ -1019,7 +1011,7 @@ const totalServicePrice =
                 <span className="text-indigo-700 font-bold text-xs uppercase">Security Deposit</span>
                 <span className="text-[10px] text-indigo-400 font-medium">{pg.advancedmonth} Month Refundable</span>
               </div>
-              <span className="text-indigo-700 font-black text-sm">₹{pg.price * pg.advancedmonth}</span>
+              <span className="text-indigo-700 font-black text-sm">₹{ pg.advancedmonth}</span>
             </div>
           )}
         </div>
@@ -1030,14 +1022,14 @@ const totalServicePrice =
   <div className="flex justify-between items-center pt-3 mt-3 border-t border-slate-200">
    
     <span className="text-indigo-600 font-black text-lg">
-      ₹{totalServicePrice+pg.advancedmonth*totalServicePrice}
+      ₹{pg.price+pg.advancedmonth}
     </span>
   </div>
 ) : (
   <span className="text-xl font-black text-slate-900">
     ₹
     {Number(pg.price || 0) +
-      Number(pg.advancedmonth || 0) * Number(pg.price || 0)}
+      Number(pg.advancedmonth ||  0)}
   </span>
 )}
 
@@ -1048,7 +1040,7 @@ const totalServicePrice =
       {/* WALLET & FINAL CHECKOUT */}
       {(() => {
         
-        const totalRent =pg.services.length>0?totalServicePrice+ (pg.advancedmonth ? totalServicePrice * pg.advancedmonth : 0):pg.price + (pg.advancedmonth ? pg.price * pg.advancedmonth : 0);
+        const totalRent =pg.services?.length>0?totalServicePrice+ (pg.advancedmonth ? totalServicePrice * pg.advancedmonth : 0):pg.price + (pg.advancedmonth);
         const maxWalletAllowed = totalRent * 0.1;
         const walletDiscount = Math.min(user?.walletBalance || 0, maxWalletAllowed);
         const isWalletApplicable = totalRent > 1 && user?.walletBalance > 0;
@@ -1084,7 +1076,7 @@ const totalServicePrice =
               <div className="relative z-10 flex justify-between items-end mb-6">
                 <div>
                   <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Final Amount</p>
-                  <p className="text-3xl font-black tracking-tighter">₹{finalPayable}</p>
+                  <p className="text-3xl font-black tracking-tighter">₹{pg.price+(pg.advancedmonth||0)}</p>
                 </div>
                 <div className="text-right">
                    <p className="text-[10px] font-bold text-emerald-400">Secure Payment</p>

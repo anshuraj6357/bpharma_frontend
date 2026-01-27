@@ -88,94 +88,141 @@ const AddPropertyModal = ({
         </div>
 
         {/* Body - Scrollable */}
-        <form
-          onSubmit={handleSaveProperty}
-          className="overflow-y-auto px-6 py-6 pb-32 sm:pb-8 space-y-8"
-        >
-          {/* Section: Basic Info */}
-          <section className="space-y-4">
-             <div className="flex items-center gap-2 mb-2">
-                <div className="w-1 h-4 bg-indigo-500 rounded-full" />
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Basic Information</h3>
-             </div>
-             <Input label="Property / Branch Name" name="name" placeholder="e.g. Royal Heights" value={formData.name} onChange={handleChange} required />
-          </section>
+       <form
+  onSubmit={handleSaveProperty}
+  className="overflow-y-auto px-4 sm:px-6 py-6 pb-32 sm:pb-8 space-y-10
+             bg-slate-50"
+>
+  {/* Section: Basic Info */}
+  <section className="space-y-5">
+    <div className="flex items-center gap-3">
+      <div className="w-1.5 h-5 bg-indigo-600 rounded-full" />
+      <h3 className="text-sm sm:text-base font-extrabold uppercase tracking-wider
+                     text-slate-700">
+        Basic Information
+      </h3>
+    </div>
 
-          {/* Section: Geography */}
-          <section className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm space-y-5">
-            <div className="flex items-center gap-2 mb-1">
-                <MapPin size={14} className="text-indigo-500" />
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Regional Data</h3>
-             </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Select
-                label="State"
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                options={statesData?.data || []}
-                placeholder={loadingStates ? "Loading..." : "Select State"}
-              />
-              <Select
-                label="City"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                options={citiesData?.data || []}
-                placeholder={loadingCities ? "Fetching..." : "Select City"}
-                disabled={!formData.state || loadingCities}
-              />
-            </div>
+    <Input
+      label="Property / Branch Name"
+      name="name"
+      placeholder="e.g. Royal Heights"
+      value={formData.name}
+      onChange={handleChange}
+      required
+    />
+  </section>
 
-            <SelectLocation
-              label="Location / Area Name"
-              name="locationName"
-              value={formData.locationName}
-              onChange={handleChange}
-              options={locationsData?.data || []}
-              placeholder={loadingLocs ? "Searching..." : "Select Area"}
-              disabled={!formData.city || loadingLocs}
-            />
+  {/* Section: Geography */}
+  <section className="bg-white p-5 sm:p-6 rounded-3xl
+                      border border-slate-200
+                      shadow-md space-y-6">
+    <div className="flex items-center gap-3">
+      <MapPin size={18} className="text-indigo-600" />
+      <h3 className="text-sm sm:text-base font-extrabold uppercase tracking-wider
+                     text-slate-700">
+        Address
+      </h3>
+    </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-slate-50 pt-4">
-                <div className="sm:col-span-1">
-                    <Input label="Pincode" name="pincode" placeholder="6-digits" value={formData.pincode} onChange={handleChange} required maxLength={6} />
-                </div>
-                <div className="sm:col-span-2">
-                    <Input label="Landmark" name="landmark" placeholder="Near Apollo Hospital" value={formData.landmark} onChange={handleChange} />
-                </div>
-            </div>
-          </section>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <Select
+        label="State"
+        name="state"
+        value={formData.state}
+        onChange={handleChange}
+        options={statesData?.data || []}
+        placeholder={loadingStates ? "Loading..." : "Select State"}
+      />
 
-          {/* Section: Specific Address */}
-          <section className="space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-                <Map size={14} className="text-indigo-500" />
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Exact Address</h3>
-             </div>
-            <Input label="House / Plot No." name="streetAdress" placeholder="Plot No. 42, 2nd Cross" value={formData.streetAdress} onChange={handleChange} />
-            <TextArea label="Complete Address" name="address" placeholder="Flat No, Wing, Society Name..." value={formData.address} onChange={handleChange} required />
-          </section>
+      <Select
+        label="City"
+        name="city"
+        value={formData.city}
+        onChange={handleChange}
+        options={citiesData?.data || []}
+        placeholder={loadingCities ? "Fetching..." : "Select City"}
+        disabled={!formData.state || loadingCities}
+      />
+    </div>
 
-          {/* Desktop Footer Actions */}
-          <div className="hidden sm:flex gap-4 pt-6">
-            <button
-              type="button"
-              onClick={() => setShowAddModal(false)}
-              className="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
-            >
-              Discard
-            </button>
-            <button
-              type="submit"
-              disabled={addingBranch}
-              className="flex-[2] bg-slate-900 text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-slate-200 hover:bg-indigo-600 transition-all flex justify-center items-center gap-3 disabled:bg-slate-300"
-            >
-              {addingBranch ? <Loader2 className="animate-spin" /> : <>Save Property <ChevronRight size={16} /></>}
-            </button>
-          </div>
-        </form>
+    <SelectLocation
+      label="Location / Area Name"
+      name="locationName"
+      value={formData.locationName}
+      onChange={handleChange}
+      options={locationsData?.data || []}
+      placeholder={loadingLocs ? "Searching..." : "Select Area"}
+      disabled={!formData.city || loadingLocs}
+    />
+
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-5
+                    border-t border-slate-200 pt-5">
+      <Input
+        label="House / Plot No."
+        name="streetAdress"
+        placeholder="Plot No. 42, 2nd Cross"
+        value={formData.streetAdress}
+        onChange={handleChange}
+      />
+
+      <div className="sm:col-span-2">
+        <Input
+          label="Landmark"
+          name="landmark"
+          placeholder="Near Apollo Hospital"
+          value={formData.landmark}
+          onChange={handleChange}
+        />
+      </div>
+
+      <Input
+        label="Pincode"
+        name="pincode"
+        placeholder="6-digit pincode"
+        value={formData.pincode}
+        onChange={handleChange}
+        required
+        maxLength={6}
+      />
+    </div>
+  </section>
+
+  {/* Desktop Footer Actions */}
+  <div className="hidden sm:flex gap-5 pt-6">
+    <button
+      type="button"
+      onClick={() => setShowAddModal(false)}
+      className="flex-1 py-4 rounded-xl
+                 text-sm font-bold uppercase tracking-wider
+                 text-slate-600 hover:text-slate-900
+                 border border-slate-300
+                 hover:bg-slate-100 transition"
+    >
+      Discard
+    </button>
+
+    <button
+      type="submit"
+      disabled={addingBranch}
+      className="flex-[2] py-4 rounded-2xl
+                 bg-indigo-600 hover:bg-indigo-700
+                 text-white text-sm font-extrabold uppercase tracking-wider
+                 shadow-lg shadow-indigo-200
+                 transition flex justify-center items-center gap-3
+                 disabled:bg-slate-300"
+    >
+      {addingBranch ? (
+        <Loader2 className="animate-spin" />
+      ) : (
+        <>
+          Save Property <ChevronRight size={18} />
+        </>
+      )}
+    </button>
+  </div>
+</form>
+
 
         {/* Mobile Action Bar - Fixed at Bottom */}
         <div className="sm:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-lg border-t border-slate-100 flex gap-3 z-30">
