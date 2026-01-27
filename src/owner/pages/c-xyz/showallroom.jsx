@@ -54,14 +54,23 @@ function ShowRooms() {
 
   if (isLoading) return <LoadingSkeleton />;
 
-  if (error) return (
-    <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-6">
-      <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-      <h3 className="text-xl font-bold text-gray-800">Connection Error</h3>
-      <p className="text-gray-500 mb-6">We couldn't load your rooms. Please check your internet.</p>
-      <button onClick={() => refetch()} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Try Again</button>
-    </div>
-  );
+ if (error) return (
+  <div className="flex flex-col items-center justify-center min-h-[400px] text-center p-6">
+    <AlertCircle className="w-12 h-12 text-orange-500 mb-4" />
+
+    <h3 className="text-xl font-bold text-gray-800">
+      No Rooms Uploaded Yet
+    </h3>
+
+    <p className="text-gray-500 mb-6 max-w-md">
+      You haven’t uploaded any rooms yet.  
+      Once you add rooms, they will appear here for tenants to view and book.
+    </p>
+
+   
+  </div>
+);
+
 
   return (
     <div className="min-h-screen bg-gray-50/50 pb-12">
@@ -111,7 +120,10 @@ function ShowRooms() {
 
       <div className="p-6 max-w-7xl mx-auto mt-6">
         {filteredRooms.length === 0 ? (
-          <EmptyState isSearch={searchTerm.length > 0} />
+          <>
+            <EmptyState isSearch={searchTerm.length > 0} />
+          </>
+        
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
             {filteredRooms.map((room) => (
