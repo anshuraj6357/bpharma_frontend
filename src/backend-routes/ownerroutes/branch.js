@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/branch/owner`;
+const USER_API = `${import.meta.env.VITE_API_BASE_URL}/branch/owner`;
 
 const owner_branch = createApi({
   reducerPath: "owner_branch",

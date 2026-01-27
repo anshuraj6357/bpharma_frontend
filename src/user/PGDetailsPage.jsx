@@ -645,7 +645,7 @@ const totalServicePrice =
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-10 gap-x-6">
           <InfoItem icon={<Home size={16}/>} label="Category" value={pg.category} />
-          <InfoItem icon={<Bed size={16}/>} label="Room Number" value={`Room #${pg.roomNumber}`} />
+          <InfoItem icon={<Bed size={16}/>} label="Room Number" value={`Room No ${pg.roomNumber}`} />
           <InfoItem icon={<Maximize size={16}/>} label="Layout" value={
             pg.category === "Hotel" ? pg.hoteltype : 
             pg.category === "Pg" ? pg.type : 

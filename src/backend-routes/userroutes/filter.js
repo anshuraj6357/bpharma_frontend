@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const user_filter = createApi({
     reducerPath: "user_filter",
     baseQuery: fetchBaseQuery({
-        baseUrl: `https://roomgi-backend-project-2.onrender.com/api/filter/user`,
+        baseUrl: `${import.meta.env.VITE_API_BASE_URL}/filter/user`,
         credentials: "include",
     }),
     tagTypes: ["Pg"], // ✅ Added tag for versioning

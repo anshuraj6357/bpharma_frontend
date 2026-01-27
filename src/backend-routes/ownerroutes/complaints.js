@@ -3,7 +3,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // const USER_API = "https://roomgi-backend-project-2.onrender.com/api/complain/owner";
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/complain/owner`;
+const USER_API = `${import.meta.env.VITE_API_BASE_URL}/complain/owner`;
 
 
 
