@@ -5,7 +5,7 @@ import { useEffect, useState, lazy, Suspense } from "react";
 /* ---------- LAYOUT (Common - No Lazy Load) ---------- */
 import Header from "./user/Header";
 import Footer from "./user/Footer";
-import DashboardHeader from "./owner/header";
+
 import ScrollToTop from "./user/ScrollToTop";
 import ProtectedRoute from "./protectedroutes/userprotectedroutes";
 import { hydrateUser } from "./backend-routes/slice/authSlice";
@@ -89,16 +89,9 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
 
-      {isAdminRoute ? (
-        <DashboardHeader
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-          isMobileMenuOpen={isMobileMenuOpen}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
-        />
-      ) : (
+      
         <Header />
-      )}
+      
 
       <main className="flex-1">
         {/* Suspense is CRITICAL here */}
@@ -157,7 +150,7 @@ function App() {
         </Suspense>
       </main>
 
-        {!isAdminRoute && <Footer />}
+        <Footer />
     </div>
   );
 }
