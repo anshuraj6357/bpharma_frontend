@@ -13,8 +13,56 @@ import {
 } from "lucide-react";
 
 // Constants (Keep these outside to prevent re-renders)
-const FACILITIES = ["AC", "Non-AC", "Bathroom", "WiFi", "Power Backup", "Laundry", "CCTV", "Parking", "Refrigerator", "24x7 Electricity"];
-const RULES = ["Keep room clean", "No loud music", "Maintain hygiene", "No outside guests", "Respect timings"];
+const FACILITIES = [
+  // Food & Living
+  "Food Included",
+  "RO Water",
+  "Kitchen",
+
+  // Comfort & Climate
+  "AC",
+  "Cooler",
+  "Fan",
+  "Geyser",
+  "Heater",
+
+  // Connectivity & Power
+  "WiFi",
+  "Power Backup",
+
+  // Furniture & Appliances
+  "Bed",
+
+  "Study Table",
+  "Refrigerator",
+  "Washing Machine",
+  "TV",
+
+  // Hygiene & Services
+  "Laundry",
+  "Daily Cleaning",
+
+  // Security & Safety
+  "CCTV",
+
+
+  // Parking & Access
+  "Parking",
+  
+
+
+];
+const RULES = [
+    "Keep Clean",
+    "No Loud Music",
+    "No Outside Guests",
+    "Visitors Not Allowed",
+    "No Parties",
+    "Follow Entry & Exit Timings",
+    "Inform Before Late Entry",
+    "Smoking Prohibited",
+    "Alcohol Prohibited",
+  ];
 const NOT_ALLOWED = ["Smoking", "Alcohol", "Pets", "Visitors", "Loud Music"];
 const GENDER_OPTIONS = ["Boys", "Girls", "Family", "Anyone"];
 const FURNISHED_OPTIONS = ["Fully Furnished", "Semi Furnished", "Unfurnished"];
@@ -171,7 +219,7 @@ export default function EditRoomForm() {
           </SectionCard>
 
           {/* Section: Extra Services */}
-          <SectionCard title="Premium Services" icon={<Plus size={20}/>} badge={formData.services.length}>
+          {/* <SectionCard title="Premium Services" icon={<Plus size={20}/>} badge={formData.services.length}>
             <div className="space-y-3">
               {formData.services.map((service, idx) => (
                 <div key={idx} className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2">
@@ -193,7 +241,7 @@ export default function EditRoomForm() {
                 <Plus size={18} /> Add Service Item
               </button>
             </div>
-          </SectionCard>
+          </SectionCard> */}
         </div>
 
         {/* Right Column: Pricing & Controls */}
@@ -211,7 +259,7 @@ export default function EditRoomForm() {
               ) : (
                 <div className="grid grid-cols-1 gap-4">
                   <InputGroup label="Monthly Rent" type="number" prefix="₹" value={formData.price} onChange={v => setFormData({...formData, price: v})} />
-                  <InputGroup label="Security Deposit (Months)" type="number" value={formData.advancedmonth} onChange={v => setFormData({...formData, advancedmonth: v})} />
+                  <InputGroup label="Advance / Security Deposi" type="number" value={formData.advancedmonth} onChange={v => setFormData({...formData, advancedmonth: v})} />
                 </div>
               )}
             </div>
