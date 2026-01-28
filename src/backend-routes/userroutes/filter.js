@@ -18,6 +18,13 @@ export const user_filter = createApi({
             }),
             invalidatesTags: ["Pg"], // ✅ triggers refetch of queries with tag
         }),
+        getAllnearestPg:builder.mutation({
+            query:({lat,long})=>({
+                url:"getallnearestpg",
+                 method: "POST",
+                body: {lat,long},
+            })
+        }),
         getAllFiltered: builder.query({
             query: (cityFromQuery) => ({
                 url: `filtered/${cityFromQuery}`,
@@ -31,6 +38,7 @@ export const {
   
     useAppliedAllFilteredMutation,
     useGetAllFilteredQuery,
+    useGetAllnearestPgMutation,
 } = user_filter;
 
 export default user_filter;

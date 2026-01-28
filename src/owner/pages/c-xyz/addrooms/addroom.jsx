@@ -190,7 +190,7 @@ const validateStep = () => {
   const handleAddRoom = async () => {
     const formData = new FormData();
     Object.keys(roomData).forEach(key => {
-      if (['facilities', 'notAllowed', 'rules'].includes(key)) {
+      if (['facilities', 'rules'].includes(key)) {
         roomData[key].forEach(val => formData.append(key, val));
       } else if (key === 'services') {
         formData.append(key, JSON.stringify(roomData.services.filter(s => s.name && s.price)));
