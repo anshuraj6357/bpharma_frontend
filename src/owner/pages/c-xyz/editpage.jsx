@@ -7,323 +7,489 @@ import {
   useAddRoomImagesMutation,
 } from "../../../backend-routes/ownerroutes/room.js";
 import { Toaster, toast } from "react-hot-toast";
-import { 
-  Trash2, Upload, ArrowLeft, X, Plus, 
-  Info, IndianRupee, Settings, ShieldAlert, Image as ImageIcon 
+import {
+  Trash2,
+  Upload,
+  ArrowLeft,
+  Info,
+  IndianRupee,
+  Image as ImageIcon,
+  CheckCircle2,
 } from "lucide-react";
 
-// Constants (Keep these outside to prevent re-renders)
-const FACILITIES = ["AC", "Non-AC", "Bathroom", "WiFi", "Power Backup", "Laundry", "CCTV", "Parking", "Refrigerator", "24x7 Electricity"];
-const RULES = ["Keep room clean", "No loud music", "Maintain hygiene", "No outside guests", "Respect timings"];
-const NOT_ALLOWED = ["Smoking", "Alcohol", "Pets", "Visitors", "Loud Music"];
+/* ================= CONSTANTS ================= */
+const FACILITIES = [
+  "Food Included", "RO Water", "Kitchen",
+  "AC", "Cooler", "Fan", "Geyser", "Heater", "Non-AC",
+  "WiFi", "Power Backup",
+  "Bed", "Study Table", "Refrigerator", "Washing Machine", "TV",
+  "Laundry", "Daily Cleaning",
+  "CCTV", "Parking",
+];
+
+const RULES = [
+  "Keep clean", "No Loud Music", "No Outside Guests",
+  "Visitors Not Allowed", "No Parties",
+  "Follow Entry & Exit Timings",
+  "Inform Before Late Entry",
+  "Smoking Prohibited", "Alcohol Prohibited",
+];
+
 const GENDER_OPTIONS = ["Boys", "Girls", "Family", "Anyone"];
 const FURNISHED_OPTIONS = ["Fully Furnished", "Semi Furnished", "Unfurnished"];
-const HOTEL_TYPES = ["Standard-Single", "Standard-Double", "Twin-Room", "Triple-Room", "Family-Room", "Deluxe-Room", "Super-Deluxe-Room", "Executive-Room", "Suite"];
-const FLAT_TYPES = ["1Rk", "1BHK", "2BHK", "3BHK", "4BHK", "5BHK"];
 
+/* ================= MAIN COMPONENT ================= */
 export default function EditRoomForm() {
   const { roomId } = useParams();
   const navigate = useNavigate();
+
   const { data, isLoading, refetch } = useGetRoomByIdQuery(roomId);
-  const [updateRoom, { isSuccess, isLoading: isUpdating }] = useUpdateRoomMutation();
+  const [updateRoom, { isLoading: isUpdating, isSuccess }] =
+    useUpdateRoomMutation();
   const [deleteImageAPI] = useDeleteRoomImageMutation();
   const [addImagesAPI] = useAddRoomImagesMutation();
 
+  const [dirty, setDirty] = useState(false);
+  const [selectedImages, setSelectedImages] = useState([]);
+
+  // upload button loading state
+  const [isUploading, setIsUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     roomNumber: "",
-    capacity: "",
-    price: "",
     category: "Pg",
-    type: "Single",
-    hoteltype: "",
-    flattype: "",
-    renttype: "Room-Rent",
-    description: "",
-    comment: "",
+    price: "",
+    rentperday: "",
+    rentperNight: "",
+    rentperhour: "",
+    advancedmonth: "",
     allowedFor: "Anyone",
     furnishedType: "Unfurnished",
     facilities: [],
     rules: [],
-    notAllowed: [],
-    rentperday: "",
-    rentperhour: "",
-    rentperNight: "",
-    advancedmonth: "",
-    services: []
   });
 
-  const [selectedImages, setSelectedImages] = useState([]);
-
+  /* ================= EFFECTS ================= */
   useEffect(() => {
     if (data?.room) {
       setFormData({
         ...data.room,
-        services: data.room.services || [],
         facilities: data.room.facilities || [],
         rules: data.room.rules || [],
-        notAllowed: data.room.notAllowed || []
       });
+      setDirty(false);
     }
   }, [data]);
 
   useEffect(() => {
     if (isSuccess) {
-      toast.success("Room Updated Successfully");
+      toast.success("Room updated successfully");
       navigate(-1);
     }
   }, [isSuccess, navigate]);
+
+  useEffect(() => {
+    setDirty(true);
+  }, [formData]);
+
+  /* ================= HANDLERS ================= */
+  const handleToggleArray = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(v => v !== value)
+        : [...prev[field], value],
+    }));
+  };
 
   const handleUpdateRoom = async () => {
     try {
       await updateRoom({ id: roomId, data: formData }).unwrap();
     } catch (err) {
-      toast.error(err?.data?.message || "Failed to update room!");
+      toast.error(err?.data?.message || "Update failed");
     }
-  };
-
-  const handleToggleArray = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: prev[field].includes(value)
-        ? prev[field].filter(item => item !== value)
-        : [...prev[field], value]
-    }));
   };
 
   const handleAddImages = async () => {
-    if (selectedImages.length === 0) return toast.error("Please select images");
-    const imgData = new FormData();
-    imgData.append("id", roomId);
-    selectedImages.forEach(file => imgData.append("roomImages", file));
-    
+    if (!selectedImages.length) return toast.error("Select images first");
+    const fd = new FormData();
+    fd.append("id", roomId);
+    selectedImages.forEach(img => fd.append("roomImages", img));
+
     try {
-      await addImagesAPI(imgData).unwrap();
+      setIsUploading(true);
+      await addImagesAPI(fd).unwrap();
       toast.success("Images uploaded");
       setSelectedImages([]);
       refetch();
-    } catch (err) {
+    } catch {
       toast.error("Upload failed");
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  if (isLoading) return (
-    <div className="flex flex-col justify-center items-center h-screen bg-gray-50">
-      <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mb-4"></div>
-      <p className="text-gray-500 font-medium">Loading room details...</p>
-    </div>
-  );
-
-  return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8 bg-gray-50 min-h-screen pb-20">
-      <Toaster position="top-right" />
-      
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors mb-2 group">
-            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> 
-            <span className="text-sm font-semibold uppercase tracking-wider">Back to List</span>
-          </button>
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-            Edit Room <span className="text-blue-600">#{formData.roomNumber}</span>
-          </h1>
-        </div>
-        <div className="flex gap-3">
-            <span className={`px-4 py-2 rounded-full text-xs font-bold uppercase ${formData.category === 'Hotel' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                Category: {formData.category}
-            </span>
-        </div>
+  /* ================= LOADING ================= */
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <div className="h-12 w-12 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin" />
       </div>
+    );
+  }
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Column: Media & Config */}
-        <div className="lg:col-span-2 space-y-8">
-          
-          {/* Section: Images */}
-          <SectionCard title="Room Gallery" icon={<ImageIcon size={20}/>}>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
-              {data?.room?.roomImages?.map((img, idx) => (
-                <div key={idx} className="group relative aspect-video rounded-xl overflow-hidden shadow-sm border border-gray-200">
-                  <img src={img} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <button 
-                        onClick={() => deleteImageAPI({ id: roomId, imageurl: img }).unwrap().then(() => refetch())}
-                        className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors shadow-lg"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <label className="border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center aspect-video cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all text-gray-400 hover:text-blue-600">
-                <Upload size={24} />
-                <span className="text-xs font-bold mt-2">Add New</span>
-                <input type="file" multiple className="hidden" onChange={(e) => setSelectedImages(Array.from(e.target.files))} />
-              </label>
-            </div>
-            {selectedImages.length > 0 && (
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-100">
-                    <p className="text-sm text-blue-700 font-medium">{selectedImages.length} images ready to upload</p>
-                    <button onClick={handleAddImages} className="text-sm bg-blue-600 text-white px-4 py-1.5 rounded-md font-bold hover:bg-blue-700">Upload Now</button>
-                </div>
-            )}
-          </SectionCard>
+  /* ================= PRICE SUMMARY ================= */
+  const priceSummary =
+    formData.category === "Hotel"
+      ? `₹${formData.rentperday || 0}/day · ₹${formData.rentperNight || 0}/night`
+      : `₹${formData.price || 0}/month · Deposit ${formData.advancedmonth || 0} mo`;
 
-          {/* Section: Extra Services */}
-          <SectionCard title="Premium Services" icon={<Plus size={20}/>} badge={formData.services.length}>
-            <div className="space-y-3">
-              {formData.services.map((service, idx) => (
-                <div key={idx} className="flex items-center gap-3 animate-in fade-in slide-in-from-left-2">
-                  <input placeholder="Service (e.g. Breakfast)" value={service.name} onChange={(e) => {
-                     const s = [...formData.services]; s[idx].name = e.target.value; setFormData({...formData, services: s});
-                  }} className="flex-1 p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" />
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">₹</span>
-                    <input type="number" placeholder="0" value={service.price} onChange={(e) => {
-                         const s = [...formData.services]; s[idx].price = e.target.value; setFormData({...formData, services: s});
-                    }} className="w-28 p-2.5 pl-7 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm" />
-                  </div>
-                  <button onClick={() => setFormData({...formData, services: formData.services.filter((_, i) => i !== idx)})} className="p-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                    <X size={20} />
-                  </button>
-                </div>
-              ))}
-              <button onClick={() => setFormData({...formData, services: [...formData.services, {name: "", price: 0}]})} className="w-full py-3 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 font-bold hover:bg-white hover:border-blue-400 hover:text-blue-600 transition-all flex items-center justify-center gap-2">
-                <Plus size={18} /> Add Service Item
-              </button>
-            </div>
-          </SectionCard>
-        </div>
+  /* ================= UI ================= */
+  return (
+    <div className="min-h-screen bg-slate-50 pb-32">
+      <Toaster position="top-right" />
 
-        {/* Right Column: Pricing & Controls */}
-        <div className="space-y-8">
-          
-          {/* Section: Pricing */}
-          <SectionCard title="Pricing Model" icon={<IndianRupee size={20}/>}>
-            <div className="space-y-4">
-              {formData.category === "Hotel" ? (
-                <div className="grid grid-cols-1 gap-4">
-                  <InputGroup label="Daily Rate (Day)" type="number" prefix="₹" value={formData.rentperday} onChange={v => setFormData({...formData, rentperday: v})} />
-                  <InputGroup label="Nightly Rate" type="number" prefix="₹" value={formData.rentperNight} onChange={v => setFormData({...formData, rentperNight: v})} />
-                  <InputGroup label="Hourly Rate" type="number" prefix="₹" value={formData.rentperhour} onChange={v => setFormData({...formData, rentperhour: v})} />
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-4">
-                  <InputGroup label="Monthly Rent" type="number" prefix="₹" value={formData.price} onChange={v => setFormData({...formData, price: v})} />
-                  <InputGroup label="Security Deposit (Months)" type="number" value={formData.advancedmonth} onChange={v => setFormData({...formData, advancedmonth: v})} />
-                </div>
-              )}
-            </div>
-          </SectionCard>
-
-          {/* Section: Visibility & Rules */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                <h3 className="font-bold text-gray-800 flex items-center gap-2"><Info size={18}/> Preferences</h3>
-            </div>
-            <div className="p-6 space-y-6">
-                <SelectGroup label="Suitable For" value={formData.allowedFor} options={GENDER_OPTIONS} onChange={v => setFormData({...formData, allowedFor: v})} />
-                <SelectGroup label="Furnishing State" value={formData.furnishedType} options={FURNISHED_OPTIONS} onChange={v => setFormData({...formData, furnishedType: v})} />
-            </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-10">
+        {/* HEADER */}
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors"
+            >
+              <ArrowLeft size={18} />
+              Back
+            </button>
+            <h1 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+              Edit Room{" "}
+              <span className="text-blue-600">#{formData.roomNumber}</span>
+            </h1>
+            <p className="mt-1 text-sm text-slate-500">
+              {priceSummary}
+            </p>
           </div>
 
-          <CheckboxList title="Facilities" items={FACILITIES} selected={formData.facilities} onToggle={v => handleToggleArray("facilities", v)} />
-          <CheckboxList title="House Rules" items={RULES} selected={formData.rules} onToggle={v => handleToggleArray("rules", v)} />
-          <CheckboxList title="Restrictions" items={NOT_ALLOWED} selected={formData.notAllowed} onToggle={v => handleToggleArray("notAllowed", v)} color="red" />
+          <div className="flex items-center gap-3">
+            <span
+              className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${
+                formData.category === "Hotel"
+                  ? "bg-purple-50 text-purple-700 ring-purple-200"
+                  : "bg-blue-50 text-blue-700 ring-blue-200"
+              }`}
+            >
+              {formData.category}
+            </span>
+            {dirty ? (
+              <span className="hidden md:inline-flex items-center gap-2 text-xs font-medium text-amber-600">
+                <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                Unsaved changes
+              </span>
+            ) : (
+              <span className="hidden md:inline-flex items-center gap-2 text-xs font-medium text-emerald-600">
+                <CheckCircle2 size={14} />
+                Saved
+              </span>
+            )}
+          </div>
+        </div>
 
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* LEFT */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* IMAGES */}
+            <SectionCard title="Room Gallery" icon={<ImageIcon size={18} />}>
+              <p className="text-xs text-slate-500">
+                Showcase the best angles of the room. Use bright, clear photos for higher conversions.
+              </p>
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {data.room.roomImages?.map((img, i) => (
+                  <div
+                    key={i}
+                    className="group relative aspect-video overflow-hidden rounded-xl border border-slate-200 bg-slate-100"
+                  >
+                    <img
+                      src={img}
+                      alt=""
+                      className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => {
+                          if (confirm("Delete this image?")) {
+                            deleteImageAPI({ id: roomId, imageurl: img })
+                              .unwrap()
+                              .then(refetch);
+                          }
+                        }}
+                        className="inline-flex items-center justify-center rounded-full bg-red-600 p-2 text-white shadow-lg shadow-red-500/40 hover:bg-red-700 transition-colors"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/60 px-3 py-4 text-center text-slate-400 transition-colors hover:border-blue-500 hover:bg-blue-50/60 hover:text-blue-600">
+                  <Upload size={22} />
+                  <span className="text-xs font-semibold tracking-wide uppercase">
+                    Add Images
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    JPG, PNG up to 5MB each
+                  </span>
+                  <input
+                    type="file"
+                    multiple
+                    className="hidden"
+                    onChange={e => setSelectedImages([...e.target.files])}
+                  />
+                </label>
+              </div>
+
+              {selectedImages.length > 0 && (
+                <div className="mt-4 flex flex-col gap-3 rounded-lg border border-blue-100 bg-blue-50 px-3 py-3 text-sm text-blue-800 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-semibold">
+                      {selectedImages.length} image
+                      {selectedImages.length > 1 ? "s" : ""} selected
+                    </span>
+                    <span className="text-xs text-blue-700/80">
+                      They will be added to the room gallery after upload.
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleAddImages}
+                    disabled={isUploading}
+                    className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isUploading ? (
+                      <>
+                        <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                        Uploading...
+                      </>
+                    ) : (
+                      "Upload"
+                    )}
+                  </button>
+                </div>
+              )}
+            </SectionCard>
+
+            {/* (Optional) Additional details section */}
+            {/* <SectionCard title="Room Details" icon={<Info size={18} />}>
+              ...
+            </SectionCard> */}
+          </div>
+
+          {/* RIGHT */}
+          <div className="space-y-6">
+            {/* PRICING */}
+            <SectionCard title="Pricing" icon={<IndianRupee size={16} />}>
+              <p className="text-xs text-slate-500 mb-3">
+                Set clear, competitive pricing. All amounts are in INR.
+              </p>
+              {formData.category === "Hotel" ? (
+                <div className="space-y-4">
+                  <Input
+                    label="Day Rate"
+                    placeholder="e.g. 1500"
+                    value={formData.rentperday}
+                    onChange={v => setFormData({ ...formData, rentperday: v })}
+                  />
+                  <Input
+                    label="Night Rate"
+                    placeholder="e.g. 1800"
+                    value={formData.rentperNight}
+                    onChange={v => setFormData({ ...formData, rentperNight: v })}
+                  />
+                  <Input
+                    label="Hourly Rate"
+                    placeholder="Optional"
+                    value={formData.rentperhour}
+                    onChange={v => setFormData({ ...formData, rentperhour: v })}
+                  />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <Input
+                    label="Monthly Rent"
+                    placeholder="e.g. 8000"
+                    value={formData.price}
+                    onChange={v => setFormData({ ...formData, price: v })}
+                  />
+                  <Input
+                    label="Advance Deposit rupees "
+                    placeholder="e.g. 2"
+                    value={formData.advancedmonth}
+                    onChange={v => setFormData({ ...formData, advancedmonth: v })}
+                  />
+                </div>
+              )}
+            </SectionCard>
+
+            {/* PREFERENCES */}
+            <SectionCard title="Preferences" icon={<Info size={16} />}>
+              <div className="space-y-4">
+                <Select
+                  label="Suitable For"
+                  value={formData.allowedFor}
+                  options={GENDER_OPTIONS}
+                  onChange={v => setFormData({ ...formData, allowedFor: v })}
+                />
+                <Select
+                  label="Furnishing"
+                  value={formData.furnishedType}
+                  options={FURNISHED_OPTIONS}
+                  onChange={v => setFormData({ ...formData, furnishedType: v })}
+                />
+              </div>
+            </SectionCard>
+
+            <CheckboxList
+              title="Facilities"
+              subtitle="Highlight what the tenant will get."
+              items={FACILITIES}
+              selected={formData.facilities}
+              onToggle={v => handleToggleArray("facilities", v)}
+            />
+
+            <CheckboxList
+              title="House Rules"
+              subtitle="Set clear expectations for tenants."
+              items={RULES}
+              selected={formData.rules}
+              onToggle={v => handleToggleArray("rules", v)}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Floating Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-gray-200 p-4 z-50 shadow-2xl">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <div className="hidden md:block">
-                <p className="text-sm font-bold text-gray-500">Editing Room {formData.roomNumber}</p>
-                <p className="text-xs text-gray-400">All changes must be saved to go live.</p>
-            </div>
-            <div className="flex gap-4 w-full md:w-auto">
-                <button onClick={() => navigate(-1)} className="flex-1 md:flex-none px-8 py-3 font-bold text-gray-600 hover:bg-gray-100 rounded-xl transition-all">Cancel</button>
-                <button 
-                    onClick={handleUpdateRoom} 
-                    disabled={isUpdating} 
-                    className="flex-[2] md:flex-none px-12 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-extrabold rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-3"
-                >
-                    {isUpdating ? <div className="animate-spin h-5 w-5 border-2 border-white/30 border-t-white rounded-full"></div> : "SAVE CHANGES"}
-                </button>
-            </div>
+      {/* FLOATING BAR */}
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2 text-xs">
+            {dirty ? (
+              <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-amber-700">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                Unsaved changes
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
+                <CheckCircle2 size={14} />
+                All changes saved
+              </span>
+            )}
+          </div>
+
+          <div className="flex w-full justify-end gap-2 sm:w-auto">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              disabled={isUpdating || !dirty}
+              onClick={handleUpdateRoom}
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300 transition-colors"
+            >
+              {isUpdating ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// UI Utility Components
-function SectionCard({ title, icon, children, badge }) {
+/* ================= UI COMPONENTS ================= */
+function SectionCard({ title, icon, children }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
-        <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-          <span className="text-blue-500">{icon}</span> {title}
+    <section className="rounded-2xl border border-slate-200 bg-white/90 shadow-sm">
+      <div className="flex items-center gap-2 border-b border-slate-100 px-5 py-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+          {icon}
+        </div>
+        <h2 className="text-sm font-semibold tracking-wide text-slate-800">
+          {title}
         </h2>
-        {badge !== undefined && <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-black">{badge}</span>}
       </div>
-      <div className="p-6">{children}</div>
+      <div className="px-5 py-4 space-y-3">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function Input({ label, value, onChange, placeholder }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {label}
+      </label>
+      <input
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2.5 text-sm text-slate-900 shadow-sm transition-all placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
+      />
     </div>
   );
 }
 
-function InputGroup({ label, type, value, onChange, prefix }) {
+function Select({ label, value, options, onChange }) {
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">{label}</label>
-      <div className="relative">
-        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold">{prefix}</span>}
-        <input 
-          type={type} 
-          value={value} 
-          onChange={(e) => onChange(e.target.value)} 
-          className={`w-full p-3 ${prefix ? 'pl-8' : 'pl-4'} bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-700 shadow-sm`}
-        />
-      </div>
-    </div>
-  );
-}
-
-function SelectGroup({ label, value, options, onChange }) {
-  return (
-    <div className="space-y-1.5">
-      <label className="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">{label}</label>
-      <select 
-        value={value} 
-        onChange={(e) => onChange(e.target.value)} 
-        className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all font-medium text-gray-700 shadow-sm cursor-pointer"
+      <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {label}
+      </label>
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="w-full rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2.5 text-sm text-slate-900 shadow-sm transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-100"
       >
-        {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+        {options.map(o => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
       </select>
     </div>
   );
 }
 
-function CheckboxList({ title, items, selected, onToggle, color = "blue" }) {
-  const accentClass = color === "red" ? "text-red-600 bg-red-50 border-red-200" : "text-blue-600 bg-blue-50 border-blue-200";
+function CheckboxList({ title, subtitle, items, selected, onToggle }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <h3 className="font-black text-gray-400 uppercase tracking-widest text-[10px] mb-4">{title}</h3>
+    <section className="rounded-2xl border border-slate-200 bg-white/90 p-5">
+      <div className="mb-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          {title}
+        </h3>
+        {subtitle && (
+          <p className="mt-1 text-xs text-slate-400">
+            {subtitle}
+          </p>
+        )}
+      </div>
       <div className="flex flex-wrap gap-2">
         {items.map(item => {
-          const isSelected = selected.includes(item);
+          const isActive = selected.includes(item);
           return (
-            <button 
-                key={item} 
-                onClick={() => onToggle(item)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${isSelected ? accentClass : 'bg-white text-gray-400 border-gray-100 hover:border-gray-300'}`}
+            <button
+              key={item}
+              type="button"
+              onClick={() => onToggle(item)}
+              className={`inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                isActive
+                  ? "border-blue-200 bg-blue-50 text-blue-700 shadow-sm"
+                  : "border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100"
+              }`}
             >
               {item}
             </button>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
