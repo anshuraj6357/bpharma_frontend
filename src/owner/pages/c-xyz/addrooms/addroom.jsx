@@ -73,9 +73,14 @@ const facilityOptions = [
 ];
 
 
-  // --- VALIDATION LOGIC ---
-const isNonEmpty = (v) => v !== undefined && v !== null && String(v).trim() !== "";
+// --- VALIDATION LOGIC ---
+const isNonEmpty = (v) =>
+  v !== undefined && v !== null && String(v).trim() !== "";
+
 const isPositiveNumber = (v) => Number(v) > 0;
+
+const isNonNegativeNumber = (v) => Number(v) >= 0;
+
 
 const validateStep = () => {
   switch (step) {
