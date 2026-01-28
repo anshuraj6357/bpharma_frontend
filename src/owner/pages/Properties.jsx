@@ -236,7 +236,7 @@ const processedProperties = useMemo(() =>
 
   const handleSaveProperty = useCallback(async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.address) return toast.warn("Please provide at least name and address.");
+
     const payload = new FormData();
     Object.keys(formData).forEach((key) => {
       if (key !== "previewImages") {
