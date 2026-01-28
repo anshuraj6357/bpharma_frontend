@@ -172,14 +172,19 @@ const RoomCard = ({ room, onEdit, onDelete, isDeleting }) => {
                 <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">Starting from</p>
                {room.category === "Pg" ? (
   <div className="flex flex-col">
-    <p className="text-sm font-black text-gray-900">
-      ₹{Number(room.price) + room.services.reduce((a, b) => a + b.price, 0)}
-      <span className="text-[10px] font-medium text-gray-500"> /mo (Total)</span>
-    </p>
-    <span className="text-[8px] text-emerald-600 font-bold uppercase">
-      Incl. Services
-    </span>
-  </div>
+  <p className="text-sm font-black text-gray-900">
+    ₹
+    {Number(room.price || 0) +
+      (Array.isArray(room.services)
+        ? room.services.reduce((a, b) => a + Number(b.price || 0), 0)
+        : 0)}
+    <span className="text-[10px] font-medium text-gray-500"> /mo (Total)</span>
+  </p>
+  <span className="text-[8px] text-emerald-600 font-bold uppercase">
+    Incl. Services
+  </span>
+</div>
+
 ) : (
   <p className="text-sm font-black text-gray-900">
     ₹{room.price || room.rentperNight || room.rentperday}
