@@ -1,11 +1,54 @@
 <!doctype html>
 <html lang="en-IN">
   <head>
+    <!-- ================= BASIC META ================= -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Preload Hero Image -->
+    <!-- ================= SEO CORE ================= -->
+    <title>Roomgi® | PG, Rooms, Flats, Hotels & Property Buy/Sell in India</title>
+    <meta
+      name="description"
+      content="Roomgi® – Book verified PGs, rooms, flats, hotels & offices across India. Zero brokerage. List & sell property instantly. Trusted by students & professionals."
+    />
+    <meta
+      name="keywords"
+      content="Roomgi, PG near me, rooms for rent, flats for rent, hotel booking, buy property India, sell property online, zero brokerage PG"
+    />
+    <meta name="author" content="Roomgi Private Limited" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://roomgi.com/" />
+
+    <!-- ================= GEO TARGETING (INDIA) ================= -->
+    <meta name="geo.region" content="IN" />
+    <meta name="geo.placename" content="India" />
+    <meta name="language" content="English" />
+
+    <!-- ================= HREFLANG ================= -->
+    <link rel="alternate" href="https://roomgi.com/" hreflang="en-in" />
+
+    <!-- ================= OPEN GRAPH ================= -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Roomgi® | Zero Brokerage PGs, Rooms & Flats" />
+    <meta
+      property="og:description"
+      content="Find PGs, rooms, flats, hotels & offices across India. Zero brokerage, verified listings, instant booking."
+    />
+    <meta property="og:url" content="https://roomgi.com/" />
+    <meta property="og:image" content="https://roomgi.com/og-image.png" />
+    <meta property="og:site_name" content="Roomgi" />
+
+    <!-- ================= TWITTER ================= -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Roomgi® | PG, Rooms & Flats Without Brokerage" />
+    <meta
+      name="twitter:description"
+      content="India’s trusted platform for PGs, rooms, flats & property buy/sell."
+    />
+    <meta name="twitter:image" content="https://roomgi.com/og-image.png" />
+
+    <!-- ================= PERFORMANCE ================= -->
     <link
       rel="preload"
       as="image"
@@ -14,46 +57,23 @@
       type="image/webp"
     />
 
-    <!-- Preconnects -->
-    <link rel="preconnect" href="https://maps.googleapis.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://maps.googleapis.com" />
     <link rel="preconnect" href="https://checkout.razorpay.com" crossorigin />
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
-    <!-- PWA -->
+    <!-- ================= PWA ================= -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#4f46e5" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
 
-    <!-- SEO -->
-    <title>Roomgi® | Book PGs, Rooms, Flats & Sell Property</title>
-    <meta
-      name="description"
-      content="Roomgi Private Limited (CIN: U68100UP2026PTC240368) is India's trusted platform for rental rooms, PGs, and offices with zero brokerage and 100% verified listings."
-    />
-    <meta
-      name="keywords"
-      content="Roomgi, PG without brokerage, rent rooms India, Roomgi Private Limited, student housing"
-    />
-    <meta name="author" content="Roomgi Private Limited" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://roomgi.com/" />
+    <!-- ================= FAVICON ================= -->
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
 
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Roomgi® | Perfect Stays Without Brokerage" />
-    <meta
-      property="og:description"
-      content="Find verified rooms and PGs across India. Zero brokerage, instant booking."
-    />
-    <meta property="og:url" content="https://roomgi.com/" />
-    <meta property="og:image" content="https://roomgi.com/og-image.png" />
+    <!-- ================= STRUCTURED DATA ================= -->
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-
-    <!-- Structured Data -->
+    <!-- Organization Schema -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -61,11 +81,8 @@
         "name": "Roomgi Private Limited",
         "url": "https://roomgi.com",
         "logo": "https://roomgi.com/logo.png",
-        "contactPoint": {
-          "@type": "ContactPoint",
-          "contactType": "customer service",
-          "areaServed": "IN"
-        },
+        "description": "India’s trusted platform for PGs, rooms, flats, hotels and property buy/sell with zero brokerage.",
+        "areaServed": "IN",
         "identifier": {
           "@type": "PropertyValue",
           "propertyID": "CIN",
@@ -74,30 +91,68 @@
       }
     </script>
 
-    <!-- Google Analytics -->
+    <!-- Local Business Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Roomgi",
+        "url": "https://roomgi.com",
+        "image": "https://roomgi.com/logo.png",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "IN"
+        },
+        "priceRange": "₹₹",
+        "areaServed": "India"
+      }
+    </script>
+
+    <!-- Website Search Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "url": "https://roomgi.com/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://roomgi.com/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <!-- ================= GOOGLE ANALYTICS ================= -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-74WL52ZQ6J"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag("js", new Date());
-      gtag("config", "G-74WL52ZQ6J", { anonymize_ip: true });
+      gtag("config", "G-74WL52ZQ6J", {
+        anonymize_ip: true,
+        send_page_view: true
+      });
     </script>
 
-    <!-- Google Maps (NO callback in React) -->
+    <!-- ================= GOOGLE MAPS (RESTRICT KEY BY DOMAIN) ================= -->
     <script
       async
       defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBI_1GjWzjhnK--jH94wVq3dmdOGm6sUos&libraries=places">
+      src="https://maps.googleapis.com/maps/api/js?key=YOUR_RESTRICTED_KEY&libraries=places">
     </script>
   </head>
 
   <body>
+    <noscript>
+      <p>Roomgi requires JavaScript to provide the best experience.</p>
+    </noscript>
+
     <div id="root"></div>
 
-    <!-- Razorpay -->
+    <!-- ================= RAZORPAY ================= -->
     <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 
-    <!-- React Entry -->
+    <!-- ================= REACT ENTRY ================= -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
