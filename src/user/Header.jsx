@@ -89,7 +89,7 @@ export default function Header() {
     <>
       {/* HEADER */}
       <header
-        className={`sticky top-0 z-[100] transition-all duration-500 ${
+        className={`z-[100] transition-all duration-500 ${
           isScrolled
             ? "bg-white/70 backdrop-blur-xl shadow-lg"
             : "bg-white"
