@@ -103,19 +103,19 @@ export default function AboutUs() {
             {/* CTA */}
             <div className="mt-8 flex justify-center gap-4 flex-wrap">
               <a
-                href="/rent"
+                href="/"
                 className="px-8 py-3 bg-green-600 text-white rounded-full font-semibold"
               >
                 Find a Rental
               </a>
               <a
-                href="/buy"
+                href="/"
                 className="px-8 py-3 border rounded-full font-semibold"
               >
                 Buy a Home
               </a>
               <a
-                href="/sell"
+                href="/"
                 className="px-8 py-3 border rounded-full font-semibold"
               >
                 Sell Property

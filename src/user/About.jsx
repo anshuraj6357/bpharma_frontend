@@ -96,13 +96,13 @@ const About = () => {
 
           {/* CTA */}
           <div className="mt-8 flex flex-wrap gap-4">
-            <a href="/rent" className="px-6 py-3 bg-green-600 text-white rounded-full font-semibold">
+            <a href="/" className="px-6 py-3 bg-green-600 text-white rounded-full font-semibold">
               Find a Rental
             </a>
-            <a href="/buy" className="px-6 py-3 border rounded-full font-semibold">
+            <a href="/" className="px-6 py-3 border rounded-full font-semibold">
               Buy a Home
             </a>
-            <a href="/sell" className="px-6 py-3 border rounded-full font-semibold">
+            <a href="/" className="px-6 py-3 border rounded-full font-semibold">
               Sell Property
             </a>
           </div>

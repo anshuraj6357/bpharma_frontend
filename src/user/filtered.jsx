@@ -38,74 +38,80 @@ export default function Searched() {
 
   /* ================= GOOGLE AUTOCOMPLETE ================= */
 useEffect(() => {
-  if (!searchInputRef.current || !city) return;
+  let intervalId;
+  let autocompleteInstance = null;
+  let isInitialized = false;   // ⭐ IMPORTANT
 
-  let autocomplete;
+  const initAutoComplete = () => {
+    if (isInitialized) return;   // ⭐ STOP DOUBLE INIT
 
-  const initAutocomplete = async () => {
-    // Wait for Google Maps JS to load
-    if (!window.google || !window.google.maps || !window.google.maps.places) {
-      setTimeout(initAutocomplete, 300);
-      return;
-    }
+    if (
+      window.google &&
+      window.google.maps &&
+      window.google.maps.places &&
+      searchInputRef.current &&
+      city
+    ) {
+      isInitialized = true;      // ⭐ LOCK
 
-    // Cleanup old autocomplete
-    if (autocompleteRef.current) {
-      window.google.maps.event.clearInstanceListeners(
-        autocompleteRef.current
-      );
-      autocompleteRef.current = null;
-    }
+      clearInterval(intervalId);
 
-    // Geocode city to get bounds
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ address: city }, (results, status) => {
-      if (status !== "OK" || !results[0]) return;
+      const geocoder = new window.google.maps.Geocoder();
 
-      const bounds = results[0].geometry.viewport;
-
-      autocomplete = new window.google.maps.places.Autocomplete(
-        searchInputRef.current,
-        {
-          types: ["geocode"],
-          bounds: bounds,
-          strictBounds: true,
-          componentRestrictions: { country: "IN" },
+      geocoder.geocode({ address: city }, (results, status) => {
+        if (status !== "OK" || !results?.[0]) {
+          console.error("Geocode failed:", status);
+          return;
         }
-      );
 
-      autocompleteRef.current = autocomplete;
+        const bounds = results[0].geometry.viewport;
 
-      autocomplete.addListener("place_changed", async () => {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) return;
+        autocompleteInstance =
+          new window.google.maps.places.Autocomplete(
+            searchInputRef.current,
+            {
+              bounds,
+              strictBounds: true,
+              componentRestrictions: { country: "IN" },
+              types: ["geocode"],
+            }
+          );
 
-        const lat = place.geometry.location.lat();
-        const long = place.geometry.location.lng();
+        autocompleteInstance.addListener("place_changed", async () => {
+          const place = autocompleteInstance.getPlace();
+          if (!place?.geometry) return;
 
-        setSearchQuery(place.formatted_address);
+          const lat = place.geometry.location.lat();
+          const long = place.geometry.location.lng();
 
-        try {
-          const response = await getAllnearestPg({ lat, long }).unwrap();
-          setPgData(response?.data || []);
-        } catch (err) {
-          console.error("Nearest PG error:", err);
-        }
+          setSearchQuery(place.formatted_address || "");
+
+          try {
+            const response = await getAllnearestPg({ lat, long }).unwrap();
+            setPgData(response?.data || []);
+          } catch (err) {
+            console.error(err);
+          }
+        });
       });
-    });
+    }
   };
 
-  initAutocomplete();
+  intervalId = setInterval(initAutoComplete, 400);
 
   return () => {
-    if (autocompleteRef.current) {
+    clearInterval(intervalId);
+
+    if (autocompleteInstance) {
       window.google.maps.event.clearInstanceListeners(
-        autocompleteRef.current
+        autocompleteInstance
       );
-      autocompleteRef.current = null;
     }
   };
 }, [city]);
+
+
+
 
 
 

@@ -31,18 +31,17 @@ export default function Header() {
   const dropdownRef = useRef(null);
   const [logoutUser, { isLoading }] = useLogoutUserMutation();
 
-  /* ================= ROLE CHECK ================= */
   const isAdmin =
     user?.role === "owner" || user?.role === "branch-manager";
 
-  /* ================= SCROLL EFFECT ================= */
+  /* Scroll Effect */
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* ================= OUTSIDE CLICK ================= */
+  /* Outside Click */
   useEffect(() => {
     const handler = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -53,7 +52,7 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  /* ================= LOGOUT ================= */
+  /* Logout */
   const handleLogout = async () => {
     try {
       await logoutUser().unwrap();
@@ -66,7 +65,6 @@ export default function Header() {
     setMobileMenu(false);
   };
 
-  /* ================= MENUS ================= */
   const navLinks = [
     { label: "Home", path: "/", icon: <Home size={18} /> },
     { label: "About", path: "/about", icon: <User size={18} /> },
@@ -89,7 +87,7 @@ export default function Header() {
 
   return (
     <>
-      {/* ================= HEADER ================= */}
+      {/* HEADER */}
       <header
         className={`sticky top-0 z-[100] transition-all duration-500 ${
           isScrolled
@@ -188,78 +186,129 @@ export default function Header() {
         </div>
       </header>
 
-      {/* ================= MOBILE MENU ================= */}
+      {/* MOBILE MENU */}
       <div
         className={`fixed inset-0 z-[110] transition ${
           mobileMenu ? "visible" : "invisible"
         }`}
       >
+        {/* Overlay */}
         <div
           onClick={() => setMobileMenu(false)}
-          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${
-            mobileMenu ? "opacity-100" : "opacity-0"
-          }`}
+          className={`
+            absolute inset-0 
+            bg-black/50 backdrop-blur-md
+            transition-all duration-500
+            ${mobileMenu ? "opacity-100" : "opacity-0"}
+          `}
         />
 
-        <aside
-          className={`absolute top-4 left-4 bottom-4 w-[280px] bg-white rounded-3xl p-8
-          transition-transform duration-300 ${
-            mobileMenu ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          <div className="flex justify-between mb-8">
-            <img src={logo} className="h-10" alt="Roomgi" />
-            <X onClick={() => setMobileMenu(false)} />
-          </div>
+        {/* Sidebar */}
+        {/* Sidebar */}
+<aside
+  className={`
+    absolute top-3 left-3 bottom-3 w-[300px] 
+    bg-white/90 backdrop-blur-2xl
+    rounded-[32px]
+    shadow-[0_20px_60px_rgba(0,0,0,0.25)]
+    border border-white/40
 
-          <div className="space-y-1">
-            {(
-              !isAuthenticated
-                ? navLinks
-                : isAdmin
-                ? adminMenuItems
-                : [...navLinks, ...userLinks]
-            ).map((l) => (
-              <button
-                key={l.label}
-                onClick={() => {
-                  navigate(l.path);
-                  setMobileMenu(false);
-                }}
-                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl
-                           text-slate-700 hover:bg-slate-100"
-              >
-                {l.icon}
-                {l.label}
-              </button>
-            ))}
+    flex flex-col   /* ⭐ IMPORTANT */
 
-            {!isAuthenticated && (
-              <button
-                onClick={() => {
-                  navigate("/login");
-                  setMobileMenu(false);
-                }}
-                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl
-                           bg-slate-950 text-white mt-6"
-              >
-                <User size={18} />
-                Login / Signup
-              </button>
-            )}
+    transform transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+    ${mobileMenu ? "translate-x-0 opacity-100" : "-translate-x-[120%] opacity-0"}
+  `}
+>
 
-            {isAuthenticated && (
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl
-                           text-red-500 hover:bg-red-50 mt-4"
-              >
-                <LogOut size={18} />
-                Logout
-              </button>
-            )}
-          </div>
-        </aside>
+  {/* HEADER */}
+  <div className="p-8 pb-4 flex justify-between items-center">
+    <img src={logo} className="h-10" alt="Roomgi" />
+    <X className="cursor-pointer" onClick={() => setMobileMenu(false)} />
+  </div>
+
+  {/* MENU LIST SCROLLABLE */}
+  <div className="flex-1 overflow-y-auto px-6 space-y-2">
+
+    {(
+      !isAuthenticated
+        ? navLinks
+        : isAdmin
+        ? adminMenuItems
+        : [...navLinks, ...userLinks]
+    ).map((l) => (
+      <button
+        key={l.label}
+        onClick={() => {
+          navigate(l.path);
+          setMobileMenu(false);
+        }}
+        className="
+          w-full flex items-center gap-4 px-5 py-3 rounded-2xl
+          text-slate-700 font-medium
+          hover:bg-white hover:shadow-md
+          active:scale-[0.98]
+          transition-all duration-200
+        "
+      >
+        {l.icon}
+        {l.label}
+      </button>
+    ))}
+
+  </div>
+
+  {/* ⭐ BOTTOM AUTH SECTION FIXED */}
+  <div className="p-6 border-t border-slate-200">
+
+    {/* LOGIN */}
+    {!isAuthenticated && (
+      <button
+        onClick={() => {
+          navigate("/login");
+          setMobileMenu(false);
+        }}
+        className="
+          w-full flex items-center gap-4 
+          px-5 py-4 rounded-2xl
+          bg-gradient-to-r from-slate-900 to-slate-700
+          text-white font-semibold
+          shadow-lg shadow-black/20
+          hover:shadow-xl hover:scale-[1.01]
+          active:scale-[0.98]
+          transition-all duration-300
+        "
+      >
+        <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+          <User size={18} />
+        </div>
+        Login / Signup
+      </button>
+    )}
+
+    {/* LOGOUT */}
+    {isAuthenticated && (
+      <button
+        onClick={handleLogout}
+        className="
+          w-full flex items-center gap-4 
+          px-5 py-4 rounded-2xl
+          bg-red-50 text-red-600 font-semibold
+          hover:bg-red-100
+          active:scale-[0.98]
+          transition-all duration-300
+        "
+      >
+        <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+          <LogOut size={18} />
+        </div>
+        Logout
+      </button>
+    )}
+
+  </div>
+
+</aside>
+
       </div>
     </>
   );
