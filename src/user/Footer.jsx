@@ -67,8 +67,9 @@ export default function Footer() {
                 </span>
               </Link>
               <p className="mt-6 text-sm leading-relaxed text-slate-400 max-w-sm">
-                India’s most transparent rental ecosystem. We connect people with 
-                verified PGs, flats, and offices with **zero brokerage**.
+                 Roomgi helps students, professionals, and families rent, buy, and sell verified PGs, rooms, flats, homes,
+  and commercial spaces across India. Zero brokerage, transparent pricing, and trusted listings make every
+  property decision simple.**.
               </p>
             </div>
 
