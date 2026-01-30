@@ -87,9 +87,9 @@ export default function Header() {
     { label: "Complaints", path: "/admin/complaints", icon: <MessageSquare size={18} /> },
   ];
 
-  /* ================= HEADER ================= */
   return (
     <>
+      {/* ================= HEADER ================= */}
       <header
         className={`sticky top-0 z-[100] transition-all duration-500 ${
           isScrolled
@@ -108,7 +108,7 @@ export default function Header() {
               className="lg:hidden p-2 rounded-xl bg-slate-50 hover:bg-indigo-50"
               onClick={() => setMobileMenu(true)}
             >
-              <Menu size={20} />
+              <Menu size={22} />
             </button>
 
             <button onClick={() => navigate("/")}>
@@ -116,10 +116,9 @@ export default function Header() {
             </button>
           </div>
 
-          {/* ================= DESKTOP NAV ================= */}
+          {/* DESKTOP NAV */}
           <nav className="hidden lg:flex gap-8 items-center">
-            {(navLinks
-            ).map((l) => (
+            {navLinks.map((l) => (
               <Link
                 key={l.label}
                 to={l.path}
@@ -135,11 +134,11 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* ================= RIGHT ================= */}
+          {/* RIGHT */}
           {!isAuthenticated ? (
             <button
               onClick={() => navigate("/login")}
-              className="bg-slate-950 text-white px-6 py-2 rounded-2xl"
+              className="hidden lg:block bg-slate-950 text-white px-6 py-2 rounded-2xl"
             >
               Login / Signup
             </button>
@@ -190,54 +189,78 @@ export default function Header() {
       </header>
 
       {/* ================= MOBILE MENU ================= */}
-      {mobileMenu && (
-        <>
-          <div
-            onClick={() => setMobileMenu(false)}
-            className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm"
-          />
-          <aside className="fixed top-4 left-4 bottom-4 w-[280px] bg-white z-[120] rounded-3xl p-8 overflow-y-auto">
-            <div className="flex justify-between mb-8">
-              <img src={logo} className="h-10" alt="Roomgi" />
-              <X onClick={() => setMobileMenu(false)} />
-            </div>
+      <div
+        className={`fixed inset-0 z-[110] transition ${
+          mobileMenu ? "visible" : "invisible"
+        }`}
+      >
+        <div
+          onClick={() => setMobileMenu(false)}
+          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${
+            mobileMenu ? "opacity-100" : "opacity-0"
+          }`}
+        />
 
-            <div className="space-y-1">
-              {(
-                !isAuthenticated
-                  ? navLinks
-                  : isAdmin
-                  ? adminMenuItems
-                  : [...navLinks, ...userLinks]
-              ).map((l) => (
-                <button
-                  key={l.label}
-                  onClick={() => {
-                    navigate(l.path);
-                    setMobileMenu(false);
-                  }}
-                  className="w-full flex items-center gap-4 px-4 py-3 rounded-xl
-                             text-slate-700 hover:bg-slate-100"
-                >
-                  {l.icon}
-                  {l.label}
-                </button>
-              ))}
+        <aside
+          className={`absolute top-4 left-4 bottom-4 w-[280px] bg-white rounded-3xl p-8
+          transition-transform duration-300 ${
+            mobileMenu ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="flex justify-between mb-8">
+            <img src={logo} className="h-10" alt="Roomgi" />
+            <X onClick={() => setMobileMenu(false)} />
+          </div>
 
-              {isAuthenticated && (
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-4 px-4 py-3 rounded-xl
-                             text-red-500 hover:bg-red-50 mt-4"
-                >
-                  <LogOut size={18} />
-                  Logout
-                </button>
-              )}
-            </div>
-          </aside>
-        </>
-      )}
+          <div className="space-y-1">
+            {(
+              !isAuthenticated
+                ? navLinks
+                : isAdmin
+                ? adminMenuItems
+                : [...navLinks, ...userLinks]
+            ).map((l) => (
+              <button
+                key={l.label}
+                onClick={() => {
+                  navigate(l.path);
+                  setMobileMenu(false);
+                }}
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl
+                           text-slate-700 hover:bg-slate-100"
+              >
+                {l.icon}
+                {l.label}
+              </button>
+            ))}
+
+            {!isAuthenticated && (
+              <button
+                onClick={() => {
+                  navigate("/login");
+                  setMobileMenu(false);
+                }}
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl
+                           bg-slate-950 text-white mt-6"
+              >
+                <User size={18} />
+                Login / Signup
+              </button>
+            )}
+
+            {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl
+                           text-red-500 hover:bg-red-50 mt-4"
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
+            )}
+          </div>
+        </aside>
+      </div>
     </>
   );
 }
