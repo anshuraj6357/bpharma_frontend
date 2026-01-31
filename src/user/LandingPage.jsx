@@ -183,45 +183,46 @@ useEffect(() => {
   </div>
   
     {/* Stats Row */}
-  <div className="relative overflow-hidden p-10 sm:p-16 bg-slate-900 rounded-[3rem] shadow-2xl">
-    {/* Abstract Background Glows */}
-    <div className="absolute top-0 -left-20 w-64 h-64 bg-indigo-500/20 rounded-full blur-[100px]" />
-    <div className="absolute bottom-0 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-[100px]" />
-  
-    <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-16">
-      {[
-        { label: "Partner Cities", value: "4", suffix: "+", icon: MapPin, color: "text-indigo-400" },
-        { label: "Verified Properties", value: "1", suffix: "K+", icon: Star, color: "text-amber-400" },
-        { label: "Happy Residents", value: "5", suffix: "K+", icon: Users, color: "text-emerald-400" },
-      ].map((stat, i) => (
-        <div key={i} className="flex flex-col items-center group">
-          {/* Icon with Soft Glow */}
-          <div className="relative mb-6">
-            <div className={`absolute inset-0 blur-2xl opacity-20 ${stat.color.replace('text', 'bg')}`} />
-            <stat.icon className={`w-10 h-10 sm:w-12 sm:h-12 ${stat.color} relative z-10 transition-transform duration-500 group-hover:scale-110`} />
-          </div>
-  
-          {/* Number Display */}
-          <div className="flex items-baseline gap-0.5">
-            <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tighter">
-              {stat.value}
-            </span>
-            <span className={`text-2xl sm:text-3xl font-black ${stat.color}`}>
-              {stat.suffix}
-            </span>
-          </div>
-  
-          {/* Label */}
-          <p className="mt-2 text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs">
-            {stat.label}
-          </p>
-          
-          {/* Decorative underline */}
-          <div className="mt-4 w-8 h-1 bg-gradient-to-r from-transparent via-slate-700 to-transparent rounded-full group-hover:w-12 transition-all duration-500" />
+ <div className="relative overflow-hidden p-10 sm:p-16 bg-white/5 backdrop-blur-lg rounded-xl shadow-lg">
+  {/* Optional subtle background glow */}
+  <div className="absolute top-0 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl" />
+  <div className="absolute bottom-0 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl" />
+
+  <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-10 lg:gap-12">
+    {[
+      { label: "Partner Cities", value: "4", suffix: "2+", icon: MapPin, color: "text-indigo-500" },
+      { label: "Verified Properties", value: "1", suffix: "200+", icon: Star, color: "text-yellow-500" },
+      { label: "Happy Residents", value: "5", suffix: "500+", icon: Users, color: "text-green-500" },
+    ].map((stat, i) => (
+      <div key={i} className="flex flex-col items-center text-center group">
+        {/* Icon */}
+        <div className="relative mb-4">
+          <div className={`absolute inset-0 blur-xl opacity-10 ${stat.color.replace("text", "bg")}`} />
+          <stat.icon className={`w-10 h-10 ${stat.color} relative z-10 transition-transform duration-300 group-hover:scale-110`} />
         </div>
-      ))}
-    </div>
+
+        {/* Number */}
+        <div className="flex items-baseline gap-1">
+          <span className="text-3xl sm:text-4xl font-extrabold text-white">
+            {stat.value}
+          </span>
+          <span className={`text-xl sm:text-2xl font-extrabold ${stat.color}`}>
+            {stat.suffix}
+          </span>
+        </div>
+
+        {/* Label */}
+        <p className="mt-1 text-gray-400 font-medium uppercase text-xs tracking-wide">
+          {stat.label}
+        </p>
+
+        {/* Decorative line */}
+        <div className="mt-3 w-6 h-1 bg-gradient-to-r from-gray-500/0 via-gray-400/50 to-gray-500/0 rounded-full transition-all duration-300 group-hover:w-10" />
+      </div>
+    ))}
   </div>
+</div>
+
   </section>
 
   {/* Featured Properties - SEO Optimized */}
