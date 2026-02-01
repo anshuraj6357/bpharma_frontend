@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // ✅ ENV BASE URL (NO trailing slash)
 const OWNER_TENANT_API =
-  import.meta.env.VITE_API_BASE_URL + "/api/v1/tenant/owner";
+  import.meta.env.VITE_API_BASE_URL + "/v1/tenant/owner";
 
 export const owner_tenant = createApi({
   reducerPath: "owner_tenant",

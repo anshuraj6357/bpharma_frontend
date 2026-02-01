@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // ✅ Use ENV for production
-const FILTER_API = import.meta.env.VITE_API_BASE_URL + "/api/v1/filter/user";
+const FILTER_API = import.meta.env.VITE_API_BASE_URL + "/v1/filter/user";
 
 export const user_filter = createApi({
   reducerPath: "user_filter",
