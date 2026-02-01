@@ -88,103 +88,135 @@ export default function Header() {
   return (
     <>
       {/* HEADER */}
-      <header
-        className={`z-[100] transition-all duration-500 ${
-          isScrolled
-            ? "bg-white/70 backdrop-blur-xl shadow-lg"
-            : "bg-white"
-        }`}
+    <header
+  className={`z-[100] transition-all duration-500 ${
+    isScrolled
+      ? "bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
+      : "bg-white"
+  }`}
+>
+  <div
+    className={`max-w-7xl mx-auto px-6 flex items-center justify-between transition-all ${
+      isScrolled ? "py-3" : "py-5"
+    }`}
+  >
+    {/* LEFT */}
+    <div className="flex items-center gap-4">
+      <button
+        className="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-indigo-50 active:scale-95 transition"
+        onClick={() => setMobileMenu(true)}
       >
-        <div
-          className={`max-w-7xl mx-auto px-6 flex items-center justify-between ${
-            isScrolled ? "py-3" : "py-5"
+        <Menu size={22} />
+      </button>
+
+      <button
+        onClick={() => navigate("/")}
+        className="hover:opacity-90 transition"
+      >
+        <img src={logo} className="h-10 md:h-12" alt="Roomgi" />
+      </button>
+    </div>
+
+    {/* DESKTOP NAV */}
+    <nav className="hidden lg:flex gap-10 items-center">
+      {navLinks.map((l) => (
+        <Link
+          key={l.label}
+          to={l.path}
+          className={`relative flex items-center gap-2 font-semibold text-sm transition ${
+            location.pathname === l.path
+              ? "text-indigo-600"
+              : "text-slate-500 hover:text-slate-900"
           }`}
         >
-          {/* LEFT */}
-          <div className="flex items-center gap-4">
-            <button
-              className="lg:hidden p-2 rounded-xl bg-slate-50 hover:bg-indigo-50"
-              onClick={() => setMobileMenu(true)}
-            >
-              <Menu size={22} />
-            </button>
+          {l.icon}
+          {l.label}
+          {location.pathname === l.path && (
+            <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-indigo-600 rounded-full" />
+          )}
+        </Link>
+      ))}
+    </nav>
 
-            <button onClick={() => navigate("/")}>
-              <img src={logo} className="h-10 md:h-12" alt="Roomgi" />
+    {/* RIGHT */}
+    {!isAuthenticated ? (
+    <button
+  onClick={() => navigate("/login")}
+  className="
+    hidden lg:flex items-center gap-2
+    px-7 py-2.5 rounded-full
+    text-white font-semibold tracking-wide
+
+    bg-gradient-to-r 
+    from-[#7B2FF7] via-[#FF3CAC] to-[#FFB347]
+
+    shadow-lg shadow-pink-500/40
+    hover:shadow-2xl hover:shadow-pink-500/60
+    hover:scale-[1.06]
+
+    active:scale-95
+    transition-all duration-300 ease-out
+    relative overflow-hidden
+  "
+>
+  {/* glossy shine */}
+  <span
+    className="
+      absolute inset-0 
+      bg-gradient-to-r from-transparent via-white/25 to-transparent
+      translate-x-[-120%] hover:translate-x-[120%]
+      transition-transform duration-700
+    "
+  />
+  Login / Signup
+</button>
+
+    ) : (
+      <div ref={dropdownRef} className="relative hidden lg:block">
+        <button
+          onClick={() => setOpenDropdown((p) => !p)}
+          className="flex items-center gap-3 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full transition"
+        >
+          <span className="font-medium">{user?.username}</span>
+          <div className="w-9 h-9 bg-indigo-600 text-white rounded-full flex items-center justify-center font-semibold">
+            {user?.username?.[0]?.toUpperCase()}
+          </div>
+        </button>
+
+        {openDropdown && (
+          <div className="absolute right-0 mt-4 w-64 bg-white rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+            {(isAdmin ? adminMenuItems : userLinks).map((u) => (
+              <button
+                key={u.label}
+                onClick={() => {
+                  navigate(u.path);
+                  setOpenDropdown(false);
+                }}
+                className="w-full px-5 py-3 flex items-center gap-3 text-sm font-medium hover:bg-slate-50 transition"
+              >
+                {u.icon}
+                {u.label}
+              </button>
+            ))}
+
+            <button
+              onClick={handleLogout}
+              className="w-full px-5 py-3 flex items-center gap-3 text-sm font-semibold text-red-500 hover:bg-red-50 transition"
+            >
+              {isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <LogOut />
+              )}
+              Logout
             </button>
           </div>
+        )}
+      </div>
+    )}
+  </div>
+</header>
 
-          {/* DESKTOP NAV */}
-          <nav className="hidden lg:flex gap-8 items-center">
-            {navLinks.map((l) => (
-              <Link
-                key={l.label}
-                to={l.path}
-                className={`flex items-center gap-2 font-semibold text-sm ${
-                  location.pathname === l.path
-                    ? "text-indigo-600"
-                    : "text-slate-500 hover:text-slate-900"
-                }`}
-              >
-                {l.icon}
-                {l.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* RIGHT */}
-          {!isAuthenticated ? (
-            <button
-              onClick={() => navigate("/login")}
-              className="hidden lg:block bg-slate-950 text-white px-6 py-2 rounded-2xl"
-            >
-              Login / Signup
-            </button>
-          ) : (
-            <div ref={dropdownRef} className="relative hidden lg:block">
-              <button
-                onClick={() => setOpenDropdown((p) => !p)}
-                className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-full"
-              >
-                <span>{user?.username}</span>
-                <div className="w-9 h-9 bg-indigo-600 text-white rounded-full flex items-center justify-center">
-                  {user?.username?.[0]?.toUpperCase()}
-                </div>
-              </button>
-
-              {openDropdown && (
-                <div className="absolute right-0 mt-4 w-64 bg-white rounded-3xl shadow-xl">
-                  {(isAdmin ? adminMenuItems : userLinks).map((u) => (
-                    <button
-                      key={u.label}
-                      onClick={() => {
-                        navigate(u.path);
-                        setOpenDropdown(false);
-                      }}
-                      className="w-full px-5 py-3 flex gap-3 hover:bg-slate-50"
-                    >
-                      {u.icon}
-                      {u.label}
-                    </button>
-                  ))}
-
-                  <button
-                    onClick={handleLogout}
-                    className="w-full px-5 py-3 flex gap-3 text-red-500 hover:bg-red-50"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="animate-spin" />
-                    ) : (
-                      <LogOut />
-                    )}
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </header>
 
       {/* MOBILE MENU */}
       <div
@@ -258,54 +290,61 @@ export default function Header() {
   </div>
 
   {/* ⭐ BOTTOM AUTH SECTION FIXED */}
-  <div className="p-6 border-t border-slate-200">
+ <div className="p-6 border-t border-slate-200">
 
-    {/* LOGIN */}
-    {!isAuthenticated && (
-      <button
-        onClick={() => {
-          navigate("/login");
-          setMobileMenu(false);
-        }}
-        className="
-          w-full flex items-center gap-4 
-          px-5 py-4 rounded-2xl
-          bg-gradient-to-r from-slate-900 to-slate-700
-          text-white font-semibold
-          shadow-lg shadow-black/20
-          hover:shadow-xl hover:scale-[1.01]
-          active:scale-[0.98]
-          transition-all duration-300
-        "
-      >
-        <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
-          <User size={18} />
-        </div>
-        Login / Signup
-      </button>
-    )}
+  {/* LOGIN */}
+  {!isAuthenticated && (
+    <button
+      onClick={() => {
+        navigate("/login");
+        setMobileMenu(false);
+      }}
+      className="
+        w-full flex items-center gap-4 
+        px-5 py-4 rounded-2xl
+        text-white font-semibold
+        bg-gradient-to-r from-[#7B2FF7] via-[#FF3CAC] to-[#FFB347]
+        shadow-lg shadow-pink-500/40
+        hover:shadow-2xl hover:shadow-pink-500/60
+        hover:scale-[1.03]
+        active:scale-[0.98]
+        transition-all duration-300 relative overflow-hidden
+      "
+    >
+      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+        <User size={18} />
+      </div>
+      Login / Signup
 
-    {/* LOGOUT */}
-    {isAuthenticated && (
-      <button
-        onClick={handleLogout}
-        className="
-          w-full flex items-center gap-4 
-          px-5 py-4 rounded-2xl
-          bg-red-50 text-red-600 font-semibold
-          hover:bg-red-100
-          active:scale-[0.98]
-          transition-all duration-300
-        "
-      >
-        <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-          <LogOut size={18} />
-        </div>
-        Logout
-      </button>
-    )}
+      {/* subtle shine effect */}
+      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent 
+                       translate-x-[-120%] hover:translate-x-[120%] 
+                       transition-transform duration-700" />
+    </button>
+  )}
 
-  </div>
+  {/* LOGOUT */}
+  {isAuthenticated && (
+    <button
+      onClick={handleLogout}
+      className="
+        w-full flex items-center gap-4 
+        px-5 py-4 rounded-2xl
+        bg-red-50 text-red-600 font-semibold
+        hover:bg-red-100
+        active:scale-[0.98]
+        transition-all duration-300
+      "
+    >
+      <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+        <LogOut size={18} />
+      </div>
+      Logout
+    </button>
+  )}
+
+</div>
+
 
 </aside>
 

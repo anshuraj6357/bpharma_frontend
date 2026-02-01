@@ -5,7 +5,7 @@ import {
   Lock,
   User,
   Phone,
-  Stars,
+  ShieldCheck, ArrowRight
 } from "lucide-react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -93,134 +93,199 @@ export default function AuthModal() {
   };
 
   return (
-  <div className="min-h-screen w-full bg-slate-200/40 backdrop-blur-xl flex items-center justify-center p-4 py-10">
-  <div className="relative bg-white rounded-[2.5rem] max-w-4xl w-full flex flex-col md:flex-row overflow-hidden shadow-xl border border-white transition-transform duration-300 hover:scale-[1.01]">
-
-    {/* CLOSE */}
+<div className="min-h-screen w-full bg-gradient-to-br from-orange-50 via-white to-amber-50 flex items-center justify-center p-4 py-12">
+  <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl max-w-4xl w-full flex flex-col lg:flex-row overflow-hidden shadow-2xl border border-orange-100/50">
+    
+    {/* CLOSE BUTTON */}
     <button
       onClick={() => navigate(-1)}
-      className="absolute top-4 right-4 md:top-6 md:right-6 z-50 bg-white/90 backdrop-blur-md p-2 rounded-full shadow-md hover:shadow-lg transition-shadow"
+      className="absolute -top-4 -right-4 z-50 bg-white shadow-xl p-3 rounded-3xl border-4 border-orange-50/80"
     >
-      <X size={20} />
+      <X size={20} className="text-orange-600 shadow-lg" />
     </button>
 
     {/* LEFT IMAGE */}
-    <div className="md:w-[42%] relative min-h-[260px] md:min-h-full overflow-hidden group">
+    <div className="lg:w-[40%] relative min-h-[280px] lg:min-h-full overflow-hidden">
       <img
         src="https://images.unsplash.com/photo-1598928506311-c55ded91a20c?q=80&w=2070&auto=format&fit=crop"
-        alt="Interior"
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        alt="Premium PG"
+        className="absolute inset-0 w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
+      
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-orange-900/95 via-orange-900/40 to-transparent" />
+      
+      {/* Content Overlay */}
       <div className="relative z-10 p-8 h-full flex flex-col justify-end text-white">
-        <div className="flex items-center gap-2 mb-3">
-          <Stars className="text-yellow-400 fill-yellow-400" size={18} />
-          <span className="text-xs font-bold tracking-[0.2em] uppercase drop-shadow">
-            Premium Living
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-lg" />
+          <span className="text-xs font-black tracking-[0.3em] uppercase bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+            Verified PG
           </span>
         </div>
-        <h1 className="text-3xl md:text-4xl font-black leading-tight mb-2 drop-shadow-lg">
-          Find Your <br /> Cozy Corner
+        
+        <h1 className="text-3xl lg:text-4xl font-black leading-tight mb-3 drop-shadow-2xl">
+          Direct Owner Deals
+          <span className="block text-amber-300/90 text-lg tracking-tight">No Brokerage</span>
         </h1>
-        <p className="text-slate-300 text-sm md:text-base drop-shadow">
-          Verified rooms, trusted owners, stress-free living.
+        
+        <p className="text-amber-100/90 text-sm font-semibold drop-shadow-lg bg-black/20 px-4 py-2 rounded-xl backdrop-blur-sm max-w-sm">
+          100% Verified | Owner Posted | Instant Contact
         </p>
       </div>
     </div>
 
     {/* RIGHT FORM */}
-    <div className="flex-1 bg-[#fdfdfd] p-8 md:p-14">
-      <div className="max-w-sm mx-auto">
-        <h2 className="text-2xl md:text-3xl font-black mb-6 text-center">
-          {isSignUp ? "Join the Community" : "Welcome Back"}
-        </h2>
+    <div className="flex-1 bg-white/95 p-8 lg:p-12 xl:p-14">
+      <div className="max-w-md mx-auto w-full space-y-6">
+        
+        {/* Title */}
+        <div className="text-center">
+          <div className="inline-flex items-center gap-2 bg-orange-50/80 px-4 py-2 rounded-2xl border border-orange-200 mb-4 backdrop-blur-sm">
+            <ShieldCheck size={18} className="text-orange-600" />
+            <span className="text-xs font-black uppercase tracking-wider text-orange-700">Secure Sign In</span>
+          </div>
+          <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-gray-900 to-slate-800 bg-clip-text text-transparent mb-2">
+            {isSignUp ? "Join NoBroker" : "Welcome Back"}
+          </h2>
+          <p className="text-slate-600 font-semibold text-sm">
+            {isSignUp 
+              ? "Create free account with verified owners" 
+              : "Access 10L+ verified properties instantly"
+            }
+          </p>
+        </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        {/* FORM */}
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          
           {isSignUp && (
-            <Input
-              icon={User}
-              label="Full Name"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Enter your name"
-              className="transition-all focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
+            <div className="space-y-1">
+              <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+                Full Name
+              </label>
+              <Input
+                icon={User}
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                placeholder="John Doe"
+                className="h-14 text-lg bg-orange-50/50 border-orange-200 focus:border-orange-500 focus:ring-orange-200/50 font-semibold"
+              />
+            </div>
           )}
 
-          <Input
-            icon={Mail}
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="email@example.com"
-            className="transition-all focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
+          <div className="space-y-1">
+            <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+              Email Address
+            </label>
+            <Input
+              icon={Mail}
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="your@email.com"
+              className="h-14 text-lg bg-orange-50/50 border-orange-200 focus:border-orange-500 focus:ring-orange-200/50 font-semibold"
+            />
+          </div>
 
-          <Input
-            icon={Lock}
-            label="Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="••••••••"
-            className="transition-all focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
+          <div className="space-y-1">
+            <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+              Password
+            </label>
+            <Input
+              icon={Lock}
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter secure password"
+              className="h-14 text-lg bg-orange-50/50 border-orange-200 focus:border-orange-500 focus:ring-orange-200/50 font-semibold"
+            />
+          </div>
 
           {isSignUp && (
             <>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-4 py-3.5 border rounded-2xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-              >
-                <option value="">Select Role</option>
-                <option value="user">User</option>
-                <option value="owner">Property Owner</option>
-              </select>
+              <div className="space-y-1">
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+                  Account Type
+                </label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full h-14 px-5 py-3 border-2 border-orange-200 rounded-2xl text-lg font-semibold bg-orange-50/50 focus:border-orange-500 focus:ring-2 focus:ring-orange-200/50 transition-all appearance-none bg-no-repeat bg-right"
+                >
+                  <option value="">Select Role</option>
+                  <option value="user">Tenant / Buyer</option>
+                  <option value="owner">Property Owner</option>
+                </select>
+              </div>
 
-              <PhoneInput
-                value={formData.phone}
-                onChange={(val) =>
-                  setFormData((p) => ({ ...p, phone: val }))
-                }
-                inputClass="w-full px-4 py-3.5 border rounded-2xl text-sm font-semibold focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-              />
+              <div className="space-y-1">
+                <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
+                  Phone Number
+                </label>
+                <PhoneInput
+                  value={formData.phone}
+                  onChange={(val) => setFormData((p) => ({ ...p, phone: val }))}
+                  inputClass="w-full h-14 px-5 py-3 border-2 border-orange-200 rounded-2xl text-lg font-semibold bg-orange-50/50 focus:border-orange-500 focus:ring-2 focus:ring-orange-200/50 transition-all"
+                />
+              </div>
             </>
           )}
 
+          {/* SUBMIT BUTTON */}
           <button
             type="submit"
             disabled={registerLoading || loginLoading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-700 hover:to-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg flex justify-center items-center gap-2"
+            className="group w-full h-16 bg-gradient-to-r from-orange-600 via-amber-600 to-amber-700
+                       text-white rounded-3xl font-black text-lg uppercase tracking-widest
+                       flex items-center justify-center gap-3
+                       border border-orange-500/30 backdrop-blur-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {registerLoading || loginLoading ? (
-              <Loader2 className="animate-spin mx-auto" />
-            ) : isSignUp ? (
-              "Create Account"
+              <Loader2 className="w-6 h-6 animate-spin" />
             ) : (
-              "Sign In"
+              <>
+                {isSignUp ? "Create Account" : "Sign In Now"}
+                <ArrowRight size={20} className="" />
+              </>
             )}
           </button>
         </form>
 
-        <p className="mt-6 text-xs text-center text-slate-400 font-bold">
-          {isSignUp ? "Already a member?" : "New here?"}
-          <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="ml-2 text-indigo-600 underline hover:text-indigo-500 transition"
-          >
-            {isSignUp ? "Login" : "Sign Up"}
-          </button>
-        </p>
+        {/* Toggle */}
+        <div className="pt-8 border-t-2 border-orange-50/50">
+          <p className="text-center text-sm font-semibold text-slate-600">
+            {isSignUp ? "Already registered?" : "New to platform?"}
+            <button
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="ml-2 font-black text-orange-600 underline decoration-2 px-2 bg-orange-50/50 py-1 rounded-lg"
+            >
+              {isSignUp ? "Login Here" : "Create Account"}
+            </button>
+          </p>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="flex items-center justify-center gap-6 pt-6">
+          <div className="flex items-center gap-2 text-xs text-orange-700 font-black uppercase tracking-wider">
+            <ShieldCheck size={14} />
+            100% Verified
+          </div>
+          <div className="w-px h-6 bg-orange-200" />
+          <div className="flex items-center gap-2 text-xs text-orange-700 font-black uppercase tracking-wider">
+            <ShieldCheck size={14} />
+            No Brokerage
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
 
   );
 }

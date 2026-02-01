@@ -180,62 +180,113 @@ useEffect(() => {
   }
 
   /* ================= UI ================= */
-  return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      {/* SEARCH BAR */}
-      <div className="bg-white sticky top-0 z-30 border-b py-6">
-        <div className="max-w-7xl mx-auto px-4 flex gap-4">
-          <div className="relative flex-1 group">
+return (
+  <div className="min-h-screen bg-white">
+
+    {/* SEARCH BAR */}
+    <div className="z-40 bg-white border-b border-gray-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 py-6"> {/* ⬅ WIDTH INCREASED */}
+
+        {/* Hero Title */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Find PG & Homes
+          </h1>
+          <p className="text-lg text-green-600 font-semibold">
+            100% Verified | Owner Posted
+          </p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-4">
+          {/* Search Input */}
+          <div className="relative flex-1">
             <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
               size={20}
             />
-
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search PG, Hotels or Area..."
+              placeholder="Enter an area, landmark or property ID"
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
                 if (!e.target.value.trim()) setPgData(data?.data || []);
               }}
-              className="w-full pl-12 pr-4 py-3 bg-slate-100 rounded-2xl outline-none"
+              className="
+                w-full pl-12 pr-6 py-4
+                rounded-2xl bg-white
+                border-2 border-gray-200
+                focus:border-green-500
+                focus:ring-4 focus:ring-green-100
+                outline-none transition-all duration-300
+                text-lg shadow-lg hover:shadow-xl
+              "
             />
           </div>
 
-          <button
-            onClick={handleFindPG}
-            className="bg-blue-600 text-white px-6 rounded-2xl font-bold"
-          >
-            Search
-          </button>
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
+            <button
+              onClick={handleFindPG}
+              className="
+                bg-gradient-to-r from-green-500 to-green-600
+                hover:from-green-600 hover:to-green-700
+                text-white px-8 py-4 rounded-2xl
+                font-bold text-lg shadow-lg hover:shadow-xl
+                transition-all duration-300
+              "
+            >
+              Search Properties
+            </button>
 
-          <button
-            onClick={() => setIsFilterOpen(true)}
-            className="border px-4 rounded-2xl"
-          >
-            <Filter />
-          </button>
+            <button
+              onClick={() => setIsFilterOpen(true)}
+              className="
+                bg-white border-2 border-green-500
+                text-green-500 px-6 py-4 rounded-2xl
+                font-semibold hover:bg-green-500 hover:text-white
+                transition-all duration-300 shadow-lg hover:shadow-xl
+                whitespace-nowrap
+              "
+            >
+              Filters
+            </button>
+          </div>
         </div>
 
         {searchError && (
-          <p className="text-red-500 text-center mt-2">{searchError}</p>
-        )}
-      </div>
-
-      {/* RESULTS */}
-      <div className="max-w-7xl mx-auto px-4 mt-10">
-        {pgisLoading ? (
-          <Loader2 className="animate-spin mx-auto" />
-        ) : pgData?.length ? (
-          <ROOMCARD pgData={pgData} />
-        ) : (
-          <p className="text-center mt-20 text-gray-500">No stays found</p>
+          <p className="text-sm text-red-500 mt-3 text-center">
+            {searchError}
+          </p>
         )}
       </div>
     </div>
-  );
+
+    {/* RESULTS */}
+    <div className="max-w-7xl mx-auto px-4 py-12"> {/* ⬅ WIDTH INCREASED */}
+      {pgisLoading ? (
+        <div className="flex justify-center mt-24">
+          <Loader2 className="animate-spin w-12 h-12 text-green-500" />
+        </div>
+      ) : pgData?.length ? (
+        <ROOMCARD pgData={pgData} />
+      ) : (
+        <div className="text-center mt-32">
+          <p className="text-2xl font-bold text-gray-800 mb-4">
+            No properties found
+          </p>
+          <p className="text-lg text-gray-500 max-w-md mx-auto">
+            Try adjusting your search or explore popular areas nearby
+          </p>
+        </div>
+      )}
+    </div>
+
+  </div>
+);
+
+
 }
 
 /* ================= DROPDOWN ================= */
