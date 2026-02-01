@@ -1,20 +1,34 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/branch/owner`;
+// ✅ Use ENV variable for production
+const BRANCH_API = import.meta.env.VITE_API_BASE_URL + "/api/branch/owner";
 
 const owner_branch = createApi({
   reducerPath: "owner_branch",
+
   baseQuery: fetchBaseQuery({
-    baseUrl: USER_API,
+    baseUrl: BRANCH_API,
     credentials: "include",
+
+    // ✅ Prevent browser/mobile cache
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
   }),
 
   tagTypes: ["Branch", "Room", "Property", "Location"],
 
+  // ✅ Production defaults
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
   endpoints: (builder) => ({
 
-    /* ===================== BRANCH ===================== */
-
+    /* ---------------- BRANCH ---------------- */
     addbranch: builder.mutation({
       query: (payload) => ({
         url: "add",
@@ -28,16 +42,15 @@ const owner_branch = createApi({
       query: () => "get",
       providesTags: ["Branch"],
     }),
-   deleteBranch: builder.mutation({
-  query: (id) => ({
-    url: "/DeleteBranch",
-    method: "DELETE",
-    body: { id },
-  }),
-  invalidatesTags: ["Branch"],
-}),
 
-
+    deleteBranch: builder.mutation({
+      query: (id) => ({
+        url: "/DeleteBranch",
+        method: "DELETE",
+        body: { id },
+      }),
+      invalidatesTags: ["Branch"],
+    }),
 
     getAllBranchByOwner: builder.query({
       query: () => "getalllbranchowner",
@@ -49,30 +62,26 @@ const owner_branch = createApi({
       providesTags: ["Branch"],
     }),
 
-    /* ===================== LOCATION ===================== */
-
-    // Get all states
+    /* ---------------- LOCATION ---------------- */
     getStates: builder.query({
       query: () => "states",
       providesTags: ["Location"],
     }),
 
-    // Get cities by state
     getCities: builder.mutation({
       query: (payload) => ({
         url: "cities",
         method: "POST",
-        body: payload, // { state: "Delhi" }
+        body: payload,
       }),
       invalidatesTags: ["Location"],
     }),
 
-    // Get locations by state + city
     getLocationNames: builder.mutation({
       query: (payload) => ({
         url: "locations",
         method: "POST",
-        body: payload, // { state: "Delhi", city: "New Delhi" }
+        body: payload,
       }),
       invalidatesTags: ["Location"],
     }),
@@ -86,12 +95,9 @@ export const {
   useGetAllBranchByOwnerQuery,
   useGetAllBranchbybranchIdQuery,
   useDeleteBranchMutation,
-
-  // Location hooks
   useGetStatesQuery,
   useGetCitiesMutation,
   useGetLocationNamesMutation,
-
 } = owner_branch;
 
 export default owner_branch;

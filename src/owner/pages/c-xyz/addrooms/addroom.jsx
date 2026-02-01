@@ -279,7 +279,7 @@ const slideVariants = {
       <InputWrapper label="Room / Unit Number *" icon={<Home size={40} />}>
         <input
           className="modern-input text-base sm:text-lg"
-          placeholder="e.g. 101-B"
+          placeholder="e.g. 101(ONLY NUMBERS ALLOWED)"
           value={roomData.roomNumber}
           onChange={(e) =>
             setRoomData({ ...roomData, roomNumber: e.target.value })
@@ -428,7 +428,7 @@ const slideVariants = {
     <InputWrapper label="Property Description  " icon={<Info size={20} />}>
       <textarea
         className="modern-input min-h-[160px] text-base sm:text-lg leading-relaxed"
-        placeholder="Briefly describe the room, amenities, and who it’s ideal for..."
+        // placeholder="Briefly describe the room, amenities, and who it’s ideal for..."
         value={roomData.description}
         onChange={(e) =>
           setRoomData({ ...roomData, description: e.target.value })

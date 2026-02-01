@@ -1,60 +1,78 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-// const USER_API = "https://roomgi-backend-project-2.onrender.com/api/room/owner";
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/room/owner`;
+// ✅ ENV BASE URL
+const OWNER_ROOM_API =
+  import.meta.env.VITE_API_BASE_URL + "/api/room/owner";
 
-
-
-
-
-
-const owner_room = createApi({
+export const owner_room = createApi({
   reducerPath: "owner_room",
+
   baseQuery: fetchBaseQuery({
-    baseUrl: USER_API,
+    baseUrl: OWNER_ROOM_API,
     credentials: "include",
+
+    // ✅ Prevent browser / CDN cache
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
   }),
 
   // 🔥 MULTI TAG TYPES
   tagTypes: ["Branch", "Room", "Property"],
 
+  // ✅ PRODUCTION CACHE RULES
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
   endpoints: (builder) => ({
 
-     getAllBranchbyproperty: builder.query({
-      query: () => "/getproperty/all",
+    /* ===================== PROPERTY → BRANCH ===================== */
+
+    getAllBranchbyproperty: builder.query({
+      query: () => ({
+        url: "/getproperty/all",
+        method: "GET",
+      }),
       providesTags: ["Branch"],
     }),
-  
-
 
     /* ===================== BRANCH ROOMS (CURSOR PAGINATION) ===================== */
-getRoomsByBranch: builder.query({
-  query: ({ branchId, cursor, limit = 10 }) => ({
-    url: `branch-rooms/${branchId}`,
-    params: { limit, cursor }, // Query params object format mein dena zyada saaf hai
-  }),
 
-  // Sirf branchId ke basis par cache maintain karega (Pagination ke liye zaroori)
-  serializeQueryArgs: ({ queryArgs }) => queryArgs.branchId,
+    getRoomsByBranch: builder.query({
+      query: ({ branchId, cursor, limit = 10 }) => ({
+        url: `branch-rooms/${branchId}`,
+        method: "GET",
+        params: { limit, cursor },
+      }),
 
-  // Naye data ko purane mein merge karna
-  merge: (currentCache, newData) => {
-    if (!currentCache) return newData; // Agar pehla load hai toh direct return karo
-    
-    return {
-      ...newData,
-      rooms: [...currentCache.rooms, ...newData.rooms], // Purane rooms + naye rooms
-      nextCursor: newData.nextCursor, // Update cursor
-    };
-  },
+      // ✅ Cache only by branchId
+      serializeQueryArgs: ({ queryArgs }) => queryArgs.branchId,
 
-  // Jab branch change ho tabhi refetch karega (Not on cursor change)
-  forceRefetch: ({ currentArg, previousArg }) => currentArg?.branchId !== previousArg?.branchId,
+      // ✅ Merge paginated data
+      merge: (currentCache, newData) => {
+        if (!currentCache) return newData;
 
-  providesTags: (result, error, arg) => [{ type: "Room", id: arg.branchId }],
-}),
+        return {
+          ...newData,
+          rooms: [...currentCache.rooms, ...newData.rooms],
+          nextCursor: newData.nextCursor,
+        };
+      },
 
-    /* ===================== ROOM ===================== */
+      // ✅ Refetch only when branch changes
+      forceRefetch: ({ currentArg, previousArg }) =>
+        currentArg?.branchId !== previousArg?.branchId,
+
+      providesTags: (result, error, arg) => [
+        { type: "Room", id: arg.branchId },
+      ],
+    }),
+
+    /* ===================== ROOM CRUD ===================== */
 
     addRoom: builder.mutation({
       query: (formData) => ({
@@ -65,14 +83,19 @@ getRoomsByBranch: builder.query({
       invalidatesTags: ["Room"],
     }),
 
-
     getAllRoom: builder.query({
-      query: () => "allroomsaccordingtoowner",
+      query: () => ({
+        url: "allroomsaccordingtoowner",
+        method: "GET",
+      }),
       providesTags: ["Room"],
     }),
 
     getRoomById: builder.query({
-      query: (roomId) => `get/${roomId}`,
+      query: (roomId) => ({
+        url: `get/${roomId}`,
+        method: "GET",
+      }),
       providesTags: ["Room"],
     }),
 
@@ -90,7 +113,7 @@ getRoomsByBranch: builder.query({
         url: `deleteroom/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Room"], // 🔥 auto refetch only rooms
+      invalidatesTags: ["Room"],
     }),
 
     deleteRoomImage: builder.mutation({
@@ -111,29 +134,19 @@ getRoomsByBranch: builder.query({
       invalidatesTags: ["Room"],
     }),
 
-   
   }),
 });
 
 export const {
-
   useGetRoomsByBranchQuery,
-
-   useGetAllBranchbypropertyQuery,
-
-useGetAllRoomQuery,
+  useGetAllBranchbypropertyQuery,
+  useGetAllRoomQuery,
   useAddRoomMutation,
-
   useGetRoomByIdQuery,
   useUpdateRoomMutation,
   useDeleteRoomMutation,
   useDeleteRoomImageMutation,
   useAddRoomImagesMutation,
-
 } = owner_room;
 
 export default owner_room;
-
-
-
-

@@ -1,108 +1,148 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { userLoggedin, userLoggedout } from "../slice/authSlice.js";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { userLoggedin, userLoggedout } from "../slice/authSlice";
 
-// const USER_API = "https://roomgi-backend-project-2.onrender.com/api/v1/user/"
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/api/v1/user/`
-;
+// ✅ Use ENV for production
+const USER_API = import.meta.env.VITE_API_BASE_URL + "/api/v1/user";
 
-const authApi = createApi({
+export const authApi = createApi({
   reducerPath: "authApi",
+
   baseQuery: fetchBaseQuery({
     baseUrl: USER_API,
-    credentials: 'include',
+    credentials: "include",
+
+    // ✅ Prevent browser + CDN caching
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
   }),
-  tagTypes: ["User"], // ✅ Add tag for versioning
+
+  tagTypes: ["User"],
+
+  // ✅ Production cache behavior
+  keepUnusedDataFor: 0, // ⛔ No stale cache
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
   endpoints: (builder) => ({
+
+    // 🔐 REGISTER
     registerUser: builder.mutation({
-      query: (formdata) => ({ url: "register", method: "POST", body: formdata }),
-      invalidatesTags: ["User"], // ✅ Invalidate user cache after registration
-    }),
-    ForgotUser: builder.mutation({
-      query: (email) => ({
-        url: `forgotpassword`,
-        method: `POST`,
-        body: email
+      query: (formdata) => ({
+        url: "register",
+        method: "POST",
+        body: formdata,
       }),
+      invalidatesTags: ["User"],
     }),
-    profile: builder.query({
-      query: () => ({ url: `profile` }),
-      providesTags: ["User"], // ✅ Provide tag for automatic refetch
-    }),
-    ForgotUserpassword: builder.mutation({
-      query: ({ password, confermpassword, resettoken }) => ({
-        url: `forgotpassword/${resettoken}`,
-        method: `POST`,
-        body: { password, confermpassword }
-      }),
-      invalidatesTags: ["User"], // ✅ Invalidate user after password reset
-    }),
+
+    // 🔑 LOGIN
     loginUser: builder.mutation({
-      query: (formdata) => ({ url: "login", method: "POST", body: formdata }),
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      query: (formdata) => ({
+        url: "login",
+        method: "POST",
+        body: formdata,
+      }),
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
-          const result = await queryFulfilled;
-          dispatch(userLoggedin({ user: result.data.existingUser }));
-          localStorage.setItem("user", JSON.stringify(result.data.existingUser));
+          const { data } = await queryFulfilled;
+          dispatch(userLoggedin({ user: data.existingUser }));
+          localStorage.setItem("user", JSON.stringify(data.existingUser));
         } catch (err) {
-          console.log("login error:", err);
+          console.error("Login failed:", err);
         }
       },
-      invalidatesTags: ["User"], // ✅ Invalidate user after login
+      invalidatesTags: ["User"],
     }),
+
+    // 🚪 LOGOUT
     logoutUser: builder.mutation({
-      query: () => ({ url: "logout", method: "GET" }),
+      query: () => ({
+        url: "logout",
+        method: "GET",
+      }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           await queryFulfilled;
           dispatch(userLoggedout());
+          localStorage.removeItem("user");
+
+          // ✅ Clear ALL RTK Query cache
           dispatch(authApi.util.resetApiState());
         } catch (err) {
-          console.log("logout error:", err);
+          console.error("Logout failed:", err);
         }
       },
-      invalidatesTags: ["User"], // ✅ Invalidate user after logout
+      invalidatesTags: ["User"],
     }),
+
+    // 👤 LOAD USER (CRITICAL)
     loadUser: builder.query({
-      query: () => ({ url: "profile", method: "GET" }),
+      query: () => ({
+        url: "profile",
+        method: "GET",
+      }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
-          const result = await queryFulfilled;
-          if (result.data?.profile) {
-            dispatch(userLoggedin({ user: result.data.profile }));
-          } else {
-            dispatch(userLoggedout());
-          }
+          const { data } = await queryFulfilled;
+          dispatch(userLoggedin({ user: data.profile }));
         } catch {
           dispatch(userLoggedout());
         }
       },
-      providesTags: ["User"], // ✅ Auto refetch when user changes
+      providesTags: ["User"],
     }),
+
+    // ✏ UPDATE PROFILE
     updateUser: builder.mutation({
-      query: (formdata) => ({ url: "profile/update", method: "PUT", body: formdata }),
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      query: (formdata) => ({
+        url: "profile/update",
+        method: "PUT",
+        body: formdata,
+      }),
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
-          const result = await queryFulfilled;
-          dispatch(userLoggedin({ user: result.data.user }));
-          localStorage.setItem("user", JSON.stringify(result.data.user));
+          const { data } = await queryFulfilled;
+          dispatch(userLoggedin({ user: data.user }));
+          localStorage.setItem("user", JSON.stringify(data.user));
         } catch (err) {
-          console.log("update user error:", err);
+          console.error("Update failed:", err);
         }
       },
-      invalidatesTags: ["User"], // ✅ Invalidate profile after update
+      invalidatesTags: ["User"],
+    }),
+
+    // 🔐 FORGOT PASSWORD
+    forgotUser: builder.mutation({
+      query: (email) => ({
+        url: "forgotpassword",
+        method: "POST",
+        body: email,
+      }),
+    }),
+
+    resetPassword: builder.mutation({
+      query: ({ password, confermpassword, resettoken }) => ({
+        url: `forgotpassword/${resettoken}`,
+        method: "POST",
+        body: { password, confermpassword },
+      }),
+      invalidatesTags: ["User"],
     }),
   }),
 });
 
 export const {
-  useForgotUserpasswordMutation,
-  useProfileQuery,
-  useForgotUserMutation,
   useRegisterUserMutation,
-  useLogoutUserMutation,
   useLoginUserMutation,
+  useLogoutUserMutation,
   useLoadUserQuery,
   useUpdateUserMutation,
+  useForgotUserMutation,
+  useResetPasswordMutation,
 } = authApi;
 
 export default authApi;

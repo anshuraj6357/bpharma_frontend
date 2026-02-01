@@ -1,96 +1,106 @@
-
-    
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-// const USER_API = "https://roomgi-backend-project-2.onrender.com/api/complain/owner";
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/complain/owner`;
+// ✅ ENV BASE URL
+const OWNER_COMPLAIN_API =
+  import.meta.env.VITE_API_BASE_URL + "/api/complain/owner";
 
-
-
-
-
-const owner_complain = createApi({
+export const owner_complain = createApi({
   reducerPath: "owner_complain",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: USER_API,
+    baseUrl: OWNER_COMPLAIN_API,
     credentials: "include",
+
+    // ✅ Prevent browser / CDN cache
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
   }),
 
   tagTypes: ["Complaint"],
 
+  // ✅ PRODUCTION CACHE RULES
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
   endpoints: (builder) => ({
-  
-      /* ---------------- GET (MANAGER / ALL) ---------------- */
-    // Stats ke liye hum usually cursor nahi bhejte, sirf summary chahiye hoti hai
+
+    /* ===================== ALL COMPLAINTS ===================== */
+
     getAllComplain: builder.query({
-      query: () => ``,
+      query: () => ({
+        url: "/",
+        method: "GET",
+      }),
       providesTags: ["Complaint"],
     }),
-    
-     // Branch based fetch with cursor
+
+    /* ===================== BRANCH BASED ===================== */
+
     getComplainByBranch: builder.query({
       query: ({ branchId, cursor, limit = 10 }) => ({
         url: `branch/${branchId}`,
+        method: "GET",
         params: { cursor, limit },
       }),
       providesTags: ["Complaint"],
     }),
-    /* ---------------- STATUS CHANGE ---------------- */
+
+    /* ===================== STATUS CHANGE ===================== */
+
     changeComplainStatus: builder.mutation({
       query: ({ complaintId, newStatus }) => ({
         url: `status/${complaintId}`,
         method: "PATCH",
         body: { status: newStatus },
       }),
-      invalidatesTags: ["Complaint"], 
+      invalidatesTags: ["Complaint"],
     }),
 
-    
-  
+    /* ===================== STATUS FILTER ===================== */
 
-    /* ---------------- PAGINATED QUERIES (Lazy Loading Support) ---------------- */
-
-    // Status based fetch with cursor
     getComplainByStatus: builder.query({
       query: ({ status, cursor, limit = 10 }) => ({
         url: `status/${status}`,
-        params: { cursor, limit }, // Query params: ?cursor=abc&limit=10
+        method: "GET",
+        params: { cursor, limit },
       }),
-      providesTags: (result) => 
-        result 
-          ? [...result.data.map(({ _id }) => ({ type: "Complaint", id: _id })), "Complaint"]
+      providesTags: (result) =>
+        result?.data
+          ? [
+              ...result.data.map((c) => ({
+                type: "Complaint",
+                id: c._id,
+              })),
+              "Complaint",
+            ]
           : ["Complaint"],
     }),
 
-   
+    /* ===================== CATEGORY FILTER ===================== */
 
-    // Category based fetch with cursor
     getComplainByCategory: builder.query({
       query: ({ category, cursor, limit = 10 }) => ({
         url: `category/${category}`,
+        method: "GET",
         params: { cursor, limit },
       }),
       providesTags: ["Complaint"],
     }),
 
-    // Tenant personal complaints with cursor
-  
   }),
 });
 
 export const {
- 
-  useChangeComplainStatusMutation,
-
   useGetAllComplainQuery,
-  useGetComplainByStatusQuery,
   useGetComplainByBranchQuery,
+  useGetComplainByStatusQuery,
   useGetComplainByCategoryQuery,
-  
+  useChangeComplainStatusMutation,
 } = owner_complain;
 
 export default owner_complain;
-
-
-

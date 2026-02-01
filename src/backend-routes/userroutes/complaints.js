@@ -1,11 +1,7 @@
- /* ---------------- DELETE ---------------- */
-
-
-    
-    
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/complain/user`;
+// ✅ Use ENV for production
+const USER_API = import.meta.env.VITE_API_BASE_URL + "/api/complain/user";
 
 const user_complaints = createApi({
   reducerPath: "complainapi",
@@ -13,13 +9,37 @@ const user_complaints = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: USER_API,
     credentials: "include",
+
+    // ✅ Prevent browser / CDN cache
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
   }),
 
   tagTypes: ["Complaint"],
 
+  // ✅ Production cache defaults
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
   endpoints: (builder) => ({
-  
-        deleteComplain: builder.mutation({
+
+    /* ---------------- CREATE ---------------- */
+    createComplain: builder.mutation({
+      query: (formData) => ({
+        url: "create",
+        method: "POST",
+        body: formData,
+      }),
+      invalidatesTags: ["Complaint"],
+    }),
+
+    /* ---------------- DELETE ---------------- */
+    deleteComplain: builder.mutation({
       query: (complaintId) => ({
         url: `${complaintId}`,
         method: "DELETE",
@@ -27,36 +47,22 @@ const user_complaints = createApi({
       invalidatesTags: ["Complaint"],
     }),
 
-  createComplain: builder.mutation({
-      query: (formData) => ({
-        url: `create`,
-        method: "POST",
-        body: formData,
-      }),
-      invalidatesTags: ["Complaint"],
-    }),
-      getAllComplainByTenant: builder.query({
+    /* ---------------- GET ALL (Tenant) ---------------- */
+    getAllComplainByTenant: builder.query({
       query: ({ cursor, limit = 10 } = {}) => ({
-        url: `get`,
+        url: "get",
         params: { cursor, limit },
       }),
       providesTags: ["Complaint"],
     }),
 
-
-    // Tenant personal complaints with cursor
-  
   }),
 });
 
 export const {
- useDeleteComplainMutation,
- useCreateComplainMutation,
- useGetAllComplainByTenantQuery
+  useCreateComplainMutation,
+  useDeleteComplainMutation,
+  useGetAllComplainByTenantQuery,
 } = user_complaints;
 
 export default user_complaints;
-
-
-
-

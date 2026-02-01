@@ -1,34 +1,49 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/payment/user`;
+// ✅ Use ENV for production
+const PAYMENT_API = import.meta.env.VITE_API_BASE_URL + "/api/payment/user";
 
 export const user_payment = createApi({
   reducerPath: "user_payment",
-  baseQuery: fetchBaseQuery({
-    baseUrl: USER_API,
-    credentials: 'include',
-  }),
-  tagTypes: ["Payment"], // ✅ Add tag for versioning
-  endpoints: (builder) => ({
-   
- 
 
-    // 🔹 3. Create Razorpay order
+  baseQuery: fetchBaseQuery({
+    baseUrl: PAYMENT_API,
+    credentials: "include",
+
+    // ✅ Prevent browser / CDN cache
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
+  }),
+
+  tagTypes: ["Payment"], // Tag for caching / invalidation
+
+  // ✅ Production defaults
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
+  endpoints: (builder) => ({
+
+    /* ---------------- RAZORPAY ORDER ---------------- */
     razorpayPayment: builder.mutation({
-      query: ({amount,receipt}) => ({
+      query: ({ amount, receipt }) => ({
         url: "create-order",
         method: "POST",
-        body: {amount,receipt},
+        body: { amount, receipt },
       }),
     }),
 
-    // 🔹 4. Verify Razorpay payment
+    /* ---------------- VERIFY RAZORPAY PAYMENT ---------------- */
     razorpayPaymentVerify: builder.mutation({
       query: (response) => {
         const body = {
           razorpay_order_id: response.razorpay_order_id,
           roomId: response.roomId,
-          walletUsed:response.walletUsed,
+          walletUsed: response.walletUsed,
         };
         if (response.razorpay_payment_id) body.razorpay_payment_id = response.razorpay_payment_id;
         if (response.razorpay_signature) body.razorpay_signature = response.razorpay_signature;
@@ -43,8 +58,8 @@ export const user_payment = createApi({
       invalidatesTags: ["Payment"], // ✅ invalidate cache after verification
     }),
 
- 
-     razorpayrentPaymentVerify: builder.mutation({
+    /* ---------------- VERIFY RAZORPAY RENT PAYMENT ---------------- */
+    razorpayrentPaymentVerify: builder.mutation({
       query: (response) => {
         const body = {
           razorpay_order_id: response.razorpay_order_id,
@@ -63,18 +78,13 @@ export const user_payment = createApi({
       invalidatesTags: ["Payment"], // ✅ invalidate cache after verification
     }),
 
-  //Dashboard
-  //bookingconfirmation
-
   }),
 });
 
 export const {
- 
   useRazorpayPaymentMutation,
   useRazorpayPaymentVerifyMutation,
-  
-  useRazorpayrentPaymentVerifyMutation
+  useRazorpayrentPaymentVerifyMutation,
 } = user_payment;
 
 export default user_payment;

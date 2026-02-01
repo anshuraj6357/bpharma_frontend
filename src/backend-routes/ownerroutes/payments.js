@@ -1,60 +1,82 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-// const USER_API = "https://roomgi-backend-project-2.onrender.com/api/payment/owner";
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/payment/owner`;
-
-
-
+// ✅ ENV BASE URL
+const OWNER_PAYMENT_API =
+  import.meta.env.VITE_API_BASE_URL + "/api/payment/owner";
 
 export const owner_payment = createApi({
   reducerPath: "owner_payment",
+
   baseQuery: fetchBaseQuery({
-    baseUrl: USER_API,
-    credentials: 'include',
+    baseUrl: OWNER_PAYMENT_API,
+    credentials: "include",
+
+    // ✅ Prevent browser / CDN caching
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
   }),
-  tagTypes: ["Payment"], // ✅ Add tag for versioning
+
+  // ✅ Declare ALL tags
+  tagTypes: ["Payment", "Expense"],
+
+  // ✅ Production cache rules
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
   endpoints: (builder) => ({
-    // 🔹 1. Get all branch payments
+
+    /* ===================== PAYMENTS ===================== */
+
     getAllPayments: builder.query({
-      query: () => "/allpayment",
-      providesTags: ["Payment"], // ✅ auto refetch if Payment data changes
+      query: () => ({
+        url: "/allpayment",
+        method: "GET",
+      }),
+      providesTags: ["Payment"],
     }),
 
-    // 🔹 2. Create a new payment
     createPayment: builder.mutation({
       query: (body) => ({
         url: "/create",
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Payment"], // ✅ invalidate cache after creation
+      invalidatesTags: ["Payment"],
     }),
 
+    /* ===================== EXPENSE ===================== */
 
-
-    // 🔹 5. Create a new expense
     createExpense: builder.mutation({
       query: (body) => ({
         url: "/create/expense",
         method: "POST",
         body,
       }),
-      invalidatesTags: ["Payment"], // ✅ invalidate cache after expense creation
+      invalidatesTags: ["Expense", "Payment"],
     }),
 
-    // 🔹 6. Get combined revenue details (with optional query params)
-    getRevenueDetails: builder.query({
-      query: (params) => {
-        const queryString = params ? `?${new URLSearchParams(params).toString()}` : "";
-        return `/getdetails${queryString}`;
-      },
-      providesTags: ["Payment"], // ✅ refetch if Payment data changes
-    }),
-  
-
-      getAllExpense: builder.query({
-      query: () => "/expense",
+    getAllExpense: builder.query({
+      query: () => ({
+        url: "/expense",
+        method: "GET",
+      }),
       providesTags: ["Expense"],
+    }),
+
+    /* ===================== REVENUE ===================== */
+
+    getRevenueDetails: builder.query({
+      query: (params = {}) => ({
+        url: "/getdetails",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["Payment"],
     }),
 
   }),
@@ -62,12 +84,10 @@ export const owner_payment = createApi({
 
 export const {
   useGetAllPaymentsQuery,
-  
   useCreatePaymentMutation,
   useCreateExpenseMutation,
-  useGetRevenueDetailsQuery,
   useGetAllExpenseQuery,
-
+  useGetRevenueDetailsQuery,
 } = owner_payment;
 
 export default owner_payment;

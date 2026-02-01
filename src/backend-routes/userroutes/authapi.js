@@ -1,60 +1,88 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { userLoggedin, userLoggedout } from '../slice/authSlice';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { userLoggedin, userLoggedout } from "../slice/authSlice";
 
-// const USER_API = import.meta.env.VITE_REACT_APP_AUTHAPI;
-const USER_API =  `https://roomgi-backend-project-2.onrender.com/api/v1/user/`;
+// ✅ Use ENV for API base
+const USER_API = import.meta.env.VITE_API_BASE_URL + "/api/v1/user";
 
 const authApi = createApi({
   reducerPath: "authApi",
+
   baseQuery: fetchBaseQuery({
     baseUrl: USER_API,
-    credentials: 'include',
+    credentials: "include",
+
+    // ✅ Prevent browser/CDN cache
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
   }),
-  tagTypes: ["User", "Wishlist"], 
+
+  tagTypes: ["User", "Wishlist"],
+
+  // ✅ Production-safe default cache rules
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
   endpoints: (builder) => ({
     registerUser: builder.mutation({
       query: (formdata) => ({ url: "register", method: "POST", body: formdata }),
-      invalidatesTags: ["User"], 
+      invalidatesTags: ["User"],
     }),
+
     resetUserpassword: builder.mutation({
-      query: ({ token, password }) => ({ url: `resetpassword/${token}`, method: `POST`, body: {password} }),
+      query: ({ token, password }) => ({
+        url: `resetpassword/${token}`,
+        method: "POST",
+        body: { password },
+      }),
+      invalidatesTags: ["User"],
     }),
+
     profile: builder.query({
-      query: () => ({ url: `profile` }),
+      query: () => ({ url: "profile" }),
       providesTags: ["User"],
     }),
+
     getAllFiltered: builder.query({
-      query: () => ({ url: `filtered` }),
+      query: () => ({ url: "filtered" }),
       providesTags: ["User"],
     }),
+
     toggleWishlist: builder.mutation({
       query: ({ roomId, branchId }) => ({
         url: "/wishlist/toggle",
         method: "POST",
         body: { roomId, branchId },
       }),
-      invalidatesTags: ["Wishlist"], // ✅ invalidate wishlist cache on toggle
+      invalidatesTags: ["Wishlist"],
     }),
+
     getWishlist: builder.query({
-      query: () => "/wishlist/my",
+      query: () => ({ url: "/wishlist/my" }),
       providesTags: ["Wishlist"],
     }),
+
     ForgotUserpassword: builder.mutation({
       query: ({ email }) => ({
-        url: `forgotpassword`,
-        method: `POST`,
-        body: { email }
+        url: "forgotpassword",
+        method: "POST",
+        body: { email },
       }),
       invalidatesTags: ["User"],
     }),
-    // authapi.js snippet
-sendOtp: builder.mutation({
-  query: (email) => ({
-    url: "send-otp",
-    method: "POST",
-    body: email,
-  }),
-}),
+
+    sendOtp: builder.mutation({
+      query: (email) => ({
+        url: "send-otp",
+        method: "POST",
+        body: email,
+      }),
+    }),
+
     loginUser: builder.mutation({
       query: (formdata) => ({ url: "login", method: "POST", body: formdata }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -68,6 +96,7 @@ sendOtp: builder.mutation({
       },
       invalidatesTags: ["User"],
     }),
+
     logoutUser: builder.mutation({
       query: () => ({ url: "logout", method: "GET" }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
@@ -81,6 +110,7 @@ sendOtp: builder.mutation({
       },
       invalidatesTags: ["User", "Wishlist"],
     }),
+
     loadUser: builder.query({
       query: () => ({ url: "profile", method: "GET" }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
@@ -97,6 +127,7 @@ sendOtp: builder.mutation({
       },
       providesTags: ["User"],
     }),
+
     updateUser: builder.mutation({
       query: (formdata) => ({ url: "profile/update", method: "PUT", body: formdata }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {

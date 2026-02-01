@@ -159,10 +159,19 @@ const RoomCard = memo(function RoomCard({
                 {room.branch?.name}
               </h3>
 
-              <div className="flex items-center gap-1 text-slate-500 text-xs mb-4">
-                <MapPin size={12} />
-                <span className="truncate">{room.branch?.address}</span>
-              </div>
+             <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-4">
+  <MapPin size={12} className="shrink-0 text-slate-400" />
+ <span
+  className="truncate text-slate-600 text-xs leading-relaxed"
+  title={`${room.branch?.streetAddress}, ${room.branch?.locationName}, ${room?.city}`}
+>
+  {room.branch?.streetAdress }{" "}
+  {room.branch?.locationName },{" "}
+  {room?.city }
+</span>
+
+</div>
+
 
               {/* AMENITIES */}
               <div className="flex items-center gap-3 mb-6">

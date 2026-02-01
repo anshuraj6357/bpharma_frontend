@@ -1,23 +1,42 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+// ✅ Use ENV variable for production
+const REVIEW_API = import.meta.env.VITE_API_BASE_URL + "/api/review/user";
+
 export const user_review = createApi({
-    reducerPath: "user_review",
-    baseQuery: fetchBaseQuery({
-        baseUrl: `https://roomgi-backend-project-2.onrender.com/api/review/user`,
-        credentials: "include", // optional, remove if not needed
+  reducerPath: "user_review",
+
+  baseQuery: fetchBaseQuery({
+    baseUrl: REVIEW_API,
+    credentials: "include",
+
+    // ✅ Prevent mobile/browser cache
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
+  }),
+
+  tagTypes: ["Review"],
+
+  // ✅ Production defaults
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
+  endpoints: (builder) => ({
+    /* ---------------- CREATE REVIEW ---------------- */
+    createReview: builder.mutation({
+      query: ({ roomId, rating, review }) => ({
+        url: "createreview",
+        method: "POST",
+        body: { roomId, rating, review },
+      }),
+      invalidatesTags: ["Review"], // ✅ invalidate cache after review creation
     }),
-    tagTypes: ["Review"],
-    endpoints: (builder) => ({
-        // ✅ Create a new review
-        createReview: builder.mutation({
-            query: ({ roomId, rating, review }) => ({
-                url: "/createreview", // backend endpoint
-                method: "POST",
-                body: { roomId, rating, review },
-            }),
-            invalidatesTags: ["Review"], // optional, if you want to refetch reviews
-        }),
-    }),
+  }),
 });
 
 export const { useCreateReviewMutation } = user_review;

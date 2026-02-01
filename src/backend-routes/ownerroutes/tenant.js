@@ -1,103 +1,136 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-// const USER_API ="https://roomgi-backend-project-2.onrender.com/api/tenant/owner";
-const USER_API = `https://roomgi-backend-project-2.onrender.com/api/tenant/owner/`;
+// ✅ ENV BASE URL (NO trailing slash)
+const OWNER_TENANT_API =
+  import.meta.env.VITE_API_BASE_URL + "/api/tenant/owner";
 
+export const owner_tenant = createApi({
+  reducerPath: "owner_tenant",
 
+  baseQuery: fetchBaseQuery({
+    baseUrl: OWNER_TENANT_API,
+    credentials: "include",
 
-const owner_tenant = createApi({
-    reducerPath: "owner_tenant",
-    baseQuery: fetchBaseQuery({
-        baseUrl: USER_API,
-        credentials: 'include',
+    // ✅ Prevent browser / CDN cache
+    prepareHeaders: (headers) => {
+      headers.set("Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      return headers;
+    },
+  }),
+
+  tagTypes: ["Tenant"],
+
+  // ✅ PRODUCTION CACHE RULES
+  keepUnusedDataFor: 0,
+  refetchOnMountOrArgChange: true,
+  refetchOnFocus: true,
+  refetchOnReconnect: true,
+
+  endpoints: (builder) => ({
+
+    /* ===================== TENANT CRUD ===================== */
+
+    addTenant: builder.mutation({
+      query: (formdata) => ({
+        url: "create",
+        method: "POST",
+        body: formdata,
+      }),
+      invalidatesTags: ["Tenant"],
     }),
-    tagTypes: ["Tenant"],
 
-    endpoints: (builder) => ({
-
-        addTenant: builder.mutation({
-            query: (formdata) => ({
-                url: `create`,
-                method: 'POST',
-                body: formdata,
-            }),
-            invalidatesTags: ["Tenant"],
-        }),
-
-        getAllTenant: builder.query({
-            query: () => `GetTenantsByBranch`,
-            providesTags: ["Tenant"],
-        }),
-
-        onlinepaidtenant: builder.mutation({
-            query: (data) => ({
-                url: `onlineadddtenant`,
-                method: "POST",
-                body: data,
-            }),
-            invalidatesTags: ["Tenant"],
-        }),
-
-        getallactivetenant: builder.query({
-            query: (selectedBranch) => `activetenant/${selectedBranch}`,
-            providesTags: ["Tenant"],
-        }),
-
-        getbooking: builder.query({
-            query: () => `bookings`,
-            providesTags: ["Tenant"],
-        }),
-
-        // getAllTenantByBranchId: builder.query({
-        //     query: (id) => `GetTenantsByBranchid/${id}`,
-        //     providesTags: ["Tenant"],
-        // }),
-
-        getTenantById: builder.query({
-            query: (id) => `GetTenantByid/${id}`,
-            providesTags: ["Tenant"],
-        }),
-        getpayrenttenantdashboard:builder.query({
-            query:(id)=>`getdashboard/${id}`
-        }),
-
-        updateTenant: builder.mutation({
-            query: ({ formdata, id }) => ({
-                url: `update/${id}`,
-                method: 'PUT',
-                body: formdata,
-            }),
-            invalidatesTags: ["Tenant"],
-        }),
-
-        // ✅ FIXED HERE
-        changeStatus: builder.mutation({
-            query: (id) => ({
-                url: `markinctive/${id}`,
-                method: 'POST',
-            }),
-            invalidatesTags: ["Tenant"],
-        }),
-
-        getStatus: builder.query({
-            query: (status) => `allstatus/${status}`,
-            providesTags: ["Tenant"],
-        }),
+    updateTenant: builder.mutation({
+      query: ({ id, formdata }) => ({
+        url: `update/${id}`,
+        method: "PUT",
+        body: formdata,
+      }),
+      invalidatesTags: ["Tenant"],
     }),
+
+    changeStatus: builder.mutation({
+      query: (id) => ({
+        url: `markinctive/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Tenant"],
+    }),
+
+    onlinepaidtenant: builder.mutation({
+      query: (data) => ({
+        url: "onlineadddtenant",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Tenant"],
+    }),
+
+    /* ===================== TENANT QUERIES ===================== */
+
+    getAllTenant: builder.query({
+      query: () => ({
+        url: "GetTenantsByBranch",
+        method: "GET",
+      }),
+      providesTags: ["Tenant"],
+    }),
+
+    getallactivetenant: builder.query({
+      query: (branchId) => ({
+        url: `activetenant/${branchId}`,
+        method: "GET",
+      }),
+      providesTags: ["Tenant"],
+    }),
+
+    getTenantById: builder.query({
+      query: (id) => ({
+        url: `GetTenantByid/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Tenant"],
+    }),
+
+    getStatus: builder.query({
+      query: (status) => ({
+        url: `allstatus/${status}`,
+        method: "GET",
+      }),
+      providesTags: ["Tenant"],
+    }),
+
+    getbooking: builder.query({
+      query: () => ({
+        url: "bookings",
+        method: "GET",
+      }),
+      providesTags: ["Tenant"],
+    }),
+
+    getpayrenttenantdashboard: builder.query({
+      query: (id) => ({
+        url: `getdashboard/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Tenant"],
+    }),
+
+  }),
 });
 
 export const {
-    useAddTenantMutation,
-    useGetpayrenttenantdashboardQuery,
-    useGetbookingQuery,
-    useOnlinepaidtenantMutation,
-    useGetallactivetenantQuery,
-    useGetStatusQuery,
-    useGetAllTenantQuery,
-    useChangeStatusMutation, // 👈 NOTE
-    useGetTenantByIdQuery,
-    useUpdateTenantMutation,
-    // useGetAllTenantByBranchIdQuery
+  useAddTenantMutation,
+  useUpdateTenantMutation,
+  useChangeStatusMutation,
+  useOnlinepaidtenantMutation,
+
+  useGetAllTenantQuery,
+  useGetallactivetenantQuery,
+  useGetTenantByIdQuery,
+  useGetStatusQuery,
+  useGetbookingQuery,
+  useGetpayrenttenantdashboardQuery,
 } = owner_tenant;
 
 export default owner_tenant;
