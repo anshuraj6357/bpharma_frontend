@@ -23,7 +23,6 @@ function loadRazorpayScript() {
   return new Promise((resolve) => {
     console.log("💡 Loading Razorpay script...");
     if (window.Razorpay) {
-      console.log("✅ Razorpay script already loaded");
       return resolve(true);
     }
 
@@ -32,11 +31,9 @@ function loadRazorpayScript() {
     script.async = true;
 
     script.onload = () => {
-      console.log("✅ Razorpay script loaded successfully");
       resolve(true);
     };
     script.onerror = () => {
-      console.error("❌ Razorpay script failed to load");
       resolve(false);
     };
 
@@ -48,31 +45,26 @@ function loadRazorpayScript() {
    BOOKING STATUS POLLING
 ============================ */
 function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) {
-  console.log("🔁 Starting booking status polling for bookingId:", bookingId);
+
   const MAX_RETRIES = 20; // ~1 minute
   let attempts = 0;
 
   const interval = setInterval(async () => {
     attempts++;
-    console.log(`⏳ Polling attempt ${attempts} for bookingId ${bookingId}`);
-
     try {
       const res = await fetch(
         `https://roomgi-backend-project-2.onrender.com/api/payment/user/status/${bookingId}`,
         { credentials: "include" }
       );
-      console.log("📦 Polling response status:", res.status);
-
+   
       if (!res.ok) throw new Error("Status API failed");
 
       const data = await res.json();
-      console.log("📊 Polling data:", data);
-
+  
       if (data.status === "paid") {
         clearInterval(interval);
         setIsConfirmingBooking(false);
-        console.log("🎉 Booking confirmed!");
-
+  
         toast.success("Booking confirmed 🎉");
 
         navigate("/bookingssuccess", {
@@ -89,7 +81,7 @@ function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) 
       if (data.status === "failed") {
         clearInterval(interval);
         setIsConfirmingBooking(false);
-        console.error("❌ Payment failed / refunded");
+        
         toast.error("Payment failed / refunded");
         navigate(-1);
       }
@@ -97,11 +89,12 @@ function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) 
       if (attempts >= MAX_RETRIES) {
         clearInterval(interval);
         setIsConfirmingBooking(false);
-        console.warn("⚠ Verification taking longer than usual");
+  
         toast.warning("Verification taking longer than usual");
       }
     } catch (err) {
-      console.error("Polling error:", err);
+      toast.error(err)
+  
     }
   }, 3000);
 }
@@ -118,41 +111,34 @@ async function startPayment(
   setIsConfirmingBooking,
   user
 ) {
-  console.log("💳 Initiating payment for roomId:", roomId, "amount:", amount);
 
   try {
     // 1️⃣ Load Razorpay SDK
     const loaded = await loadRazorpayScript();
     if (!loaded) {
       toast.error("Payment SDK failed to load");
-      console.error("❌ Razorpay SDK failed to load");
+     
       return;
     }
-    console.log("✅ Razorpay SDK loaded");
+   
 
-    // 2️⃣ Create Razorpay order on backend
-    console.log("📦 Creating Razorpay order...");
+
     const response = await razorpayPayment({
       amount: amount.payableAmount * 100, // amount in INR
       receipt: `receipt_${Date.now()}_${roomId}`,
     }).unwrap();
 
-    console.log("📦 Razorpay order response:", response);
-
     const order = response?.order;
     if (!order) {
       toast.error("Order creation failed");
-      console.error("❌ Order creation failed, response:", response);
       return;
     }
 
     // 3️⃣ Minimum amount check
     if (order.amount < 100) { // Razorpay minimum 1 INR = 100 paise
       toast.error("Amount too low. Minimum 1 INR required.");
-      console.error("❌ Order amount too low:", order.amount);
       return;
     }
-    console.log("✅ Order amount OK (paise):", order.amount);
 
     // 4️⃣ Razorpay payment modal options
     const options = {
@@ -164,8 +150,7 @@ async function startPayment(
       order_id: order.id,
 
       handler: async (rzpResponse) => {
-        console.log("💡 Razorpay handler called with response:", rzpResponse);
-
+  
         try {
           setIsConfirmingBooking(true);
           toast.info("Confirming your booking ⏳");
@@ -179,29 +164,24 @@ async function startPayment(
             amount,
           }).unwrap();
 
-          console.log("📦 Payment verification data:", verifyData);
-
+       
           if (!verifyData?.success) {
             toast.error("Payment verification failed");
-            console.error("❌ Payment verification failed");
             setIsConfirmingBooking(false);
             return;
           }
 
-          // 6️⃣ Start webhook-based booking status polling
-          console.log("🔁 Starting booking status polling for:", verifyData.booking._id);
-          startBookingStatusPolling(verifyData.booking._id, navigate, setIsConfirmingBooking);
+           startBookingStatusPolling(verifyData.booking._id, navigate, setIsConfirmingBooking);
 
         } catch (err) {
-          console.error("❌ Payment verification error:", err);
-          toast.error("Verification error");
+       +     toast.error("Verification error");
           setIsConfirmingBooking(false);
         }
       },
 
       modal: {
         ondismiss: () => {
-          console.log("⚠ Payment modal dismissed by user");
+   
           toast.info("Payment cancelled");
           setIsConfirmingBooking(false);
         },
@@ -216,11 +196,9 @@ async function startPayment(
       theme: { color: "#2563eb" },
     };
 
-    console.log("💡 Opening Razorpay modal with options:", options);
     new window.Razorpay(options).open();
 
   } catch (err) {
-    console.error("❌ Payment failed:", err);
     toast.error("Payment failed");
     setIsConfirmingBooking(false);
   }
@@ -248,9 +226,6 @@ export default function PGDetailsPage() {
 
 
   const { data, isLoading, isError } = useGetPgByIdQuery(id);
-  console.log("data",data)
-
-
 
   const [razorpayPayment, { isLoading: razorpaypaymentloading }] =
     useRazorpayPaymentMutation();
@@ -262,7 +237,6 @@ export default function PGDetailsPage() {
   const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
 
   const pg = data?.room;
-  console.log("pg",pg)
 
   const allImages = useMemo(() => {
     if (!pg) return [];
@@ -707,9 +681,6 @@ const totalServicePrice =
           </div>
         </div>
 
-        <button className="w-full mt-10 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all border border-white/10">
-          Instant Booking
-        </button>
       </div>
     </div>
   </div>
@@ -879,34 +850,45 @@ const totalServicePrice =
  
 
   {/* 1. PUBLISH STATUS BLOCK (MNC Upgrade) */}
-  {pg.toPublish?.status && (
-    <div className="relative overflow-hidden bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm group hover:shadow-md transition-all duration-300">
-      {/* Subtle Background Icon */}
-      <CheckCircle2 className="absolute -right-4 -bottom-4 w-32 h-32 text-emerald-50 opacity-[0.05] group-hover:scale-110 transition-transform" />
-      
-      <div className="flex items-center gap-4 mb-4">
-        <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
-          <Calendar size={20} strokeWidth={2.5} />
-        </div>
-        <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Visibility Status</h3>
+{pg.toPublish?.status && (
+  <div className="relative overflow-hidden bg-white border border-orange-100 rounded-2xl p-6 shadow-sm">
+    {/* Subtle Background Icon */}
+    <CheckCircle2 className="absolute -right-4 -bottom-4 w-32 h-32 text-amber-50 opacity-[0.05]" />
+
+    {/* Header */}
+    <div className="flex items-center gap-4 mb-4">
+      <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
+        <Calendar size={20} strokeWidth={2.5} />
+      </div>
+      <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">
+        Visibility Status
+      </h3>
+    </div>
+
+    {/* Main Content */}
+    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+      <div>
+        <p className="text-2xl font-extrabold text-slate-900 tracking-tight">
+          Live on Platform
+        </p>
+        <p className="text-slate-500 font-semibold text-sm">
+          Launched on{" "}
+          {new Date(pg.toPublish.date).toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </p>
       </div>
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-        <div>
-          <p className="text-2xl font-black text-slate-900 tracking-tight">
-            Live on Platform
-          </p>
-          <p className="text-slate-500 font-bold text-sm">
-            Launched on {new Date(pg.toPublish.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest border border-emerald-100">
-          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-          Active
-        </div>
+      <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 text-amber-600 rounded-full text-xs font-black uppercase tracking-widest border border-amber-100">
+        <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+        Active
       </div>
     </div>
-  )}
+  </div>
+)}
+
 
   {/* 2. BRANCH ROOMS SECTION (The Upgrade) */}
 
@@ -917,65 +899,43 @@ const totalServicePrice =
   aria-labelledby="branch-units-heading"
 >
   {/* --- HEADER WITH ACTIONS --- */}
-  <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 md:mb-10 gap-6">
-    
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <div className="h-6 w-1 bg-indigo-600 rounded-full" aria-hidden="true"></div>
-        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">
-          Inventory Intelligence
-        </span>
-      </div>
-
-      <h2
-        id="branch-units-heading"
-        className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight"
-      >
-        Branch Units{" "}
-        <span className="text-slate-300 font-light">/ Overview</span>
-      </h2>
-
-      <p className="text-slate-500 font-medium text-sm max-w-md">
-        Real-time availability and occupancy metrics for{" "}
-        <span className="text-slate-900 font-bold">
-          Branch ID: {pg.branchId}
-        </span>.
-      </p>
+ <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 md:mb-10 gap-6 p-4 bg-orange-50/40 rounded-3xl shadow-sm backdrop-blur-sm">
+  {/* Left Section */}
+  <div className="space-y-2">
+    <div className="flex items-center gap-2">
+      <div className="h-6 w-1 bg-amber-500 rounded-full" aria-hidden="true"></div>
+      <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em]">
+        Inventory Intelligence
+      </span>
     </div>
 
-    <button
-      onClick={() => navigate(`/branch-rooms/${pg.branch}`)}
-      aria-label="Manage all branch inventory"
-      title="Manage all inventory"
-      className="relative overflow-hidden group flex items-center gap-3 bg-slate-950 text-white px-6 md:px-10 py-3 md:py-5 rounded-[1.5rem] md:rounded-[2rem] font-black text-xs md:text-sm transition-all hover:bg-indigo-600 hover:shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    <h2
+      id="branch-units-heading"
+      className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight"
     >
-      <span className="relative z-10">Manage All Inventory</span>
-      <ArrowRight
-        className="relative z-10 group-hover:translate-x-2 transition-transform duration-300"
-        size={18}
-        aria-hidden="true"
-      />
-
-      {/* Subtle shine */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-    </button>
-  </header>
-
-  {/* --- STATS GRID SLOT (Scalable Area) --- */}
-  <section
-    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-    aria-label="Branch statistics"
-  >
-    {/* Your stat cards go here */}
-  </section>
-
-  {/* --- CARD ACTION FOOTER (Reusable) --- */}
-  <div className="mt-4 pt-4 border-t border-slate-100/50 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
-    <span className="text-[10px] font-black text-slate-500 uppercase tracking-tight">
-      View Details
-    </span>
-    <ArrowRight size={14} className="text-slate-400" aria-hidden="true" />
+      All Rooms
+    </h2>
   </div>
+
+  {/* Button */}
+  <button
+    onClick={() => navigate(`/branch-rooms/${pg.branch}`)}
+    aria-label="Manage all branch inventory"
+    title="Manage all inventory"
+    className="relative overflow-hidden group flex items-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white px-6 md:px-10 py-3 md:py-5 rounded-[1.75rem] font-black text-xs md:text-sm shadow-lg transition-all duration-300 active:scale-95 focus:outline-none focus:ring-2 focus:ring-amber-400"
+  >
+    <span className="relative z-10">Manage All Inventory</span>
+    <ArrowRight
+      className="relative z-10 group-hover:translate-x-2 transition-transform duration-300"
+      size={18}
+      aria-hidden="true"
+    />
+
+    {/* Subtle shine effect */}
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-[1.75rem]" />
+  </button>
+</header>
+
 </InfoBlock>
 
 
@@ -1150,55 +1110,61 @@ const totalServicePrice =
 
 
 // REUSABLE INFO BLOCK COMPONENT
-function InfoBlock({ title, children }) {
+function InfoBlock({ title, children, className = "" }) {
   return (
-   <section
-  className="bg-white rounded-[2.5rem] border border-gray-100/80 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.04)] hover:shadow-[0_25px_70px_-20px_rgba(0,0,0,0.08)] transition-all duration-500 overflow-hidden group mb-8"
-  aria-labelledby={`section-${title?.toLowerCase()?.replace(/\s+/g, "-")}`}
->
-  {/* Dynamic Gradient Accent */}
-  <div
-    className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-400 to-transparent opacity-10 group-hover:opacity-100 transition-opacity duration-700"
-    aria-hidden="true"
-  />
+    <section
+      className={`
+        bg-white/90 backdrop-blur-xl rounded-3xl border border-orange-100/50 
+        shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-500 
+        overflow-hidden group relative ${className}
+        before:absolute before:inset-0 before:bg-gradient-to-r 
+        before:from-orange-500/5 before:to-amber-500/5 
+        before:opacity-0 before:group-hover:opacity-100 before:transition-all
+        before:duration-700
+      `}
+      aria-labelledby={`section-${title?.toLowerCase()?.replace(/\s+/g, "-")}`}
+    >
+      {/* Saffron Top Bar */}
+      <div className="h-2 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 shadow-lg" />
 
-  <div className="p-8 md:p-10">
-    
-    {/* Section Header */}
-    <header className="relative mb-10 flex items-center justify-between">
-      <div className="relative inline-block">
-        <h3
-          id={`section-${title?.toLowerCase()?.replace(/\s+/g, "-")}`}
-          className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight relative z-10"
-        >
-          {title}
-        </h3>
+      <div className="p-8 lg:p-12 relative z-10">
+        {/* Header - Saffron Style */}
+        <header className="flex items-start lg:items-center justify-between mb-10 pb-6 border-b border-orange-100/50">
+          <div className="flex items-center gap-4">
+            {/* Status Dot */}
+            <div className="w-3 h-3 bg-orange-400 rounded-full shadow-lg animate-pulse hidden lg:block" />
+            
+            {/* Title */}
+            <div className="relative">
+              <h3
+                id={`section-${title?.toLowerCase()?.replace(/\s+/g, "-")}`}
+                className="text-2xl lg:text-3xl font-black bg-gradient-to-r from-gray-900 via-gray-900 to-orange-500 bg-clip-text text-transparent tracking-tight"
+              >
+                {title}
+              </h3>
+              {/* Underline Effect */}
+              <div className="absolute -bottom-2 left-0 w-8 h-1 bg-orange-400 rounded-full opacity-75 group-hover:w-24 transition-all duration-500" />
+            </div>
+          </div>
 
-        {/* Title Decoration */}
-        <div
-          className="absolute -bottom-1 left-0 w-1/4 h-1.5 bg-indigo-500/20 rounded-full group-hover:w-full transition-all duration-700 ease-out"
-          aria-hidden="true"
-        />
+          {/* Decorative Corner Badge */}
+          <div className="flex w-12 h-12 items-center justify-center rounded-2xl bg-orange-50/80 backdrop-blur-sm text-orange-500 shadow-xl group-hover:scale-110 transition-all duration-500 ml-auto">
+            <Sparkles size={18} />
+          </div>
+        </header>
+
+        {/* Content Area */}
+        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-700">
+          {children}
+        </div>
+
+        {/* Subtle Bottom Gradient */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-orange-50 to-transparent opacity-80 pointer-events-none" />
       </div>
-
-      {/* Status / Decorative Icon */}
-      <div
-        className="hidden sm:flex w-10 h-10 rounded-2xl bg-gray-50 items-center justify-center text-gray-300 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-all duration-500"
-        aria-hidden="true"
-      >
-        <Sparkles size={18} />
-      </div>
-    </header>
-
-    {/* Content */}
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out fill-mode-forwards">
-      {children}
-    </div>
-  </div>
-</section>
-
+    </section>
   );
 }
+
 // ACTION BUTTON COMPONENT
 // 1. Pehle ye reusable component define karein
 function ActionBtn({
@@ -1216,29 +1182,47 @@ function ActionBtn({
       onClick={onClick}
       disabled={disabled || loading}
       aria-label={label}
-      className={`flex items-center justify-center gap-3 py-4 px-6 rounded-[1.5rem] font-black transition-all duration-300 w-full 
-        active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2
-        ${disabled || loading ? "opacity-60 cursor-not-allowed" : ""}
+      className={`
+        group relative overflow-hidden flex items-center justify-center gap-4 py-4 px-8 lg:px-10 
+        rounded-3xl font-black text-sm uppercase tracking-wider transition-all duration-400 w-full
+        active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-500/50
+        shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 before:absolute before:inset-0 
+        before:bg-gradient-to-r before:from-orange-500/0 before:to-orange-500/20 before:-skew-x-12
+        before:opacity-0 before:group-hover:opacity-100 before:transition-all before:duration-500
         ${
-          primary
-            ? "bg-slate-900 text-white shadow-xl shadow-slate-200 hover:bg-indigo-600"
-            : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+          disabled || loading 
+            ? "opacity-50 cursor-not-allowed bg-gray-100 border border-gray-200 text-gray-400 shadow-none" 
+            : primary
+              ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 border-2 border-orange-400/50 shadow-orange-500/25"
+              : "bg-white/80 backdrop-blur-sm border-2 border-orange-100/50 text-gray-800 hover:bg-orange-50/50 hover:border-orange-200 hover:text-orange-700 shadow-lg"
         }
       `}
     >
+      {/* Shine Effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform -translate-x-[calc(100%+20px)] group-hover:translate-x-0 transition-transform duration-700" />
+      
+      {/* Loading Spinner */}
+      {loading && (
+        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+      )}
+      
       {/* Icon */}
-      <span
-        className={`flex items-center justify-center ${
-          primary ? "text-indigo-400" : "text-slate-400"
-        }`}
-        aria-hidden="true"
-      >
-        {icon}
-      </span>
+      {!loading && (
+        <span
+          className={`flex items-center justify-center transition-all duration-300 ${
+            primary || loading
+              ? "text-white/90 group-hover:text-white drop-shadow-lg"
+              : "text-orange-500 group-hover:scale-110"
+          }`}
+          aria-hidden="true"
+        >
+          {icon}
+        </span>
+      )}
 
       {/* Label */}
-      <span className="text-sm uppercase tracking-tighter">
-        {loading ? "Please wait..." : label}
+      <span className="relative z-10 font-bold leading-tight">
+        {loading ? "Processing..." : label}
       </span>
     </button>
   );

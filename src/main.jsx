@@ -31,7 +31,7 @@ import "react-toastify/dist/ReactToastify.css";
    🔹 DEPLOY VERSIONING
 ========================= */
 // Har deploy ke liye bas is version ko increment karo
-const APP_VERSION = "1.0.8"; 
+const APP_VERSION = "1.0.9"; 
 const storedVersion = localStorage.getItem("app_version");
 
 if (storedVersion !== APP_VERSION) {
