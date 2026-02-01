@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // ✅ Use ENV for production
-const PAYMENT_API = import.meta.env.VITE_API_BASE_URL + "/api/payment/user";
+const PAYMENT_API = import.meta.env.VITE_API_BASE_URL + "/api/v1/payment/user";
 
 export const user_payment = createApi({
   reducerPath: "user_payment",

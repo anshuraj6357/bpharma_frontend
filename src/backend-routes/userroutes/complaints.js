@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // ✅ Use ENV for production
-const USER_API = import.meta.env.VITE_API_BASE_URL + "/api/complain/user";
+const USER_API = import.meta.env.VITE_API_BASE_URL + "/api/v1/complain/user";
 
 const user_complaints = createApi({
   reducerPath: "complainapi",

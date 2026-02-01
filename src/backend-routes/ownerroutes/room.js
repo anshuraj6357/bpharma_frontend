@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // ✅ ENV BASE URL
 const OWNER_ROOM_API =
-  import.meta.env.VITE_API_BASE_URL + "/api/room/owner";
+  import.meta.env.VITE_API_BASE_URL + "/api/v1/room/owner";
 
 export const owner_room = createApi({
   reducerPath: "owner_room",

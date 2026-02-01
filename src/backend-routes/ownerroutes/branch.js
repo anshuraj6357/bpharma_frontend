@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // ✅ Use ENV variable for production
-const BRANCH_API = import.meta.env.VITE_API_BASE_URL + "/api/branch/owner";
+const BRANCH_API = import.meta.env.VITE_API_BASE_URL + "/api/v1/branch/owner";
 
 const owner_branch = createApi({
   reducerPath: "owner_branch",

@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // ✅ ENV BASE URL
 const OWNER_COMPLAIN_API =
-  import.meta.env.VITE_API_BASE_URL + "/api/complain/owner";
+  import.meta.env.VITE_API_BASE_URL + "/api/v1/complain/owner";
 
 export const owner_complain = createApi({
   reducerPath: "owner_complain",

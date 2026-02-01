@@ -7,7 +7,7 @@ export const user_PgApi = createApi({
      🌍 BASE QUERY
   ======================= */
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://roomgi-backend-project-2.onrender.com/api/property/user",
+    baseUrl: "https://roomgi-backend-project-2.onrender.com/api/v1/property/user",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Cache-Control", "no-store");
