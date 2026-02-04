@@ -11,6 +11,11 @@
   import LandingPageSkeleton from "./loader/landingpageskeleton";
   import { useGetAllListedPgQuery } from "../backend-routes/userroutes/allpg.js";
   import { useGetWishlistQuery } from "../backend-routes/userroutes/authapi";
+
+  import Ads1 from "../assets/ads1.png";
+import Ads2  from "../assets/ads2.png";
+import Ads3  from "../assets/ads3.png";
+
   
   export default function LandingPage() {
     const navigate = useNavigate();
@@ -39,6 +44,26 @@ useEffect(() => {
     }
   );
 }, []);
+
+
+const slides = [
+  "stats",        // pehla slide → stats
+  Ads1,   // phir ads
+  Ads2,
+  Ads3,
+];
+
+
+const [activeSlide, setActiveSlide] = useState(0);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setActiveSlide((prev) => (prev + 1) % slides.length);
+  }, 4000);
+  return () => clearInterval(interval);
+}, []);
+
+
 
   
   const { data: pgApiData, isLoading: pgLoading, error: pgError } =
@@ -183,45 +208,75 @@ useEffect(() => {
   </div>
   
     {/* Stats Row */}
-  <div className="relative overflow-hidden p-10 sm:p-16 bg-slate-900 rounded-[3rem] shadow-2xl">
-    {/* Abstract Background Glows */}
-    <div className="absolute top-0 -left-20 w-64 h-64 bg-indigo-500/20 rounded-full blur-[100px]" />
-    <div className="absolute bottom-0 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-[100px]" />
-  
-    <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-16">
-      {[
-        { label: "Partner Cities", value: "4", suffix: "+", icon: MapPin, color: "text-indigo-400" },
-        { label: "Verified Properties", value: "1", suffix: "K+", icon: Star, color: "text-amber-400" },
-        { label: "Happy Residents", value: "5", suffix: "K+", icon: Users, color: "text-emerald-400" },
-      ].map((stat, i) => (
-        <div key={i} className="flex flex-col items-center group">
-          {/* Icon with Soft Glow */}
-          <div className="relative mb-6">
-            <div className={`absolute inset-0 blur-2xl opacity-20 ${stat.color.replace('text', 'bg')}`} />
-            <stat.icon className={`w-10 h-10 sm:w-12 sm:h-12 ${stat.color} relative z-10 transition-transform duration-500 group-hover:scale-110`} />
+ <div className="relative overflow-hidden p-10 sm:p-16 bg-slate-900 rounded-[3rem] shadow-2xl min-h-[360px]">
+
+  {slides.map((slide, index) => (
+    <div
+      key={index}
+      className={`absolute inset-0 flex items-center justify-center transition-all duration-1000
+        ${activeSlide === index ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full"}
+      `}
+    >
+
+      {/* ================= STATS SLIDE ================= */}
+      {slide === "stats" && (
+        <>
+          {/* Background glows */}
+          <div className="absolute top-0 -left-20 w-64 h-64 bg-indigo-500/20 rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-[100px]" />
+
+          <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-16 w-full">
+            {[
+              { label: "Partner Cities", value: "4", suffix: "+", icon: MapPin, color: "text-indigo-400" },
+              { label: "Verified Properties", value: "1", suffix: "K+", icon: Star, color: "text-amber-400" },
+              { label: "Happy Residents", value: "5", suffix: "K+", icon: Users, color: "text-emerald-400" },
+            ].map((stat, i) => (
+              <div key={i} className="flex flex-col items-center">
+
+                <div className="relative mb-6">
+                  <div className={`absolute inset-0 blur-2xl opacity-20 ${stat.color.replace("text", "bg")}`} />
+                  <stat.icon className={`w-10 h-10 sm:w-12 sm:h-12 ${stat.color}`} />
+                </div>
+
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white">
+                    {stat.value}
+                  </span>
+                  <span className={`text-2xl sm:text-3xl font-black ${stat.color}`}>
+                    {stat.suffix}
+                  </span>
+                </div>
+
+                <p className="mt-2 text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
           </div>
-  
-          {/* Number Display */}
-          <div className="flex items-baseline gap-0.5">
-            <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tighter">
-              {stat.value}
-            </span>
-            <span className={`text-2xl sm:text-3xl font-black ${stat.color}`}>
-              {stat.suffix}
-            </span>
-          </div>
-  
-          {/* Label */}
-          <p className="mt-2 text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs">
-            {stat.label}
-          </p>
-          
-          {/* Decorative underline */}
-          <div className="mt-4 w-8 h-1 bg-gradient-to-r from-transparent via-slate-700 to-transparent rounded-full group-hover:w-12 transition-all duration-500" />
-        </div>
-      ))}
+        </>
+      )}
+
+      {/* ================= IMAGE SLIDE ================= */}
+      {slide !== "stats" && (
+        <>
+          <img
+            src={slide}
+            alt="Sponsored Ad"
+            className="w-full h-full object-cover rounded-[3rem]"
+          />
+          <div className="absolute inset-0 bg-black/30 rounded-[3rem]" />
+
+          <span className="absolute top-6 left-6 px-4 py-1.5 bg-white/20 backdrop-blur text-white text-xs font-bold rounded-full">
+            Sponsored
+          </span>
+        </>
+      )}
+
     </div>
-  </div>
+  ))}
+</div>
+
+
   </section>
 
   {/* Featured Properties - SEO Optimized */}
