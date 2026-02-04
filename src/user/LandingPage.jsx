@@ -208,8 +208,10 @@ useEffect(() => {
   </div>
   
     {/* Stats Row */}
- <div className="relative overflow-hidden p-6 sm:p-10 lg:p-16 bg-slate-900 rounded-[2rem] sm:rounded-[3rem] shadow-2xl 
-                min-h-[260px] sm:min-h-[320px] lg:min-h-[380px]">
+ <div className="relative overflow-hidden p-6 sm:p-10 lg:p-16 
+bg-slate-900 rounded-[2rem] sm:rounded-[3rem] shadow-2xl
+aspect-[3/1] sm:aspect-[16/6] lg:aspect-[16/5]">
+
 
   {slides.map((slide, index) => (
     <div
@@ -258,24 +260,36 @@ useEffect(() => {
       )}
 
       {/* ================= IMAGE SLIDE ================= */}
-      {slide !== "stats" && (
-        <div className="relative w-full h-full flex items-center justify-center px-4 sm:px-10">
-          
-          <img
-            src={slide}
-            alt="Sponsored Ad"
-            className="max-h-full max-w-full object-contain rounded-2xl sm:rounded-[3rem]"
-          />
+{slide !== "stats" && (
+  <div className="absolute inset-0">
+    
+    <div className="relative w-full h-full overflow-hidden
+                    rounded-[2rem] sm:rounded-[3rem]">
 
-          {/* Soft overlay */}
-          <div className="absolute inset-0 bg-black/25 rounded-[3rem]" />
+      <img
+        src={slide}
+        alt="Sponsored Ad"
+        className="absolute inset-0 w-full h-full 
+                   object-cover object-center"
+      />
 
-          {/* Badge */}
-          <span className="absolute top-4 sm:top-6 left-4 sm:left-6 px-3 py-1.5 bg-white/20 backdrop-blur text-white text-[10px] sm:text-xs font-bold rounded-full">
-            Sponsored
-          </span>
-        </div>
-      )}
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/25" />
+
+      {/* Badge */}
+      <span className="absolute top-4 sm:top-6 left-4 sm:left-6 
+                       px-3 py-1.5 bg-white/20 backdrop-blur 
+                       text-white text-[10px] sm:text-xs font-bold 
+                       rounded-full">
+        Roomgi
+      </span>
+
+    </div>
+  </div>
+)}
+
+
+
 
     </div>
   ))}
