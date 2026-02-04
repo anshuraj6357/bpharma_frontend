@@ -208,13 +208,14 @@ useEffect(() => {
   </div>
   
     {/* Stats Row */}
- <div className="relative overflow-hidden p-10 sm:p-16 bg-slate-900 rounded-[3rem] shadow-2xl min-h-[360px]">
+ <div className="relative overflow-hidden p-6 sm:p-10 lg:p-16 bg-slate-900 rounded-[2rem] sm:rounded-[3rem] shadow-2xl 
+                min-h-[260px] sm:min-h-[320px] lg:min-h-[380px]">
 
   {slides.map((slide, index) => (
     <div
       key={index}
-      className={`absolute inset-0 flex items-center justify-center transition-all duration-1000
-        ${activeSlide === index ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full"}
+      className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ease-in-out
+        ${activeSlide === index ? "opacity-100 scale-100" : "opacity-0 scale-[1.02]"}
       `}
     >
 
@@ -222,32 +223,32 @@ useEffect(() => {
       {slide === "stats" && (
         <>
           {/* Background glows */}
-          <div className="absolute top-0 -left-20 w-64 h-64 bg-indigo-500/20 rounded-full blur-[100px]" />
-          <div className="absolute bottom-0 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-[100px]" />
+          <div className="absolute top-0 -left-16 sm:-left-20 w-48 sm:w-64 h-48 sm:h-64 bg-indigo-500/20 rounded-full blur-[90px]" />
+          <div className="absolute bottom-0 -right-16 sm:-right-20 w-48 sm:w-64 h-48 sm:h-64 bg-purple-500/20 rounded-full blur-[90px]" />
 
-          <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-12 lg:gap-16 w-full">
+          <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-8 sm:gap-12 lg:gap-16 w-full">
             {[
               { label: "Partner Cities", value: "4", suffix: "+", icon: MapPin, color: "text-indigo-400" },
               { label: "Verified Properties", value: "1", suffix: "K+", icon: Star, color: "text-amber-400" },
               { label: "Happy Residents", value: "5", suffix: "K+", icon: Users, color: "text-emerald-400" },
             ].map((stat, i) => (
-              <div key={i} className="flex flex-col items-center">
+              <div key={i} className="flex flex-col items-center text-center">
 
-                <div className="relative mb-6">
+                <div className="relative mb-4 sm:mb-6">
                   <div className={`absolute inset-0 blur-2xl opacity-20 ${stat.color.replace("text", "bg")}`} />
-                  <stat.icon className={`w-10 h-10 sm:w-12 sm:h-12 ${stat.color}`} />
+                  <stat.icon className={`w-8 h-8 sm:w-12 sm:h-12 ${stat.color}`} />
                 </div>
 
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-white">
+                  <span className="text-3xl sm:text-5xl lg:text-6xl font-black text-white">
                     {stat.value}
                   </span>
-                  <span className={`text-2xl sm:text-3xl font-black ${stat.color}`}>
+                  <span className={`text-xl sm:text-3xl font-black ${stat.color}`}>
                     {stat.suffix}
                   </span>
                 </div>
 
-                <p className="mt-2 text-slate-400 font-bold uppercase tracking-[0.2em] text-xs">
+                <p className="mt-2 text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] sm:text-xs">
                   {stat.label}
                 </p>
               </div>
@@ -258,23 +259,28 @@ useEffect(() => {
 
       {/* ================= IMAGE SLIDE ================= */}
       {slide !== "stats" && (
-        <>
+        <div className="relative w-full h-full flex items-center justify-center px-4 sm:px-10">
+          
           <img
             src={slide}
             alt="Sponsored Ad"
-            className="w-full h-full object-cover rounded-[3rem]"
+            className="max-h-full max-w-full object-contain rounded-2xl sm:rounded-[3rem]"
           />
-          <div className="absolute inset-0 bg-black/30 rounded-[3rem]" />
 
-          <span className="absolute top-6 left-6 px-4 py-1.5 bg-white/20 backdrop-blur text-white text-xs font-bold rounded-full">
+          {/* Soft overlay */}
+          <div className="absolute inset-0 bg-black/25 rounded-[3rem]" />
+
+          {/* Badge */}
+          <span className="absolute top-4 sm:top-6 left-4 sm:left-6 px-3 py-1.5 bg-white/20 backdrop-blur text-white text-[10px] sm:text-xs font-bold rounded-full">
             Sponsored
           </span>
-        </>
+        </div>
       )}
 
     </div>
   ))}
 </div>
+
 
 
   </section>
