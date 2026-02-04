@@ -99,7 +99,7 @@ useEffect(() => {
     // SEO Optimized Meta Tags
     useEffect(() => {
       const title = "RoomGi - Premium PG & Rooms Without Brokerage | Verified Stays";
-      const description = "Discover verified PGs, rooms & shared accommodations with zero brokerage. High-speed WiFi, modern amenities, instant booking. Live better, pay less.";
+      const description = "Discover verified PGs, rooms & shared accommodations with Minimum charges. High-speed WiFi, modern amenities, instant booking. Live better, pay less.";
       
       document.title = title;
       const metaDesc = document.querySelector('meta[name="description"]');
@@ -151,7 +151,7 @@ useEffect(() => {
       },
       {
         icon: CreditCard,
-        title: "Zero Brokerage",
+        title: "Free property listing",
         desc: "Direct owner deals, save ₹15K–30K instantly",
         stat: "100%",
         gradient: "from-emerald-500 to-emerald-600",

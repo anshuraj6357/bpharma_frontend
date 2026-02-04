@@ -68,7 +68,7 @@ export default function Footer() {
               </Link>
               <p className="mt-6 text-sm leading-relaxed text-slate-400 max-w-sm">
                  Roomgi helps students, professionals, and families rent, buy, and sell verified PGs, rooms, flats, homes,
-  and commercial spaces across India. Zero brokerage, transparent pricing, and trusted listings make every
+  and commercial spaces across India. Minimum charges, transparent pricing, and trusted listings make every
   property decision simple.**.
               </p>
             </div>

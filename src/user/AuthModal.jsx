@@ -126,7 +126,7 @@ export default function AuthModal() {
         
         <h1 className="text-3xl lg:text-4xl font-black leading-tight mb-3 drop-shadow-2xl">
           Direct Owner Deals
-          <span className="block text-amber-300/90 text-lg tracking-tight">No Brokerage</span>
+          <span className="block text-amber-300/90 text-lg tracking-tight">Free property listing</span>
         </h1>
         
         <p className="text-amber-100/90 text-sm font-semibold drop-shadow-lg bg-black/20 px-4 py-2 rounded-xl backdrop-blur-sm max-w-sm">
@@ -169,7 +169,7 @@ export default function AuthModal() {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder="John Doe"
+                placeholder="Your name"
                 className="h-14 text-lg bg-orange-50/50 border-orange-200 focus:border-orange-500 focus:ring-orange-200/50 font-semibold"
               />
             </div>
@@ -185,7 +185,7 @@ export default function AuthModal() {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="your@email.com"
+              placeholder="your@gmail.com"
               className="h-14 text-lg bg-orange-50/50 border-orange-200 focus:border-orange-500 focus:ring-orange-200/50 font-semibold"
             />
           </div>
@@ -278,7 +278,7 @@ export default function AuthModal() {
           <div className="w-px h-6 bg-orange-200" />
           <div className="flex items-center gap-2 text-xs text-orange-700 font-black uppercase tracking-wider">
             <ShieldCheck size={14} />
-            No Brokerage
+            Free property listing
           </div>
         </div>
       </div>

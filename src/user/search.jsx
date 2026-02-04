@@ -135,7 +135,7 @@ export default function SearchPage() {
               {i === 0
                 ? "Verified"
                 : i === 1
-                ? "Zero Brokerage"
+                ? "Free property listing"
                 : "Instant Booking"}
             </span>
           </div>
@@ -149,7 +149,7 @@ export default function SearchPage() {
         </h1>
 
         <p className="text-indigo-100 mb-10">
-          Zero brokerage • Verified properties • Instant booking
+          Free property listing• Verified properties • Instant booking
         </p>
 
         {/* Search Box */}

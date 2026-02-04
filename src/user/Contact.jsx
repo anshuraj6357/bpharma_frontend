@@ -169,7 +169,7 @@ export default function Contact() {
 
             <form onSubmit={handleForm} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <InputGroup label="Full Name" type="text" placeholder="John Doe" />
+                <InputGroup label="Full Name" type="text" placeholder="Your Name" />
                 <InputGroup
                   label="Phone Number"
                   type="tel"
