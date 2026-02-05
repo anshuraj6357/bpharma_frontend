@@ -208,9 +208,12 @@ useEffect(() => {
   </div>
   
     {/* Stats Row */}
- <div className="relative overflow-hidden p-6 sm:p-10 lg:p-16 
-bg-slate-900 rounded-[2rem] sm:rounded-[3rem] shadow-2xl
-aspect-[3/1] sm:aspect-[16/6] lg:aspect-[16/5]">
+ <div
+  className="relative overflow-hidden 
+  bg-slate-900 rounded-[2rem] sm:rounded-[3rem] shadow-2xl
+  aspect-[4/3] sm:aspect-[16/6] lg:aspect-[16/5]"
+>
+
 
 
   {slides.map((slide, index) => (
@@ -259,34 +262,33 @@ aspect-[3/1] sm:aspect-[16/6] lg:aspect-[16/5]">
         </>
       )}
 
-      {/* ================= IMAGE SLIDE ================= */}
+   {/* ================= IMAGE SLIDE ================= */}
 {slide !== "stats" && (
-  <div className="absolute inset-0">
+  <div className="absolute inset-0 overflow-hidden rounded-[2rem] sm:rounded-[3rem]">
     
-    <div className="relative w-full h-full overflow-hidden
-                    rounded-[2rem] sm:rounded-[3rem]">
+    <img
+      src={slide}
+      alt="Sponsored Ad"
+      className="absolute inset-0 w-full h-full 
+                 object-cover object-center"
+    />
 
-      <img
-        src={slide}
-        alt="Sponsored Ad"
-        className="absolute inset-0 w-full h-full 
-                   object-cover object-center"
-      />
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black/25" />
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/25" />
+    {/* Badge */}
+    <span
+      className="absolute top-4 sm:top-6 left-4 sm:left-6 
+      px-3 py-1.5 bg-white/20 backdrop-blur 
+      text-white text-[10px] sm:text-xs font-bold 
+      rounded-full"
+    >
+      Roomgi
+    </span>
 
-      {/* Badge */}
-      <span className="absolute top-4 sm:top-6 left-4 sm:left-6 
-                       px-3 py-1.5 bg-white/20 backdrop-blur 
-                       text-white text-[10px] sm:text-xs font-bold 
-                       rounded-full">
-        Roomgi
-      </span>
-
-    </div>
   </div>
 )}
+
 
 
 
