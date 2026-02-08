@@ -146,7 +146,7 @@ export default function AuthModal() {
             <span className="text-xs font-black uppercase tracking-wider text-orange-700">Secure Sign In</span>
           </div>
           <h2 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-gray-900 to-slate-800 bg-clip-text text-transparent mb-2">
-            {isSignUp ? "Join NoBroker" : "Welcome Back"}
+            {isSignUp ? "Join Roomgi" : "Welcome Back"}
           </h2>
           <p className="text-slate-600 font-semibold text-sm">
             {isSignUp 
