@@ -815,7 +815,7 @@ const totalServicePrice =
 
 {/* FACILITIES SECTION */}
 {pg.facilities?.length > 0 && (
-  <InfoBlock title="Premium Amenities">
+  <InfoBlock title="Premium facilities">
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       {pg.facilities.map((item, i) => (
         <div 
