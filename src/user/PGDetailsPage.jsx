@@ -815,30 +815,25 @@ const totalServicePrice =
 
 {/* FACILITIES SECTION */}
 {pg.facilities?.length > 0 && (
-  <InfoBlock title="Premium facilities">
+  <InfoBlock title="Premium Facilities">
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       {pg.facilities.map((item, i) => (
-        <div 
-          key={i} 
-          className="relative overflow-hidden flex flex-col items-center justify-center gap-3 p-6 bg-white border border-gray-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group/item"
+        <div
+          key={i}
+          className="flex flex-col items-center justify-center gap-3 p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
         >
-          {/* Subtle Background Pattern */}
-          <div className="absolute top-0 right-0 p-2 opacity-[0.03] group-hover/item:opacity-10 transition-opacity">
-            <Sparkles size={40} />
+          {/* Icon */}
+          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all duration-300">
+            <Zap size={20} />
           </div>
 
-          <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 group-hover/item:bg-indigo-600 group-hover/item:text-white transition-all duration-300">
-            {/* Yahan aap category-based icon logic bhi laga sakte hain, 
-                filhal hum modern Check use kar rahe hain */}
-            <Zap size={20} className="fill-current" />
-          </div>
-
-          <span className="font-black text-gray-900 text-sm text-center tracking-tight leading-tight">
+          {/* Facility Name */}
+          <span className="font-semibold text-gray-800 text-sm text-center">
             {item}
           </span>
-          
-          {/* Bottom Dot Decor */}
-          <div className="w-1 h-1 rounded-full bg-indigo-200 group-hover/item:w-4 transition-all" />
+
+          {/* Bottom Divider Line */}
+          <div className="w-6 h-[2px] bg-indigo-200 mt-1" />
         </div>
       ))}
     </div>
@@ -846,8 +841,6 @@ const totalServicePrice =
 )}
 
 
-          {/* PUBLISH STATUS */}
- 
 
   {/* 1. PUBLISH STATUS BLOCK (MNC Upgrade) */}
 {pg.toPublish?.status && (
@@ -893,50 +886,7 @@ const totalServicePrice =
   {/* 2. BRANCH ROOMS SECTION (The Upgrade) */}
 
 
-<InfoBlock
-  className="mt-12 md:mt-16 p-4 md:p-6 bg-white"
-  role="region"
-  aria-labelledby="branch-units-heading"
->
-  {/* --- HEADER WITH ACTIONS --- */}
- <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 md:mb-10 gap-6 p-4 bg-orange-50/40 rounded-3xl shadow-sm backdrop-blur-sm">
-  {/* Left Section */}
-  <div className="space-y-2">
-    <div className="flex items-center gap-2">
-      <div className="h-6 w-1 bg-amber-500 rounded-full" aria-hidden="true"></div>
-      <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em]">
-        Inventory Intelligence
-      </span>
-    </div>
 
-    <h2
-      id="branch-units-heading"
-      className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight"
-    >
-      All Rooms
-    </h2>
-  </div>
-
-  {/* Button */}
-  <button
-    onClick={() => navigate(`/branch-rooms/${pg.branch}`)}
-    aria-label="Manage all branch inventory"
-    title="Manage all inventory"
-    className="relative overflow-hidden group flex items-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white px-6 md:px-10 py-3 md:py-5 rounded-[1.75rem] font-black text-xs md:text-sm shadow-lg transition-all duration-300 active:scale-95 focus:outline-none focus:ring-2 focus:ring-amber-400"
-  >
-    <span className="relative z-10">Manage All Inventory</span>
-    <ArrowRight
-      className="relative z-10 group-hover:translate-x-2 transition-transform duration-300"
-      size={18}
-      aria-hidden="true"
-    />
-
-    {/* Subtle shine effect */}
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-[1.75rem]" />
-  </button>
-</header>
-
-</InfoBlock>
 
 
 </div>
@@ -1165,8 +1115,7 @@ function InfoBlock({ title, children, className = "" }) {
   );
 }
 
-// ACTION BUTTON COMPONENT
-// 1. Pehle ye reusable component define karein
+
 function ActionBtn({
   icon,
   label,

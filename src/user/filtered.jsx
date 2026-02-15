@@ -22,6 +22,7 @@ export default function Searched() {
   const [pgData, setPgData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchError, setSearchError] = useState("");
+  console.log(pgData)
 
   // FILTER STATES
   const [isFilterOpen, setIsFilterOpen] = useState(false);
