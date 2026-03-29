@@ -16,6 +16,7 @@ import ResetPassword from "./user/changingpassword.jsx"
 // User Pages
 const LandingPage = lazy(() => import("./user/LandingPage"));
 const PGDetailsPage = lazy(() => import("./user/PGDetailsPage"));
+// const HotelDetailsPage=Lazy(()=>import ("./user/HotelDetailsPage"))
 const PGMap = lazy(() => import("./user/pgmap.jsx"));
 const Searched = lazy(() => import("./user/filtered.jsx"));
 const BranchRoomsPage = lazy(() => import("./user/branch-rooms.jsx"));
@@ -53,6 +54,7 @@ const ReportIssue = lazy(() => import("./user/reportanissue.jsx"));
 const MissionVision = lazy(() => import("./user/missionandvision.jsx"));
 const WhyRoomgi = lazy(() => import("./user/why-roomgi.jsx"));
 const SafetyGuidelinesPage = lazy(() => import("./user/safetyguidlinepage.jsx"));
+const HotelBookingForm=lazy(()=>import("./user/hoteldatebooking"))
 
 // Admin
 const AdminApp = lazy(() => import("./owner/AdminApp"));
@@ -89,9 +91,9 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <ScrollToTop />
 
-      
-        <Header />
-      
+
+      <Header />
+
 
       <main className="flex-1">
         {/* Suspense is CRITICAL here */}
@@ -101,6 +103,7 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<LandingPage />} />
               <Route path="/pg/:id" element={<PGDetailsPage />} />
+              <Route path="/hotelbookingform/:id" element={<HotelBookingForm />} />
               <Route path="/pgmap/:branchId" element={<PGMap />} />
               <Route path="/branch-rooms/:id" element={<BranchRoomsPage />} />
               <Route path="/allpotos/:id" element={<AllPotos />} />
@@ -139,8 +142,8 @@ function App() {
             <Route path="/mission" element={<MissionVision />} />
             <Route path="/why-roomgi" element={<WhyRoomgi />} />
             <Route path="/safety-guidelines" element={<SafetyGuidelinesPage />} />
-                     <Route path="/forgot-password" element={<ForgotPassword />} />
-                                <Route path="/forgotpasswordpage/:token" element={<ResetPassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/forgotpasswordpage/:token" element={<ResetPassword />} />
 
 
 
@@ -150,7 +153,7 @@ function App() {
         </Suspense>
       </main>
 
-        <Footer />
+      <Footer />
     </div>
   );
 }

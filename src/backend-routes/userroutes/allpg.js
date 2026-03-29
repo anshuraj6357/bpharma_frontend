@@ -7,7 +7,7 @@ export const user_PgApi = createApi({
      🌍 BASE QUERY
   ======================= */
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://roomgi-backend-project-2.onrender.com/api/v1/property/user",
+    baseUrl: "http://localhost:5000/api/v1/property/user",
     credentials: "include",
     prepareHeaders: (headers) => {
       headers.set("Cache-Control", "no-store");
@@ -31,14 +31,20 @@ export const user_PgApi = createApi({
     /* =======================
        🏠 GET ALL PGs
     ======================= */
-    getAllListedPg: builder.query({
-      query: ({ lat, lng } = {}) => ({
-        url: "/allpg",
-        method: "GET",
-        params: lat && lng ? { lat, lng } : {},
-      }),
-      providesTags: ["Pg"],
-      keepUnusedDataFor: 60, // 1 minute
+  getAllListedPg: builder.query({
+  query: (params = {}) => ({
+    url: "/allpg",
+    method: "GET",
+    params, // 👈 send everything dynamically
+  }),
+  providesTags: ["Pg"],
+  keepUnusedDataFor: 60,
+}),
+    getAllhotelsroom:builder.query({
+      query:()=>({
+        url:"/allhotelrooms",
+        method:"GET"
+      })
     }),
 
     /* =======================
@@ -85,6 +91,7 @@ export const user_PgApi = createApi({
 ======================= */
 export const {
   useGetAllListedPgQuery,
+  useGetAllhotelsroomQuery,
   useGetservicesareaQuery,
   useGetMapPgQuery,
   useGetPgByIdQuery,

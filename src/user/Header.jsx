@@ -65,11 +65,12 @@ export default function Header() {
     setMobileMenu(false);
   };
 
-  const navLinks = [
-    { label: "Home", path: "/", icon: <Home size={18} /> },
-    { label: "About", path: "/about", icon: <User size={18} /> },
-    { label: "Contact", path: "/contact", icon: <MessageSquare size={18} /> },
-  ];
+const navLinks = [
+  { label: "Explore PG", path: "/?category=Pg", icon: <Home size={18} /> },
+  { label: "About", path: "/about", icon: <User size={18} /> },
+  { label: "Contact", path: "/contact", icon: <MessageSquare size={18} /> },
+  // { label: "Explore Hotel", path: "/?category=Hotel", icon: <MessageSquare size={18} /> },
+];
 
   const userLinks = [
     { label: "My Profile", path: "/myprofile", icon: <User size={18} /> },

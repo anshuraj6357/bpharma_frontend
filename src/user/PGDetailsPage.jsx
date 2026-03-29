@@ -1,1190 +1,197 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
-import { Phone, Loader2,MapPin ,Check , X,Zap ,ReceiptText, ShieldCheck, ArrowRight,LayoutGrid,Layers,Calendar,CheckCircle2,Construction,CheckCircle,
-  Sparkles, Home,Bed,Maximize ,Armchair,Users, Navigation, Share2, Star, BadgeCheck } from "lucide-react";
+import { 
+  Loader2, LayoutGrid, Star, MapPin, ShieldCheck, 
+  ArrowLeft, Heart, Share2, Info, Navigation 
+} from "lucide-react";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
+import handleGetDirections from "./component/handleGetDirections"
+// Components & API
+import LeftInformationdescription from "./l.jsx";
+import RightInformationdescription from "./r.jsx";
 import SkeletonLoader from "./loader/skeletondetails.jsx";
 import { useProfileQuery } from "../backend-routes/userroutes/authapi";
-
-
 import { useGetPgByIdQuery } from "../backend-routes/userroutes/allpg.js";
-import {
-  useRazorpayPaymentVerifyMutation,
-  useRazorpayPaymentMutation,
-} from "../backend-routes/userroutes/payment";
 
-
-/* ============================
-   RAZORPAY SCRIPT LOADER
-============================ */
-function loadRazorpayScript() {
-  return new Promise((resolve) => {
-    console.log("💡 Loading Razorpay script...");
-    if (window.Razorpay) {
-      return resolve(true);
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-
-    script.onload = () => {
-      resolve(true);
-    };
-    script.onerror = () => {
-      resolve(false);
-    };
-
-    document.body.appendChild(script);
-  });
-}
-
-/* ============================
-   BOOKING STATUS POLLING
-============================ */
-function startBookingStatusPolling(bookingId, navigate, setIsConfirmingBooking) {
-
-  const MAX_RETRIES = 20; // ~1 minute
-  let attempts = 0;
-
-  const interval = setInterval(async () => {
-    attempts++;
-    try {
-      const res = await fetch(
-        `https://roomgi-backend-project-2.onrender.com/api/payment/user/status/${bookingId}`,
-        { credentials: "include" }
-      );
-   
-      if (!res.ok) throw new Error("Status API failed");
-
-      const data = await res.json();
-  
-      if (data.status === "paid") {
-        clearInterval(interval);
-        setIsConfirmingBooking(false);
-  
-        toast.success("Booking confirmed 🎉");
-
-        navigate("/bookingssuccess", {
-          replace: true,
-          state: {
-            bookingId: data.bookingId,
-            branchName: data.branchName,
-            roomNumber: data.roomNumber,
-            amount: data.amount,
-          },
-        });
-      }
-
-      if (data.status === "failed") {
-        clearInterval(interval);
-        setIsConfirmingBooking(false);
-        
-        toast.error("Payment failed / refunded");
-        navigate(-1);
-      }
-
-      if (attempts >= MAX_RETRIES) {
-        clearInterval(interval);
-        setIsConfirmingBooking(false);
-  
-        toast.warning("Verification taking longer than usual");
-      }
-    } catch (err) {
-      toast.error(err)
-  
-    }
-  }, 3000);
-}
-
-/* =========================
-   START PAYMENT
-========================= */
-async function startPayment(
-  amount,
-  razorpayPayment,
-  razorpayPaymentVerify,
-  roomId,
-  navigate,
-  setIsConfirmingBooking,
-  user
-) {
-
-  try {
-    // 1️⃣ Load Razorpay SDK
-    const loaded = await loadRazorpayScript();
-    if (!loaded) {
-      toast.error("Payment SDK failed to load");
-     
-      return;
-    }
-   
-
-
-    const response = await razorpayPayment({
-      amount: amount.payableAmount * 100, // amount in INR
-      receipt: `receipt_${Date.now()}_${roomId}`,
-    }).unwrap();
-
-    const order = response?.order;
-    if (!order) {
-      toast.error("Order creation failed");
-      return;
-    }
-
-    // 3️⃣ Minimum amount check
-    if (order.amount < 100) { // Razorpay minimum 1 INR = 100 paise
-      toast.error("Amount too low. Minimum 1 INR required.");
-      return;
-    }
-
-    // 4️⃣ Razorpay payment modal options
-    const options = {
-      key: "rzp_live_Rn8nwfw3Hdmb8E",
-      amount: order.amount, // already in paise from backend
-      currency: order.currency,
-      name: "Roomgi",
-      description: "Room Booking Payment",
-      order_id: order.id,
-
-      handler: async (rzpResponse) => {
-  
-        try {
-          setIsConfirmingBooking(true);
-          toast.info("Confirming your booking ⏳");
-
-          // 5️⃣ Verify payment on backend
-          const verifyData = await razorpayPaymentVerify({
-            razorpay_order_id: rzpResponse.razorpay_order_id,
-            razorpay_payment_id: rzpResponse.razorpay_payment_id,
-            razorpay_signature: rzpResponse.razorpay_signature,
-            roomId,
-            amount,
-          }).unwrap();
-
-       
-          if (!verifyData?.success) {
-            toast.error("Payment verification failed");
-            setIsConfirmingBooking(false);
-            return;
-          }
-
-           startBookingStatusPolling(verifyData.booking._id, navigate, setIsConfirmingBooking);
-
-        } catch (err) {
-       +     toast.error("Verification error");
-          setIsConfirmingBooking(false);
-        }
-      },
-
-      modal: {
-        ondismiss: () => {
-   
-          toast.info("Payment cancelled");
-          setIsConfirmingBooking(false);
-        },
-      },
-
-      prefill: {
-        name: user?.name || "Guest User",
-        email: user?.email || "guest@roomgi.com",
-        contact: user?.phone || "",
-      },
-
-      theme: { color: "#2563eb" },
-    };
-
-    new window.Razorpay(options).open();
-
-  } catch (err) {
-    toast.error("Payment failed");
-    setIsConfirmingBooking(false);
-  }
-}
-
-
-
-
-/* =========================
-   MAIN COMPONENT
-========================= */
 export default function PGDetailsPage() {
-  const { data: userdata } = useProfileQuery();
-
-
-
-
-  const user = userdata?.profile;
-
-
-  const navigate = useNavigate();
   const { id } = useParams();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const [isConfirmingBooking, setIsConfirmingBooking] = useState(false);
-
-
+  
+  const { data: userdata } = useProfileQuery();
   const { data, isLoading, isError } = useGetPgByIdQuery(id);
 
-  const [razorpayPayment, { isLoading: razorpaypaymentloading }] =
-    useRazorpayPaymentMutation();
-  const [razorpayPaymentVerify] =
-    useRazorpayPaymentVerifyMutation();
-
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [useWallet, setUseWallet] = useState(false);
-  const [userLocation, setUserLocation] = useState({ lat: null, lng: null });
-
   const pg = data?.room;
+  const coord=data?.location;
+  const allImages = useMemo(() => pg?.roomImages || [], [pg]);
 
-  const allImages = useMemo(() => {
-    if (!pg) return [];
-    return pg.roomImages || [];
-  }, [pg]);
+  // Back Button Functionality
+  const handleBack = () => navigate(-1);
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) =>
-          setUserLocation({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          }),
-        () => toast.warning("Enable location to get directions")
-      );
-    }
-  }, []);
-
-  const handleBook = (amount) => {
-    if (!isAuthenticated) {
-      toast.error("Login first");
-      return;
-    }
-
-    startPayment(
-      amount,
-      razorpayPayment,
-      razorpayPaymentVerify,
-      id,
-      navigate,
-      setIsConfirmingBooking,
-      user
-    );
-  };
-
-
-  const handleGetDirections = () => {
-
-
-
-    const [lng, lat] =data.location.coordinates || [];
-    if (!lat || !lng) return toast.error("PG location missing");
-    if (!userLocation.lat) return toast.error("User location not available");
-
-    window.open(
-      `https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lng}&destination=${lat},${lng}`,
-      "_blank"
-    );
-  };
-
-  const sharePG = () => {
-    navigator.share
-      ? navigator.share({
-        title: `Check out ${pg.branch.name}`,
-        url: window.location.href,
-      })
-      : toast.info("Sharing not supported");
-  };
-
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <SkeletonLoader count={1} />
-      </div>
-    );
-  }
-
+  if (isLoading) return <SkeletonLoader />;
 
   if (isError || !pg) {
     return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <p className="text-red-500 font-semibold">Error loading PG</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center animate-in fade-in zoom-in duration-500">
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100">
+            <Loader2 className="w-12 h-12 animate-spin text-orange-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-slate-800">Finding your perfect stay...</h2>
+          </div>
+        </div>
       </div>
     );
   }
-  const totalRent =
-    pg.price + (pg.advancedmonth);
-
-  const maxWalletAllowed = totalRent * 0.1;
-  const walletDiscount = Math.min(user?.walletBalance || 0, maxWalletAllowed);
-
-  // 👇 FINAL CHECK
-  const finalAfterWallet = totalRent - walletDiscount;
-
-  // 👇 WALLET APPLICABLE ONLY IF > ₹1 LEFT
-  const isWalletApplicable = finalAfterWallet > 1;
-
-
-  const ShowAllButton = () => (
-    <button
-      onClick={() => navigate(`/allpotos/${id}`)}
-      className="absolute bottom-4 right-4 bg-white/90 backdrop-blur
-    px-4 py-2 rounded-lg shadow-md text-sm font-semibold
-    hover:bg-white transition z-10"
-    >
-      Show all photos
-    </button>
-  );
-
-
-
-
-
-
-const totalServicePrice =
-  pg.services?.reduce((sum, s) => sum + Number(s.price || 0), 0) || 0;
-
-
 
   return (
-    <div className="min-h-screen bg-gray-50">
-
-
-      {isConfirmingBooking && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4 shadow-2xl w-[90%] max-w-sm">
-
-            <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
-
-            <h2 className="text-xl font-bold text-gray-800">
-              Confirming your booking
-            </h2>
-
-            <p className="text-sm text-gray-500 text-center">
-              Please wait while we securely confirm your payment and reserve your room.
-            </p>
-
-          </div>
-        </div>
-      )}
-
-      {/* IMAGE SLIDER */}
-   <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 relative group/gallery">
-
-  {/* ------- MOBILE LAYOUT (Compact & Modern) ------- */}
-  <div
-  className="md:hidden w-full max-w-screen-sm mx-auto h-[320px] sm:h-[360px] relative overflow-hidden rounded-[2rem] shadow-2xl"
-  role="region"
-  aria-label="Property image gallery"
->
-  {/* SINGLE IMAGE */}
-  {allImages.length === 1 && (
-    <img
-      src={allImages[0]}
-      className="w-full h-full object-cover"
-      alt={`${pg?.branch?.name || "Property"} main image`}
-      loading="eager"
-      fetchpriority="high"
-    />
-  )}
-
-  {/* TWO IMAGES */}
-  {allImages.length === 2 && (
-    <div className="grid grid-cols-2 h-full gap-1.5">
-      {allImages.map((img, i) => (
-        <img
-          key={i}
-          src={img}
-          className="w-full h-full object-cover"
-          alt={`${pg?.branch?.name || "Property"} view ${i + 1}`}
-          loading={i === 0 ? "eager" : "lazy"}
-          decoding="async"
-        />
-      ))}
-    </div>
-  )}
-
-  {/* THREE OR MORE */}
-  {allImages.length >= 3 && (
-    <div className="grid grid-cols-2 grid-rows-3 gap-1.5 h-full">
-      {/* HERO */}
-      <div className="col-span-2 row-span-2 overflow-hidden">
-        <img
-          src={allImages[0]}
-          className="w-full h-full object-cover"
-          alt={`${pg?.branch?.name || "Property"} featured image`}
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-
-      {/* SECOND */}
-      <div className="overflow-hidden">
-        <img
-          src={allImages[1]}
-          className="w-full h-full object-cover"
-          alt={`${pg?.branch?.name || "Property"} gallery image 2`}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-
-      {/* THIRD */}
-      <div className="overflow-hidden relative">
-        <img
-          src={allImages[2]}
-          className="w-full h-full object-cover"
-          alt={`${pg?.branch?.name || "Property"} gallery image 3`}
-          loading="lazy"
-          decoding="async"
-        />
-
-        {allImages.length > 3 && (
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center border-l border-white/20">
-            <span className="text-white font-black text-xl tracking-tight">
-              +{allImages.length - 3}
-            </span>
-            <span className="text-white/80 text-[10px] font-bold uppercase tracking-widest">
-              Photos
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
-  )}
-
-  {/* MOBILE FLOATING CTA */}
-  <button 
-    onClick={() => navigate(`/allpotos/${id}`)}
-    aria-label="View all property photos"
-    title="View all photos"
-    className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-xl px-4 py-2 rounded-xl text-[11px] font-black text-slate-900 shadow-xl border border-white/50 flex items-center gap-2 active:scale-90 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500"
-  >
-    <LayoutGrid size={14} />
-    Show Gallery
-  </button>
-</div>
-
-
-
-  {/* ------- DESKTOP LAYOUT (MNC Bento Style) ------- */}
-  <div
-  className="hidden md:block w-full max-w-screen-2xl mx-auto relative overflow-hidden rounded-[2.5rem] shadow-2xl bg-slate-100"
-  role="region"
-  aria-label="Property image gallery"
->
-  <div className="h-[420px] lg:h-[550px] xl:h-[600px]">
-    {allImages.length === 1 ? (
-      <div className="relative h-full overflow-hidden group">
-        <img
-          src={allImages[0]}
-          alt={`${pg?.branch?.name || "Property"} main image`}
-          loading="eager"
-          fetchpriority="high"
-          className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
-        />
-      </div>
-    ) : (
-      <div
-        className={`grid h-full gap-2 lg:gap-3 ${
-          allImages.length === 2
-            ? "grid-cols-2"
-            : allImages.length === 3
-            ? "grid-cols-3 grid-rows-2"
-            : "grid-cols-4 grid-rows-2"
-        }`}
-      >
-        {/* HERO IMAGE */}
-        <div
-          className={`${
-            allImages.length === 2
-              ? "col-span-1"
-              : "col-span-2 row-span-2"
-          } relative overflow-hidden group`}
-        >
-          <img
-            src={allImages[0]}
-            alt={`${pg?.branch?.name || "Property"} featured image`}
-            loading="eager"
-            fetchpriority="high"
-            className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105 cursor-pointer"
-          />
-          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-        </div>
-
-        {/* SECONDARY IMAGES */}
-        {allImages.slice(1, 5).map((img, i) => (
-          <div
-            key={i}
-            className="relative overflow-hidden group bg-white"
+    <div className="min-h-screen bg-[#FDFCFB] text-slate-900 selection:bg-orange-100">
+      
+      {/* 🟢 TOP NAV BAR (Sticky on Scroll) */}
+      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100 px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <button 
+            onClick={handleBack}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors group"
           >
-            <img
-              src={img}
-              alt={`${pg?.branch?.name || "Property"} gallery image ${i + 2}`}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 cursor-pointer"
-            />
-            <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <ArrowLeft className="w-6 h-6 group-active:scale-90 transition-transform" />
+          </button>
+          <div className="flex gap-2">
+            <button className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+              <Heart className="w-5 h-5 text-slate-600" />
+            </button>
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-
-  {/* FLOATING CTA */}
-  <button
-    onClick={() => navigate(`/allpotos/${id}`)}
-    aria-label="View all property photos"
-    title="View all photos"
-    className="absolute bottom-4 right-4 lg:bottom-6 lg:right-6 bg-slate-900/80 hover:bg-slate-900 backdrop-blur-xl text-white px-4 py-2 lg:px-6 lg:py-3 rounded-2xl font-bold text-xs lg:text-sm shadow-2xl border border-white/10 flex items-center gap-2 lg:gap-3 transition-all hover:px-6 lg:hover:px-8 active:scale-95 focus:outline-none focus:ring-2 focus:ring-indigo-500 group"
-  >
-    <LayoutGrid
-      size={18}
-      className="transition-transform duration-500 group-hover:rotate-90"
-    />
-    <span>View All Photos</span>
-  </button>
-</div>
-
-
-
-</div>
-
-
-
-
-      {/* MAIN CONTENT */}
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-3 gap-10">
-
-        {/* LEFT SIDE — INFORMATION */}
-        <div className="lg:col-span-2 space-y-8">
-
-         {/* BASIC INFORMATION SECTION */}
-<InfoBlock title="Property Overview">
-  <div className="space-y-10">
-    {/* ================= HEADER SECTION (MNC STYLE) ================= */}
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center gap-3">
-          <h2 className="text-4xl font-black text-gray-900 tracking-tight">
-            {pg.branch.name}
-          </h2>
-          {pg.verified && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white rounded-full shadow-lg shadow-indigo-200">
-              <BadgeCheck className="w-4 h-4 fill-white text-indigo-600" />
-              <span className="text-[10px] font-black uppercase tracking-wider">Verified Stay</span>
-            </div>
-          )}
         </div>
-        <div className="flex items-center text-gray-500 gap-2">
-          <MapPin size={18} className="text-indigo-500" />
-          <span className="text-lg font-medium">{pg.city}, India</span>
-        </div>
-      </div>
+      </nav>
 
-      {/* RATING PILL - Floating Design */}
-      <div className="flex items-center gap-4 bg-white border border-gray-100 p-2 pr-6 rounded-2xl shadow-xl shadow-gray-100/50">
-        <div className="w-12 h-12 bg-amber-400 rounded-xl flex items-center justify-center shadow-lg shadow-amber-200">
-          <Star className="w-6 h-6 text-white fill-white" />
-        </div>
-        <div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-black text-gray-900">
-              {pg.personalreview?.length > 0
-                ? (pg.totalrating / pg.personalreview.length).toFixed(1)
-                : "New"}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        {/* 🟢 HEADER SECTION */}
+        <div className="mb-8">
+          {/* <div className="flex flex-wrap items-center gap-2 mb-2">
+            <span className="bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+              Popular Choice
             </span>
-            <span className="text-xs font-bold text-gray-400">/ 5.0</span>
-          </div>
-          <p className="text-[10px] font-black text-indigo-600 uppercase tracking-tighter">
-            {pg.personalreview?.length || 0} Guest Reviews
-          </p>
-        </div>
-      </div>
-    </div>
-
-    {/* ================= BENTO GRID DETAILS ================= */}
-    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-      
-      {/* Main Info Card (Large) */}
-      <div className="md:col-span-8 bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all duration-500">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
-            <Sparkles size={20} />
-          </div>
-          <h3 className="text-xl font-bold text-gray-900 tracking-tight">Essential Details</h3>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-10 gap-x-6">
-          <InfoItem icon={<Home size={16}/>} label="Category" value={pg.category} />
-          <InfoItem icon={<Bed size={16}/>} label="Room Number" value={`Room No ${pg.roomNumber}`} />
-          <InfoItem icon={<Maximize size={16}/>} label="Layout" value={
-            pg.category === "Hotel" ? pg.hoteltype : 
-            pg.category === "Pg" ? pg.type : 
-            pg.renttype === "Flat-Rent" ? pg.flattype : pg.roomtype
-          } />
-          <InfoItem icon={<Armchair size={16}/>} label="Furnishing" value={pg.furnishedType} />
-          
-          {/* Advance Month Logic */}
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Security Deposit</span>
-            {pg.advancedmonth > 0 ? (
-              <p className="text-lg font-bold text-gray-900 flex items-center gap-1">
-                {pg.advancedmonth} <span className="text-sm text-gray-500 font-medium">Rs</span>
-              </p>
-            ) : (
-              <span className="w-fit text-[10px] px-2 py-1 bg-emerald-50 text-emerald-600 rounded-md font-bold uppercase tracking-tighter">No Advance</span>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Availability</span>
-            <div className="flex items-center gap-2">
-               <div className={`w-2 h-2 rounded-full animate-pulse ${pg.availabilityStatus === "Available" ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-               <span className={`text-lg font-bold ${pg.availabilityStatus === "Available" ? "text-emerald-600" : "text-red-600"}`}>
-                {pg.availabilityStatus}
-              </span>
+            <div className="flex items-center gap-1 text-orange-500 font-bold text-sm">
+              <Star className="w-4 h-4 fill-current" />
+              <span>4.8 (120+ reviews)</span>
             </div>
+          </div> */}
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+            {pg.name || "Premium Managed Stay"}
+          </h1>
+          <div className="flex items-center gap-1 text-slate-500 mt-2">
+            <MapPin className="w-4 h-4" />
+            <span className="text-sm font-medium">{pg.branch?.name || "Prime Location, City Center"}</span>
           </div>
         </div>
-      </div>
 
-      {/* Occupancy Stats Card (Sidebar Style) */}
-      <div className="md:col-span-4 bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group">
-        {/* Abstract Background Decoration */}
-        <div className="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 blur-[80px] group-hover:bg-indigo-500/40 transition-all duration-700"></div>
-        
-        <h3 className="text-lg font-bold mb-8 relative z-10 flex items-center gap-2">
-          <Users size={18} className="text-indigo-400" />
-          Live Status
-        </h3>
-
-        <div className="space-y-8 relative z-10">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Currently Occupied</p>
-              <p className="text-4xl font-black">{pg.occupied || "0"}</p>
+        {/* 🟢 MODERN GALLERY GRID */}
+        <div className="relative group mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 h-[350px] md:h-[550px] rounded-[2rem] overflow-hidden shadow-2xl shadow-orange-900/10">
+            {/* Main Image */}
+            <div className="md:col-span-2 md:row-span-2 relative overflow-hidden">
+              <img 
+                src={allImages[0]} 
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-700 cursor-zoom-in" 
+                alt="Main View"
+              />
             </div>
-            <div className="w-12 h-1 bg-red-500 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)]"></div>
-          </div>
-
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Vacant Units</p>
-              <p className="text-4xl font-black text-emerald-400">
-                {pg.category === "Pg" ? pg.vacant : Math.max(0, pg.vacant - pg.occupied)}
-              </p>
-            </div>
-            <div className="w-12 h-1 bg-emerald-400 rounded-full shadow-[0_0_15px_rgba(52,211,153,0.5)]"></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</InfoBlock>
-
-
-         {/* DESCRIPTION SECTION - PRODUCTION GRADE */}
-{pg.description && (
-  <InfoBlock title="About this space">
-    <div className="relative group/desc">
-      {/* 1. Iconic Lead-in: MNCs use subtle accents to break text monotony */}
-      <div className="flex gap-4">
-        <div className="hidden md:flex flex-col items-center">
-          <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mb-2 shadow-[0_0_8px_rgba(99,102,241,0.6)]" />
-          <div className="w-[2px] flex-1 bg-gradient-to-b from-indigo-100 to-transparent rounded-full" />
-        </div>
-
-        <div className="space-y-6">
-          {/* 2. Optimized Typography: Leading-relaxed and Gray-600 for eye comfort */}
-          <div className="relative">
-            <p className="text-gray-600 leading-[1.8] text-base md:text-lg font-medium selection:bg-indigo-100 selection:text-indigo-900">
-              {pg.description}
-            </p>
-          </div>
-
-          {/* 3. Feature Highlights: Automated extraction from text (Mental Mapping) */}
-          <div className="flex flex-wrap gap-3 pt-4">
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-2xl border border-gray-100 group-hover/desc:border-indigo-100 transition-colors">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[11px] font-black text-gray-500 uppercase tracking-wider">Recently Renovated</span>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-2xl border border-gray-100 group-hover/desc:border-indigo-100 transition-colors">
-              <Sparkles size={14} className="text-amber-500" />
-              <span className="text-[11px] font-black text-gray-500 uppercase tracking-wider">Top Rated Host</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Subtle Border Decoration for Desktop */}
-      <div className="absolute -left-10 top-0 bottom-0 w-[1px] bg-gray-100 hidden md:block" />
-    </div>
-  </InfoBlock>
-)}
-
-          {/* ALLOWED FOR */}
-        {/* ALLOWED FOR SECTION - PRODUCTION LEVEL */}
-{pg.allowedFor && (
-  <InfoBlock title="Preferred Guests">
-    <div className="relative overflow-hidden group/allowed">
-      <div className={`flex items-center justify-between p-6 rounded-[2rem] transition-all duration-500 ${
-        pg.allowedFor.toLowerCase().includes('girls') 
-          ? 'bg-rose-50/50 border border-rose-100' 
-          : 'bg-indigo-50/50 border border-indigo-100'
-      }`}>
-        
-        <div className="flex items-center gap-5">
-          {/* Icon Container with Dark Contrast */}
-          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg transition-transform duration-500 group-hover/allowed:rotate-[-10deg] ${
-            pg.allowedFor.toLowerCase().includes('girls')
-              ? 'bg-rose-600 shadow-rose-200'
-              : 'bg-indigo-900 shadow-indigo-200'
-          }`}>
-            <Users className="text-white w-7 h-7" />
-          </div>
-
-          <div className="space-y-1">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Exclusively For</span>
-            <h4 className="text-2xl font-black text-gray-900 tracking-tight">
-              {pg.allowedFor}
-            </h4>
-          </div>
-        </div>
-
-        {/* Status Indicator */}
-        <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm border border-gray-50">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs font-black text-gray-700 uppercase tracking-tighter">Admission Open</span>
-        </div>
-
-        {/* Background Abstract Pattern (MNC Style Decor) */}
-        <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
-           <Users size={120} />
-        </div>
-      </div>
-
-      {/* Trust Note */}
-      <p className="mt-4 px-2 text-xs font-bold text-gray-500 flex items-center gap-2">
-        <BadgeCheck size={14} className="text-indigo-500" />
-        Strict adherence to house rules is required for all {pg.allowedFor}.
-      </p>
-    </div>
-  </InfoBlock>
-)}
-
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-  {/* RULES SECTION */}
-  {pg.rules?.length > 0 && (
-    <InfoBlock title="House Guidelines">
-      <div className="space-y-4">
-        {pg.rules.map((rule, i) => (
-          <div key={i} className="flex items-start gap-4 group/rule">
-            <div className="mt-1 w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 group-hover/rule:bg-emerald-500 transition-colors">
-              <Check size={12} className="text-emerald-600 group-hover/rule:text-white" />
-            </div>
-            <p className="text-gray-900 font-bold text-[15px] leading-snug">{rule}</p>
-          </div>
-        ))}
-      </div>
-    </InfoBlock>
-  )}
-
-  {/* NOT ALLOWED SECTION */}
-  {pg.notAllowed?.length > 0 && (
-    <InfoBlock title="Restricted">
-      <div className="space-y-4">
-        {pg.notAllowed.map((item, i) => (
-          <div key={i} className="flex items-start gap-4 group/not">
-            <div className="mt-1 w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center flex-shrink-0 group-hover/not:bg-rose-500 transition-colors">
-              <X size={12} className="text-rose-600 group-hover/not:text-white" />
-            </div>
-            <p className="text-gray-900 font-bold text-[15px] leading-snug">{item}</p>
-          </div>
-        ))}
-      </div>
-    </InfoBlock>
-  )}
-</div>
-
-
-     
-
-{/* FACILITIES SECTION */}
-{pg.facilities?.length > 0 && (
-  <InfoBlock title="Premium Facilities">
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-      {pg.facilities.map((item, i) => (
-        <div
-          key={i}
-          className="flex flex-col items-center justify-center gap-3 p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-        >
-          {/* Icon */}
-          <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 hover:bg-indigo-600 hover:text-white transition-all duration-300">
-            <Zap size={20} />
-          </div>
-
-          {/* Facility Name */}
-          <span className="font-semibold text-gray-800 text-sm text-center">
-            {item}
-          </span>
-
-          {/* Bottom Divider Line */}
-          <div className="w-6 h-[2px] bg-indigo-200 mt-1" />
-        </div>
-      ))}
-    </div>
-  </InfoBlock>
-)}
-
-
-
-  {/* 1. PUBLISH STATUS BLOCK (MNC Upgrade) */}
-{pg.toPublish?.status && (
-  <div className="relative overflow-hidden bg-white border border-orange-100 rounded-2xl p-6 shadow-sm">
-    {/* Subtle Background Icon */}
-    <CheckCircle2 className="absolute -right-4 -bottom-4 w-32 h-32 text-amber-50 opacity-[0.05]" />
-
-    {/* Header */}
-    <div className="flex items-center gap-4 mb-4">
-      <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
-        <Calendar size={20} strokeWidth={2.5} />
-      </div>
-      <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">
-        Visibility Status
-      </h3>
-    </div>
-
-    {/* Main Content */}
-    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-      <div>
-        <p className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Live on Platform
-        </p>
-        <p className="text-slate-500 font-semibold text-sm">
-          Launched on{" "}
-          {new Date(pg.toPublish.date).toLocaleDateString("en-IN", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-          })}
-        </p>
-      </div>
-
-      <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 text-amber-600 rounded-full text-xs font-black uppercase tracking-widest border border-amber-100">
-        <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
-        Active
-      </div>
-    </div>
-  </div>
-)}
-
-
-  {/* 2. BRANCH ROOMS SECTION (The Upgrade) */}
-
-
-
-
-
-</div>
-
-     {/* RIGHT SIDE — RENT & ACTIONS */}
-<div className="space-y-6 lg:sticky lg:top-24">
-  
-  {/* ================== PREMIUM RENT CARD ================== */}
-  <InfoBlock title="Payment Summary">
-    <div className="w-full bg-slate-50/50 rounded-3xl p-2 space-y-4">
-      
-      {/* RENT BREAKDOWN BOX */}
-      <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
-        <div className="flex items-center gap-2 mb-4">
-          <ReceiptText size={18} className="text-indigo-600" />
-          <h4 className="text-slate-900 font-black text-sm uppercase tracking-wider">
-            Billing Details
-          </h4>
-        </div>
-
-        <div className="space-y-3">
-          
-            <div className="flex justify-between items-center">
-              <span className="text-slate-500 font-medium">Standard Room Rent</span>
-              <span className="text-slate-900 font-bold">₹{pg.price}</span>
-            </div>
-          
-
-          {pg.advancedmonth > 0 && (
-            <div className="flex justify-between items-center py-2 px-3 bg-indigo-50/50 rounded-xl border border-indigo-100/50">
-              <div className="flex flex-col">
-                <span className="text-indigo-700 font-bold text-xs uppercase">Security Deposit</span>
-                <span className="text-[10px] text-indigo-400 font-medium">{pg.advancedmonth} Month Refundable</span>
+            {/* Secondary Images */}
+            {allImages.slice(1, 5).map((img, idx) => (
+              <div key={idx} className="hidden md:block relative overflow-hidden">
+                <img 
+                  src={img} 
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-500 cursor-zoom-in" 
+                  alt={`Room view ${idx + 2}`}
+                />
               </div>
-              <span className="text-indigo-700 font-black text-sm">₹{ pg.advancedmonth}</span>
-            </div>
-          )}
+            ))}
+            {/* View All Overlay */}
+            <button 
+              onClick={() => navigate(`/allpotos/${id}`)}
+              className="absolute bottom-6 right-6 flex items-center gap-2 bg-white/90 backdrop-blur px-5 py-2.5 rounded-xl shadow-lg hover:bg-white transition-all font-bold text-sm border border-slate-200"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              View All Photos
+            </button>
+          </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-dashed border-slate-200 flex justify-between items-baseline">
-          <span className="text-slate-400 font-black text-[10px] uppercase tracking-widest">Total Value</span>
-         {pg?.category === "Pg" ? (
-  <div className="flex justify-between items-center pt-3 mt-3 border-t border-slate-200">
-   
-    <span className="text-indigo-600 font-black text-lg">
-      ₹{pg.price+pg.advancedmonth}
-    </span>
-  </div>
-) : (
-  <span className="text-xl font-black text-slate-900">
-    ₹
-    {Number(pg.price || 0) +
-      Number(pg.advancedmonth ||  0)}
-  </span>
-)}
-
+        {/* 🟢 CONTENT GRID (Two Column Layout) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           
-        </div>
-      </div>
+          {/* Left Side: Information */}
+          <div className="lg:col-span-8 space-y-10">
+            <div className="bg-white p-2 rounded-3xl">
+               <LeftInformationdescription pg={pg} />
+            </div>
+            
+            {/* Location Bar with Directions */}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+               <div className="flex items-center gap-5">
+                 <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-lg">
+                    <Navigation className="w-7 h-7 text-orange-400" />
+                 </div>
+                 <div>
+                    <h3 className="text-xl font-bold">How to get there?</h3>
+                    <p className="text-slate-400 text-sm">Open in Maps for precise directions to {pg.name}</p>
+                 </div>
+               </div>
+               <button 
 
-      {/* WALLET & FINAL CHECKOUT */}
-      {(() => {
-        
-        const totalRent =pg.services?.length>0?totalServicePrice+ (pg.advancedmonth ? totalServicePrice * pg.advancedmonth : 0):pg.price + (pg.advancedmonth);
-        const maxWalletAllowed = totalRent * 0.1;
-        const walletDiscount = Math.min(user?.walletBalance || 0, maxWalletAllowed);
-        const isWalletApplicable = totalRent > 1 && user?.walletBalance > 0;
-        const finalPayable = totalRent - (useWallet && isWalletApplicable ? walletDiscount : 0);
+               onClick={()=>handleGetDirections(coord)}
 
-        return (
-          <div className="p-4 space-y-4">
-            {isAuthenticated && pg.availabilityStatus === "Available" && isWalletApplicable && (
-              <div 
-                onClick={() => setUseWallet(!useWallet)}
-                className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
-                  useWallet ? "bg-emerald-50 border-emerald-500 shadow-md" : "bg-white border-slate-100"
-                }`}
-              >
-                <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
-                  useWallet ? "bg-emerald-500 border-emerald-500" : "bg-white border-slate-200"
-                }`}>
-                  {useWallet && <Check size={14} className="text-white stroke-[4px]" />}
+               
+               className="w-full md:w-auto px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-orange-900/20 active:scale-95">
+                 Get Directions
+               </button>
+            </div>
+          </div>
+
+          {/* Right Side: Booking Card */}
+          <div className="lg:col-span-4 relative">
+            <div className="lg:sticky lg:top-28">
+              <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden transition-all duration-300 hover:shadow-orange-200/40">
+                <RightInformationdescription pg={pg} />
+                
+                {/* Security Badge */}
+                <div className="bg-slate-50 p-4 flex items-center justify-center gap-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest border-t border-slate-100">
+                  <ShieldCheck className="w-4 h-4 text-green-500" />
+                  Roomgi Safe & Secure Booking
                 </div>
-                <div className="flex-1">
-                  <p className="text-slate-900 font-black text-xs uppercase tracking-tight">Redeem Wallet</p>
-                  <p className="text-[10px] text-slate-500 font-medium">Balance: ₹{user.walletBalance}</p>
-                </div>
-                {useWallet && <span className="text-emerald-600 font-black text-sm">-₹{walletDiscount}</span>}
-              </div>
-            )}
-
-            <div className="bg-slate-900 rounded-3xl p-6 text-white shadow-2xl shadow-indigo-200/50 relative overflow-hidden group">
-              <div className="absolute right-[-10%] top-[-10%] opacity-10 group-hover:rotate-12 transition-transform duration-700">
-                <Sparkles size={100} />
               </div>
               
-              <div className="relative z-10 flex justify-between items-end mb-6">
+              {/* Extra Help Card */}
+              <div className="mt-6 p-6 bg-orange-50/50 rounded-3xl border border-orange-100 flex items-start gap-4">
+                <Info className="w-5 h-5 text-orange-600 mt-1" />
                 <div>
-                  <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Final Amount</p>
-                  <p className="text-3xl font-black tracking-tighter">₹{pg.price+(pg.advancedmonth||0)}</p>
-                </div>
-                <div className="text-right">
-                   <p className="text-[10px] font-bold text-emerald-400">Secure Payment</p>
-                   <ShieldCheck className="ml-auto text-emerald-400" size={20} />
+                  <h4 className="font-bold text-orange-900 text-sm">Need Help?</h4>
+                  <p className="text-xs text-orange-800/70 mt-1 leading-relaxed">Our 24/7 concierge is available to help you with your booking or any property queries.</p>
                 </div>
               </div>
-{isAuthenticated ? (
-  pg.availabilityStatus === "Occupied" ? (
-    <button
-      disabled
-      className="group relative w-full py-4 bg-slate-100 border-2 border-slate-200 text-slate-400 rounded-2xl font-bold text-lg cursor-not-allowed flex items-center justify-center gap-2 overflow-hidden"
-    >
-      <span className="z-10">Currently Occupied</span>
-      {/* Subtle "unavailable" pattern */}
-      <div className="absolute inset-0 opacity-5 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px]" />
-    </button>
-  ) : (
-    <button
-      onClick={() =>
-        handleBook({
-          totalAmount: totalRent,
-          walletUsed: useWallet ? walletDiscount : 0,
-          payableAmount: finalPayable,
-        })
-      }
-      className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-lg transition-all hover:shadow-xl hover:shadow-indigo-200 active:scale-[0.98] flex items-center justify-center gap-2"
-    >
-      Confirm & Pay ₹{finalPayable.toLocaleString()}
-      <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
-    </button>
-  )
-) : (
-  <div className="space-y-3">
-    <button
-      className="w-full py-4 bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 rounded-2xl font-bold text-lg transition-colors flex items-center justify-center gap-2"
-      onClick={() =>navigate("/login")}
-    >
-      Login to Book
-    </button>
-    <p className="text-center text-xs text-slate-500 font-medium">
-      Secure your spot in seconds after signing in.
-    </p>
-  </div>
-)}
             </div>
           </div>
-        );
-      })()}
-    </div>
-  </InfoBlock>
-
-  {/* ================== PREMIUM ACTIONS ================== */}
-  <div className="grid grid-cols-1 gap-3">
-    <ActionBtn 
-      icon={<Phone size={20} />} 
-      label="Contact us" 
-      primary 
-      onClick={() => window.open(`https://wa.me/919693915693`, '_blank')} 
-    />
-    <div className="grid grid-cols-2 gap-3">
-      <ActionBtn icon={<Navigation size={18} />} label="Directions" onClick={handleGetDirections} />
-      <ActionBtn icon={<Share2 size={18} />} label="Share Link" onClick={sharePG} />
-    </div>
-  </div>
-</div>
-
-      </div>
-    </div>
-  );
-}
-
-
-// REUSABLE INFO BLOCK COMPONENT
-function InfoBlock({ title, children, className = "" }) {
-  return (
-    <section
-      className={`
-        bg-white/90 backdrop-blur-xl rounded-3xl border border-orange-100/50 
-        shadow-2xl hover:shadow-3xl hover:-translate-y-1 transition-all duration-500 
-        overflow-hidden group relative ${className}
-        before:absolute before:inset-0 before:bg-gradient-to-r 
-        before:from-orange-500/5 before:to-amber-500/5 
-        before:opacity-0 before:group-hover:opacity-100 before:transition-all
-        before:duration-700
-      `}
-      aria-labelledby={`section-${title?.toLowerCase()?.replace(/\s+/g, "-")}`}
-    >
-      {/* Saffron Top Bar */}
-      <div className="h-2 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-400 shadow-lg" />
-
-      <div className="p-8 lg:p-12 relative z-10">
-        {/* Header - Saffron Style */}
-        <header className="flex items-start lg:items-center justify-between mb-10 pb-6 border-b border-orange-100/50">
-          <div className="flex items-center gap-4">
-            {/* Status Dot */}
-            <div className="w-3 h-3 bg-orange-400 rounded-full shadow-lg animate-pulse hidden lg:block" />
-            
-            {/* Title */}
-            <div className="relative">
-              <h3
-                id={`section-${title?.toLowerCase()?.replace(/\s+/g, "-")}`}
-                className="text-2xl lg:text-3xl font-black bg-gradient-to-r from-gray-900 via-gray-900 to-orange-500 bg-clip-text text-transparent tracking-tight"
-              >
-                {title}
-              </h3>
-              {/* Underline Effect */}
-              <div className="absolute -bottom-2 left-0 w-8 h-1 bg-orange-400 rounded-full opacity-75 group-hover:w-24 transition-all duration-500" />
-            </div>
-          </div>
-
-          {/* Decorative Corner Badge */}
-          <div className="flex w-12 h-12 items-center justify-center rounded-2xl bg-orange-50/80 backdrop-blur-sm text-orange-500 shadow-xl group-hover:scale-110 transition-all duration-500 ml-auto">
-            <Sparkles size={18} />
-          </div>
-        </header>
-
-        {/* Content Area */}
-        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-700">
-          {children}
+          
         </div>
+      </main>
 
-        {/* Subtle Bottom Gradient */}
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-orange-50 to-transparent opacity-80 pointer-events-none" />
-      </div>
-    </section>
+      {/* 🟢 PAYMENT PROCESSING MODAL */}
+      {isConfirmingBooking && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-sm w-full text-center shadow-3xl animate-in zoom-in-95 duration-300">
+            <div className="relative w-20 h-20 mx-auto mb-6">
+              <div className="absolute inset-0 bg-orange-100 rounded-full animate-ping opacity-25"></div>
+              <div className="relative bg-orange-500 rounded-full w-20 h-20 flex items-center justify-center shadow-lg shadow-orange-500/40">
+                <Loader2 className="w-10 h-10 text-white animate-spin" />
+              </div>
+            </div>
+            <h3 className="text-2xl font-black text-slate-900 mb-2">Finalizing...</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">
+              We are verifying your transaction with the bank. Please do not refresh the page.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
-
-
-function ActionBtn({
-  icon,
-  label,
-  primary = false,
-  onClick,
-  disabled = false,
-  loading = false,
-  type = "button",
-}) {
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled || loading}
-      aria-label={label}
-      className={`
-        group relative overflow-hidden flex items-center justify-center gap-4 py-4 px-8 lg:px-10 
-        rounded-3xl font-black text-sm uppercase tracking-wider transition-all duration-400 w-full
-        active:scale-[0.97] focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-500/50
-        shadow-xl hover:shadow-2xl hover:shadow-orange-500/10 before:absolute before:inset-0 
-        before:bg-gradient-to-r before:from-orange-500/0 before:to-orange-500/20 before:-skew-x-12
-        before:opacity-0 before:group-hover:opacity-100 before:transition-all before:duration-500
-        ${
-          disabled || loading 
-            ? "opacity-50 cursor-not-allowed bg-gray-100 border border-gray-200 text-gray-400 shadow-none" 
-            : primary
-              ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 border-2 border-orange-400/50 shadow-orange-500/25"
-              : "bg-white/80 backdrop-blur-sm border-2 border-orange-100/50 text-gray-800 hover:bg-orange-50/50 hover:border-orange-200 hover:text-orange-700 shadow-lg"
-        }
-      `}
-    >
-      {/* Shine Effect */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform -translate-x-[calc(100%+20px)] group-hover:translate-x-0 transition-transform duration-700" />
-      
-      {/* Loading Spinner */}
-      {loading && (
-        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-      )}
-      
-      {/* Icon */}
-      {!loading && (
-        <span
-          className={`flex items-center justify-center transition-all duration-300 ${
-            primary || loading
-              ? "text-white/90 group-hover:text-white drop-shadow-lg"
-              : "text-orange-500 group-hover:scale-110"
-          }`}
-          aria-hidden="true"
-        >
-          {icon}
-        </span>
-      )}
-
-      {/* Label */}
-      <span className="relative z-10 font-bold leading-tight">
-        {loading ? "Processing..." : label}
-      </span>
-    </button>
-  );
-}
-
-
-const InfoItem = ({ label, value }) => (
-  <div className="flex flex-col">
-    <span className="text-sm text-gray-500 font-medium">{label}</span>
-    <p className="text-lg font-semibold text-gray-800 tracking-wide">
-      {value || "—"}
-    </p>
-  </div>
-);
-
-

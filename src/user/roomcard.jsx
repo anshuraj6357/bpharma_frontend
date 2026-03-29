@@ -122,11 +122,13 @@ const RoomCard = memo(function RoomCard({
                     VERIFIED
                   </div>
                 )}
-                <div className="bg-white/90 px-3 py-1.5 rounded-full text-[10px] font-bold">
-                  {room.allowedFor === "Anyone"
-                    ? "👥 MIXED"
-                    : `👩 ${room.allowedFor?.toUpperCase()}`}
-                </div>
+                {room.category !== "Hotel" && (
+                  <div className="bg-white/90 px-3 py-1.5 rounded-full text-[10px] font-bold">
+                    {room.allowedFor === "Anyone"
+                      ? "👥 MIXED"
+                      : `👩 ${room.allowedFor?.toUpperCase() || "N/A"}`}
+                  </div>
+                )}
               </div>
 
               {/* WISHLIST */}
@@ -152,25 +154,25 @@ const RoomCard = memo(function RoomCard({
             {/* CONTENT */}
             <div className="p-5 flex flex-col flex-grow">
               <span className="text-[10px] font-bold text-green-600 uppercase mb-1">
-                {room.category}
+                {room.category || "Hotel"}
               </span>
 
               <h3 className="text-lg font-bold text-slate-900 line-clamp-1">
                 {room.branch?.name}
               </h3>
 
-             <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-4">
-  <MapPin size={12} className="shrink-0 text-slate-400" />
- <span
-  className="truncate text-slate-600 text-xs leading-relaxed"
-  title={`${room.branch?.streetAddress}, ${room.branch?.locationName}, ${room?.city}`}
->
-  {room.branch?.streetAdress }{" "}
-  {room.branch?.locationName },{" "}
-  {room?.city }
-</span>
+              <div className="flex items-center gap-1.5 text-slate-500 text-xs mb-4">
+                <MapPin size={12} className="shrink-0 text-slate-400" />
+                <span
+                  className="truncate text-slate-600 text-xs leading-relaxed"
+                  title={`${room.branch?.streetAddress}, ${room.branch?.locationName}, ${room?.city}`}
+                >
+                  {room.branch?.streetAdress}{" "}
+                  {room.branch?.locationName},{" "}
+                  {room?.city}
+                </span>
 
-</div>
+              </div>
 
 
               {/* AMENITIES */}
@@ -185,40 +187,73 @@ const RoomCard = memo(function RoomCard({
                   {room.furnishedType || "Furnished"}
                 </span>
               </div>
+              {room.category === "Hotel" ? (
+                <div className="mt-auto pt-4 border-t flex justify-between items-center gap-4">
 
-              {/* PRICE */}
-              <div className="mt-auto pt-4 border-t flex justify-between items-center gap-4">
-                <div>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase">
-                    {room.category === "Hotel" ? "Per Night" : "Monthly"}
-                  </p>
+                  {/* HOTEL PRICE */}
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase">
+                      Per Night
+                    </p>
 
-                  <p className="text-sm font-black text-gray-900">
-                    ₹{room.price}
-                    <span className="text-[10px] text-gray-500">
-                      /{room.category === "Hotel" ? "night" : "mo"}
+                    <p className="text-sm font-black text-gray-900">
+                      ₹{room.base_price}
+                      <span className="text-[10px] text-gray-500">/night</span>
+                    </p>
+
+                    <span className="text-[8px] text-blue-600 font-bold uppercase">
+                      Max {room.max_adults} Adults • {room.max_children} Children
                     </span>
-                  </p>
+                  </div>
 
-                  {room.category === "Pg" && (
-                    <span className="text-[8px] text-emerald-600 font-bold uppercase">
-                      Incl. Services
-                    </span>
-                  )}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goToDetail(room._id);
+                    }}
+                    className="flex-grow bg-slate-900 text-white py-3 rounded-xl font-bold text-sm 
+                 hover:bg-green-600 transition-all flex items-center justify-center gap-2"
+                  >
+                    View Details
+                    <ArrowRight size={16} />
+                  </button>
                 </div>
+              ) : (
+                <div className="mt-auto pt-4 border-t flex justify-between items-center gap-4">
 
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goToDetail(room._id);
-                  }}
-                  className="flex-grow bg-slate-900 text-white py-3 rounded-xl font-bold text-sm 
-                             hover:bg-green-600 transition-all flex items-center justify-center gap-2"
-                >
-                  View Details
-                  <ArrowRight size={16} />
-                </button>
-              </div>
+                  {/* PG / RENT PRICE */}
+                  <div>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase">
+                      Monthly
+                    </p>
+
+                    <p className="text-sm font-black text-gray-900">
+                      ₹{room.price}
+                      <span className="text-[10px] text-gray-500">/mo</span>
+                    </p>
+
+                    {room.category === "Pg" && (
+                      <span className="text-[8px] text-emerald-600 font-bold uppercase">
+                        Incl. Services
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goToDetail(room._id);
+                    }}
+                    className="flex-grow bg-slate-900 text-white py-3 rounded-xl font-bold text-sm 
+                 hover:bg-green-600 transition-all flex items-center justify-center gap-2"
+                  >
+                    View Details
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+              )}
+
+
             </div>
           </article>
         );
